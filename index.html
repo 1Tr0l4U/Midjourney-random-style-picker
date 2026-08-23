@@ -1058,11 +1058,12 @@ const SrefApp = (function(){
     const el = document.getElementById('sref-summary');
     const userCount = Object.keys(data).length;
     const srefCount = Object.values(data).flat().length;
-    if(!srefCount){
+    const moodboardCount = Object.values(moodboardData).flat().length;
+    if(!srefCount && !moodboardCount){
       el.textContent = '';
       return;
     }
-    el.textContent = `The collection contains ${srefCount} sref${srefCount===1?'':'s'} provided by ${userCount} user${userCount===1?'':'s'}`;
+    el.textContent = `The collection contains ${srefCount} sref${srefCount===1?'':'s'} and ${moodboardCount} moodboard${moodboardCount===1?'':'s'}, provided by ${userCount} user${userCount===1?'':'s'}`;
   }
 
   function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
