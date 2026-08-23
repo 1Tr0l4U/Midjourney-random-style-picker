@@ -182,8 +182,44 @@ input.field95, textarea.field95, select.field95{
   gap:14px;
   padding:2px 8px;
   font-size:12px;
+  position:relative;
 }
 .menubar span{cursor:default}
+.menu-item{
+  cursor:pointer;
+  position:relative;
+  padding:1px 4px;
+}
+.menu-item:hover{background:var(--titlebar1);color:#fff}
+.file-dropdown{
+  display:none;
+  position:absolute;
+  top:100%;left:0;
+  min-width:220px;
+  background:var(--gray);
+  color:#000;
+  box-shadow:2px 2px 6px rgba(0,0,0,.5);
+  border-top:2px solid var(--gray-light);
+  border-left:2px solid var(--gray-light);
+  border-right:2px solid var(--gray-darker);
+  border-bottom:2px solid var(--gray-darker);
+  padding:6px;
+  z-index:30;
+  font-weight:normal;
+}
+.file-dropdown.show{display:block}
+.file-dropdown-status{
+  font-size:11px;font-weight:bold;padding:4px 6px;white-space:normal;
+}
+.file-dropdown-sep{
+  border-top:1px solid var(--gray-darker);
+  border-bottom:1px solid var(--gray-light);
+  margin:4px 2px;
+}
+.file-dropdown-item{
+  font-size:12px;padding:5px 6px;cursor:pointer;
+}
+.file-dropdown-item:hover{background:var(--titlebar1);color:#fff}
 .window-body{
   background:var(--gray);
   padding:10px;
@@ -535,15 +571,18 @@ input.field95, textarea.field95, select.field95{
         <div class="tbtn" onclick="OS.close('sref')">✕</div>
       </div>
     </div>
-    <div class="menubar"><span>File</span><span>Edit</span><span>View</span><span>Help</span></div>
+    <div class="menubar">
+      <span class="menu-item" onclick="SrefApp.toggleFileMenu(event)">
+        File
+        <div class="file-dropdown" id="sref-file-dropdown">
+          <div class="file-dropdown-item" onclick="SrefApp.loadRemoteData()">🔄 Click to reload the data</div>
+        </div>
+      </span>
+      <span>Edit</span><span>View</span><span>Help</span>
+    </div>
     <div class="window-body">
 
-      <div class="sref-card">
-        <label><b>Import Sref File</b></label><br>
-        <div class="sref-small">username: then comma separated Sref URLs/codes, one block per user.</div>
-        <input type="file" id="sref-fileInput" class="field95" style="margin-top:6px;width:100%">
-        <div id="sref-summary" class="sref-small" style="margin-top:6px;font-weight:bold"></div>
-      </div>
+      <div id="sref-summary" class="sref-small" style="font-weight:bold;margin-bottom:8px">Loading…</div>
 
       <div class="sref-tabs">
         <div class="sref-tab active" onclick="SrefApp.switchTab(0)">Random Sref / Moodboard</div>
@@ -976,11 +1015,28 @@ const SrefApp = (function(){
     });
   }
 
-  document.getElementById('sref-fileInput').addEventListener('change', e=>{
-    const r = new FileReader();
-    r.onload = ()=> parseFile(r.result);
-    r.readAsText(e.target.files[0]);
+  function toggleFileMenu(e){
+    e.stopPropagation();
+    document.getElementById('sref-file-dropdown').classList.toggle('show');
+  }
+  document.addEventListener('click', ()=>{
+    document.getElementById('sref-file-dropdown').classList.remove('show');
   });
+
+  const DATA_URL = 'https://raw.githubusercontent.com/1Tr0l4U/Midjourney-random-style-picker/main/community-srefs-moodboards.txt';
+
+  async function loadRemoteData(){
+    const el = document.getElementById('sref-summary');
+    el.textContent = 'Loading…';
+    try{
+      const res = await fetch(DATA_URL, { cache: 'no-store' });
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const text = await res.text();
+      parseFile(text);
+    } catch(err){
+      el.textContent = 'Could not load community data (' + err.message + '). Try Reload Data.';
+    }
+  }
 
   function parseFile(text){
     data = {}; moodboardData = {}; let u = null;
@@ -1345,8 +1401,9 @@ const SrefApp = (function(){
 
   buildWeights();
   refreshToggles();
+  loadRemoteData();
 
-  return {switchTab, copy, buildWeights, dynamicGenerate, closeLightbox, randomCombined, updateSourceToggles, refreshToggles};
+  return {switchTab, copy, buildWeights, dynamicGenerate, closeLightbox, randomCombined, updateSourceToggles, refreshToggles, loadRemoteData, toggleFileMenu};
 })();
 
 /* =====================================================
