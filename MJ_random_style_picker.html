@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PromptOS 95</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root{
+  --gray:#c0c0c0;
+  --gray-dark:#808080;
+  --gray-darker:#404040;
+  --gray-light:#dfdfdf;
+  --white:#ffffff;
+  --black:#000000;
+  --titlebar1:#000080;
+  --titlebar2:#1084d0;
+  --titlebar-inactive1:#7f7f7f;
+  --titlebar-inactive2:#a0a0a0;
+  --teal:#008080;
+  --accent:#000080;
+}
+*{box-sizing:border-box;user-select:none}
+html,body{height:100%;margin:0}
+body{
+  font-family:Tahoma,"Segoe UI",Verdana,sans-serif;
+  font-size:12px;
+  background:var(--teal);
+  overflow:hidden;
+  color:#000;
+  cursor:default;
+}
+
+/* ---------- desktop ---------- */
+#desktop{
+  position:relative;
+  width:100%;
+  height:calc(100vh - 34px);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255,255,255,0.05), transparent 40%),
+    var(--teal);
+  overflow:hidden;
+}
+
+.icon{
+  position:absolute;
+  width:76px;
+  height:78px;
+  padding:6px 2px;
+  text-align:center;
+  border:1px dotted transparent;
+  cursor:pointer;
+}
+.icon:focus,.icon.selected{
+  border:1px dotted #fff;
+  background:rgba(0,0,80,0.25);
+}
+.icon .glyph{
+  width:38px;height:38px;margin:0 auto 4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;
+  filter:drop-shadow(1px 1px 0 rgba(0,0,0,.5));
+}
+.icon .label{
+  color:#fff;
+  font-size:11px;
+  line-height:13px;
+  text-shadow:1px 1px 1px #000;
+  word-wrap:break-word;
+}
+
+/* ---------- windows 95 bevel helpers ---------- */
+.raised{
+  border-top:2px solid var(--gray-light);
+  border-left:2px solid var(--gray-light);
+  border-right:2px solid var(--gray-darker);
+  border-bottom:2px solid var(--gray-darker);
+  background:var(--gray);
+}
+.sunken{
+  border-top:2px solid var(--gray-darker);
+  border-left:2px solid var(--gray-darker);
+  border-right:2px solid var(--gray-light);
+  border-bottom:2px solid var(--gray-light);
+}
+.btn95{
+  background:var(--gray);
+  border-top:2px solid var(--gray-light);
+  border-left:2px solid var(--gray-light);
+  border-right:2px solid var(--gray-darker);
+  border-bottom:2px solid var(--gray-darker);
+  padding:4px 10px;
+  font-family:inherit;
+  font-size:12px;
+  cursor:pointer;
+  color:#000;
+}
+.btn95:active{
+  border-top:2px solid var(--gray-darker);
+  border-left:2px solid var(--gray-darker);
+  border-right:2px solid var(--gray-light);
+  border-bottom:2px solid var(--gray-light);
+  padding:5px 9px 3px 11px;
+}
+input.field95, textarea.field95, select.field95{
+  border-top:2px solid var(--gray-darker);
+  border-left:2px solid var(--gray-darker);
+  border-right:2px solid var(--gray-light);
+  border-bottom:2px solid var(--gray-light);
+  background:#fff;
+  padding:4px 6px;
+  font-family:inherit;
+  font-size:12px;
+  color:#000;
+}
+
+/* ---------- window ---------- */
+.window{
+  position:absolute;
+  min-width:260px;
+  box-shadow:2px 3px 10px rgba(0,0,0,.5);
+  display:flex;
+  flex-direction:column;
+}
+.window.hidden{display:none}
+.resize-handle{
+  position:absolute;
+  right:0;bottom:0;
+  width:16px;height:16px;
+  cursor:nwse-resize;
+  background:
+    linear-gradient(135deg, transparent 0 50%, var(--gray-darker) 50% 55%, transparent 55% 65%, var(--gray-darker) 65% 70%, transparent 70% 80%, var(--gray-darker) 80% 85%, transparent 85%);
+  z-index:5;
+}
+.titlebar{
+  background:linear-gradient(90deg,var(--titlebar1),var(--titlebar2));
+  color:#fff;
+  display:flex;
+  align-items:center;
+  padding:3px 3px 3px 6px;
+  font-weight:bold;
+  font-size:12px;
+  cursor:default;
+  letter-spacing:.2px;
+}
+.window.inactive .titlebar{
+  background:linear-gradient(90deg,var(--titlebar-inactive1),var(--titlebar-inactive2));
+}
+.titlebar .ttitle{
+  flex:1;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+.titlebar .tbtns{display:flex;gap:2px}
+.tbtn{
+  width:18px;height:16px;
+  background:var(--gray);
+  border-top:1px solid var(--gray-light);
+  border-left:1px solid var(--gray-light);
+  border-right:1px solid var(--gray-darker);
+  border-bottom:1px solid var(--gray-darker);
+  font-size:10px;
+  line-height:14px;
+  text-align:center;
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
+}
+.tbtn:active{
+  border-top:1px solid var(--gray-darker);
+  border-left:1px solid var(--gray-darker);
+  border-right:1px solid var(--gray-light);
+  border-bottom:1px solid var(--gray-light);
+}
+.menubar{
+  background:var(--gray);
+  border-bottom:1px solid var(--gray-dark);
+  display:flex;
+  gap:14px;
+  padding:2px 8px;
+  font-size:12px;
+}
+.menubar span{cursor:default}
+.window-body{
+  background:var(--gray);
+  padding:10px;
+  overflow:auto;
+  flex:1;
+}
+.statusbar{
+  background:var(--gray);
+  border-top:1px solid var(--gray-light);
+  padding:2px 6px;
+  font-size:11px;
+  color:#333;
+}
+
+/* ---------- taskbar ---------- */
+#taskbar{
+  position:fixed;
+  left:0;bottom:0;right:0;
+  height:34px;
+  background:var(--gray);
+  border-top:2px solid var(--gray-light);
+  display:flex;
+  align-items:center;
+  padding:3px 4px;
+  gap:6px;
+  z-index:9999;
+}
+#startBtn{
+  display:flex;align-items:center;gap:5px;
+  font-weight:bold;
+  padding:4px 10px 4px 6px;
+  font-size:13px;
+}
+#startBtn .g{font-size:15px}
+#startBtn.pressed{
+  border-top:2px solid var(--gray-darker);
+  border-left:2px solid var(--gray-darker);
+  border-right:2px solid var(--gray-light);
+  border-bottom:2px solid var(--gray-light);
+}
+#taskDivider{
+  width:2px;height:24px;
+  border-left:1px solid var(--gray-darker);
+  border-right:1px solid var(--gray-light);
+}
+#taskItems{
+  flex:1;display:flex;gap:4px;height:100%;align-items:center;overflow:hidden;
+}
+.taskitem{
+  height:26px;
+  min-width:130px;
+  max-width:180px;
+  display:flex;align-items:center;gap:5px;
+  padding:0 8px;
+  font-size:12px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+.taskitem.active{
+  border-top:2px solid var(--gray-darker) !important;
+  border-left:2px solid var(--gray-darker) !important;
+  border-right:2px solid var(--gray-light) !important;
+  border-bottom:2px solid var(--gray-light) !important;
+  background:#b6b6b6;
+}
+#clock{
+  border-top:2px solid var(--gray-darker);
+  border-left:2px solid var(--gray-darker);
+  border-right:2px solid var(--gray-light);
+  border-bottom:2px solid var(--gray-light);
+  padding:5px 10px;
+  font-size:12px;
+}
+
+/* ---------- start menu ---------- */
+#startMenu{
+  position:fixed;
+  left:2px;
+  bottom:36px;
+  width:230px;
+  display:flex;
+  box-shadow:2px 2px 8px rgba(0,0,0,.5);
+  z-index:10000;
+}
+#startMenu.hidden{display:none}
+#startMenu .sidebar{
+  width:26px;
+  background:linear-gradient(180deg,#000080,#1084d0);
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding-bottom:10px;
+}
+#startMenu .sidebar span{
+  writing-mode:vertical-rl;
+  transform:rotate(180deg);
+  color:#fff;
+  font-weight:bold;
+  font-size:15px;
+  letter-spacing:2px;
+}
+#startMenu .items{flex:1;background:var(--gray);padding:2px}
+.startitem{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 10px;
+  font-size:12px;
+  cursor:pointer;
+}
+.startitem:hover{background:var(--titlebar1);color:#fff}
+.startitem .g{font-size:17px;width:20px;text-align:center}
+.startsep{
+  border-top:1px solid var(--gray-darker);
+  border-bottom:1px solid var(--gray-light);
+  margin:3px 4px;
+}
+
+/* ---------- scoped app styles ---------- */
+.sref-tabs{display:flex;gap:4px;margin-bottom:8px}
+.sref-tab{
+  flex:1;padding:6px;text-align:center;cursor:pointer;font-size:11px;
+  background:var(--gray);
+  border-top:2px solid var(--gray-light);
+  border-left:2px solid var(--gray-light);
+  border-right:2px solid var(--gray-darker);
+  border-bottom:2px solid var(--gray-darker);
+}
+.sref-tab.active{
+  background:#b6b6b6;
+  border-top:2px solid var(--gray-darker);
+  border-left:2px solid var(--gray-darker);
+  border-right:2px solid var(--gray-light);
+  border-bottom:2px solid var(--gray-light);
+}
+.sref-card{background:var(--gray);padding:10px;margin-bottom:10px}
+.sref-card textarea{width:100%;min-height:50px;resize:vertical}
+.sref-toggle-row{
+  display:flex;align-items:center;gap:5px;font-size:11px;color:#222;cursor:pointer;
+}
+.sref-toggle-row input[type="checkbox"]{
+  width:auto;flex-shrink:0;margin:0;cursor:pointer;
+}
+.sref-toggle-row.disabled{
+  opacity:.5;cursor:not-allowed;
+}
+.sref-toggle-row.disabled input[type="checkbox"]{
+  cursor:not-allowed;
+}
+.sref-usertoggle-row{
+  display:flex;align-items:center;gap:16px;margin-top:4px;
+}
+.sref-usertoggle-row .sref-toggle-row{
+  flex:1;min-width:180px;
+}
+.sref-source-row{
+  display:flex;gap:18px;margin-top:8px;flex-wrap:wrap;
+}
+.sref-source-row label{
+  font-size:12px;font-weight:bold;display:flex;align-items:center;gap:6px;cursor:pointer;
+}
+.sref-source-row input[type="checkbox"]{
+  width:auto;margin:0;cursor:pointer;
+}
+.sref-source-section{
+  display:flex;flex-direction:column;gap:0;
+}
+.sref-source-section > label:first-child{
+  font-size:12px;font-weight:bold;display:flex;align-items:center;gap:6px;cursor:pointer;
+}
+.sref-source-section > label:first-child input[type="checkbox"]{
+  width:auto;margin:0;cursor:pointer;
+}
+.sref-source-section > label:first-child span{
+  transition:opacity .15s;
+}
+.sref-source-section > label:first-child span.sref-faded{
+  opacity:.45;
+}
+.sref-source-inner{
+  transition:opacity .15s;
+}
+.sref-source-inner.sref-section-disabled{
+  opacity:.45;pointer-events:none;
+}
+.sref-count-row{
+  display:flex;gap:16px;flex-wrap:wrap;
+}
+.sref-count-row .sref-source-section{
+  flex:1;min-width:180px;
+}
+.sref-out{
+  margin-top:10px;padding:8px;background:#fff;
+  border-top:2px solid var(--gray-darker);border-left:2px solid var(--gray-darker);
+  border-right:2px solid var(--gray-light);border-bottom:2px solid var(--gray-light);
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  word-break:break-all;font-size:11px;
+}
+.sref-out span{
+  user-select:text;
+  cursor:text;
+  flex:1;
+}
+.sref-out .btn95{
+  flex-shrink:0;
+  white-space:nowrap;
+}
+.sref-out.copied{background:#d4f7d4}
+.sref-weight-row{display:flex;gap:6px;margin-top:6px}
+.sref-weight-row input{flex:1}
+.sref-small{font-size:11px;color:#333;margin-top:4px}
+.sref-image-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.sref-image-box{
+  width:120px;height:120px;background:#fff;
+  border-top:2px solid var(--gray-darker);border-left:2px solid var(--gray-darker);
+  border-right:2px solid var(--gray-light);border-bottom:2px solid var(--gray-light);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  cursor:pointer;
+}
+.sref-image-box:hover{outline:2px solid var(--titlebar1)}
+.sref-moodboard-box{width:150px;height:150px}
+.sref-moodboard-tile{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;padding:8px;text-align:center;width:100%;height:100%;
+}
+.sref-moodboard-icon{font-size:32px}
+.sref-moodboard-code{
+  font-size:10px;color:#333;word-break:break-all;font-family:"Courier New",monospace;
+}
+.sref-moodboard-open{
+  font-size:11px;font-weight:bold;color:var(--titlebar1);margin-top:2px;
+}
+.sref-image-box img{max-width:100%;max-height:100%;object-fit:contain}
+.sref-image-box img.loading{opacity:0;position:absolute}
+.sref-image-box{position:relative}
+.sref-spinner{
+  width:20px;height:20px;border-radius:50%;
+  border:3px solid var(--gray-darker);
+  border-top-color:transparent;
+  animation:sref-spin .7s linear infinite;
+}
+@keyframes sref-spin{to{transform:rotate(360deg)}}
+.sref-img-error{font-size:11px;font-weight:bold;text-align:center;padding:6px;color:#333}
+.sref-image-title{
+  width:100%;font-size:12px;font-weight:bold;margin-bottom:4px;color:#000;
+}
+.sref-tile-group{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.sref-tile-caption{
+  font-size:10px;font-weight:bold;color:#000;text-align:center;
+  max-width:120px;word-break:break-word;
+}
+.sref-label{font-weight:bold;font-size:11px;display:block;margin-top:6px}
+
+#notesArea{
+  width:100%;height:100%;min-height:220px;
+  border:none;outline:none;resize:none;
+  font-family:"Courier New",monospace;font-size:13px;
+  padding:6px;
+}
+
+#paintCanvas{background:#fff;cursor:crosshair;display:block}
+.paint-toolbar{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.swatch{
+  width:18px;height:18px;border:1px solid #000;cursor:pointer;
+}
+.swatch.selected{outline:2px solid #fff;box-shadow:0 0 0 3px #000}
+
+.mycomp-list, .bin-list{width:100%;border-collapse:collapse;font-size:12px}
+.mycomp-list td, .bin-list td{padding:6px 8px;border-bottom:1px solid #b0b0b0}
+.mycomp-list tr:hover, .bin-list tr:hover{background:#e6e6ff}
+
+/* shutdown screen */
+#shutdownScreen{
+  position:fixed;inset:0;background:#000;color:#fff;
+  display:none;align-items:center;justify-content:center;
+  flex-direction:column;gap:16px;z-index:99999;font-size:16px;text-align:center;
+}
+#shutdownScreen.show{display:flex}
+#shutdownScreen .btn95{color:#000}
+
+/* lightbox for enlarged style-reference images */
+#srefLightbox{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:none;align-items:center;justify-content:center;
+  z-index:100000;
+}
+#srefLightbox.show{display:flex}
+#srefLightbox .lb-window{
+  max-width:min(90vw,700px);
+  max-height:85vh;
+  display:flex;flex-direction:column;
+}
+#srefLightbox .lb-body{
+  background:#fff;
+  padding:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:auto;
+}
+#srefLightbox .lb-body img{
+  max-width:100%;
+  max-height:70vh;
+  object-fit:contain;
+  display:block;
+}
+#srefLightbox .lb-error{
+  font-size:16px;font-weight:bold;padding:30px;color:#333;
+}
+</style>
+</head>
+<body>
+
+<div id="desktop">
+
+  <div class="icon" style="left:18px; top:18px" ondblclick="OS.open('sref')">
+    <div class="glyph">🔗</div>
+    <div class="label">Random Style<br>Picker</div>
+  </div>
+
+  <div class="icon" style="left:18px; top:118px" ondblclick="OS.open('mycomputer')">
+    <div class="glyph">🖥️</div>
+    <div class="label">My Computer</div>
+  </div>
+
+  <div class="icon" style="left:18px; top:218px" ondblclick="OS.open('notes')">
+    <div class="glyph">📝</div>
+    <div class="label">Notes.txt</div>
+  </div>
+
+  <div class="icon" style="left:18px; top:318px" ondblclick="OS.open('paint')">
+    <div class="glyph">🎨</div>
+    <div class="label">Paint</div>
+  </div>
+
+  <div class="icon" style="left:18px; top:418px" ondblclick="OS.open('bin')">
+    <div class="glyph">🗑️</div>
+    <div class="label">Recycle Bin</div>
+  </div>
+
+  <!-- ============ WINDOW: Random Style Picker ============ -->
+  <div class="window raised hidden" id="win-sref" data-default-width="560" data-default-height="560" style="left:120px; top:40px; width:560px; height:560px;">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'sref')">
+      <div class="ttitle"><span>🔗</span><span>Random Style Picker</span></div>
+      <div class="tbtns">
+        <div class="tbtn" onclick="OS.minimize('sref')">_</div>
+        <div class="tbtn" onclick="OS.toggleMax('sref')">□</div>
+        <div class="tbtn" onclick="OS.close('sref')">✕</div>
+      </div>
+    </div>
+    <div class="menubar"><span>File</span><span>Edit</span><span>View</span><span>Help</span></div>
+    <div class="window-body">
+
+      <div class="sref-card">
+        <label><b>Import Sref File</b></label><br>
+        <div class="sref-small">username: then comma separated Sref URLs/codes, one block per user.</div>
+        <input type="file" id="sref-fileInput" class="field95" style="margin-top:6px;width:100%">
+        <div id="sref-summary" class="sref-small" style="margin-top:6px;font-weight:bold"></div>
+      </div>
+
+      <div class="sref-tabs">
+        <div class="sref-tab active" onclick="SrefApp.switchTab(0)">Random Sref / Moodboard</div>
+        <div class="sref-tab" onclick="SrefApp.switchTab(1)">Random Sref Weights</div>
+      </div>
+
+      <div class="sref-card sref-tabContent">
+        <div class="sref-count-row">
+          <div class="sref-source-section">
+            <label><input type="checkbox" id="sref-includeSref" checked onchange="SrefApp.updateSourceToggles('sref')"> <span id="sref-includeSref-text">Srefs</span></label>
+            <div id="sref-section-sref" class="sref-source-inner">
+              <label class="sref-label">Number of Srefs</label>
+              <select id="sref-urlCount1" class="field95" onchange="SrefApp.refreshToggles()">
+                <option selected>1</option><option>2</option><option>3</option><option>4</option>
+                <option>5</option><option>6</option><option>7</option><option>8</option>
+                <option>9</option><option>10</option><option>11</option><option>12</option>
+                <option>13</option><option>14</option><option>15</option><option>16</option>
+                <option>17</option><option>18</option><option>19</option><option>20</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="sref-source-section">
+            <label><input type="checkbox" id="sref-includeMoodboard" onchange="SrefApp.updateSourceToggles('moodboard')"> <span id="sref-includeMoodboard-text">Moodboards</span></label>
+            <div id="sref-section-moodboard" class="sref-source-inner sref-section-disabled">
+              <label class="sref-label">Number of Moodboards</label>
+              <select id="sref-moodboardCount" class="field95" onchange="SrefApp.refreshToggles()">
+                <option selected>1</option><option>2</option><option>3</option><option>4</option>
+                <option>5</option><option>6</option><option>7</option><option>8</option>
+                <option>9</option><option>10</option><option>11</option><option>12</option>
+                <option>13</option><option>14</option><option>15</option><option>16</option>
+                <option>17</option><option>18</option><option>19</option><option>20</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="sref-small" style="margin-top:10px">Pick a random user first, then a random sref/moodboard from that user (otherwise picks from the whole collection, which may favor users with more data):</div>
+        <div class="sref-usertoggle-row">
+          <label class="sref-toggle-row" id="sref-toggle-row1">
+            <input type="checkbox" id="sref-userToggle1">
+          </label>
+          <label class="sref-toggle-row" id="sref-toggle-row2">
+            <input type="checkbox" id="sref-userToggle2">
+          </label>
+        </div>
+
+        <label class="sref-label">Prompt</label>
+        <textarea id="sref-prompt1" class="field95"></textarea>
+
+        <div style="margin-top:8px"><button class="btn95" onclick="SrefApp.randomCombined()">Generate</button></div>
+        <div id="sref-out1"></div>
+      </div>
+
+      <div class="sref-card sref-tabContent" style="display:none">
+        <label class="sref-label">Number of Srefs</label>
+        <select id="sref-urlCount" class="field95" onchange="SrefApp.buildWeights()">
+          <option>1</option><option>2</option><option selected>3</option>
+          <option>4</option><option>5</option><option>6</option>
+          <option>7</option><option>8</option><option>9</option><option>10</option>
+          <option>11</option><option>12</option><option>13</option><option>14</option>
+          <option>15</option><option>16</option><option>17</option><option>18</option>
+          <option>19</option><option>20</option>
+        </select>
+
+        <div id="sref-weights"></div>
+
+        <div class="sref-toggle-row" id="sref-toggle-row3" style="margin-top:8px">
+          <input type="checkbox" id="sref-userToggle3">
+          <label for="sref-userToggle3">Pick a random user first, then a random sref from that user for each one (otherwise picks from the whole collection, which may favor users with more data)</label>
+        </div>
+
+        <label class="sref-label">Prompt</label>
+        <textarea id="sref-prompt3" class="field95"></textarea>
+
+        <div style="margin-top:8px"><button class="btn95" onclick="SrefApp.dynamicGenerate()">Generate</button></div>
+        <div id="sref-out3"></div>
+      </div>
+
+      <div class="sref-card">
+        <label class="sref-label" id="sref-output-label">🖼 Style Reference</label>
+        <div id="sref-imageOutput" class="sref-image-grid"></div>
+      </div>
+
+    </div>
+    <div class="statusbar">Ready</div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'sref')"></div>
+  </div>
+
+  <!-- ============ WINDOW: My Computer ============ -->
+  <div class="window raised hidden" id="win-mycomputer" data-default-width="420" data-default-height="320" style="left:200px; top:80px; width:420px; height:320px;">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'mycomputer')">
+      <div class="ttitle"><span>🖥️</span><span>My Computer</span></div>
+      <div class="tbtns">
+        <div class="tbtn" onclick="OS.minimize('mycomputer')">_</div>
+        <div class="tbtn" onclick="OS.toggleMax('mycomputer')">□</div>
+        <div class="tbtn" onclick="OS.close('mycomputer')">✕</div>
+      </div>
+    </div>
+    <div class="menubar"><span>File</span><span>Edit</span><span>View</span><span>Help</span></div>
+    <div class="window-body">
+      <table class="mycomp-list">
+        <tr><td>💾</td><td>3½ Floppy (A:)</td></tr>
+        <tr><td>💽</td><td>Local Disk (C:)</td></tr>
+        <tr><td>💿</td><td>CD-ROM (D:)</td></tr>
+        <tr><td>📁</td><td>My Programs <span class="sref-small">(empty — add your own later)</span></td></tr>
+        <tr><td>🔗</td><td>Random Style Picker.exe</td></tr>
+      </table>
+    </div>
+    <div class="statusbar">5 object(s) | Free space: 512 MB</div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'mycomputer')"></div>
+  </div>
+
+  <!-- ============ WINDOW: Notes ============ -->
+  <div class="window raised hidden" id="win-notes" data-default-width="380" data-default-height="300" style="left:260px; top:120px; width:380px; height:300px;">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'notes')">
+      <div class="ttitle"><span>📝</span><span>Notes.txt - Notepad</span></div>
+      <div class="tbtns">
+        <div class="tbtn" onclick="OS.minimize('notes')">_</div>
+        <div class="tbtn" onclick="OS.toggleMax('notes')">□</div>
+        <div class="tbtn" onclick="OS.close('notes')">✕</div>
+      </div>
+    </div>
+    <div class="menubar"><span>File</span><span>Edit</span><span>Format</span><span>Help</span></div>
+    <div class="window-body sunken" style="padding:0;background:#fff">
+      <textarea id="notesArea" placeholder="Type your notes here...">=====================================================
+NOTES
+=====================================================
+- This is your desktop. Double-click icons to open them.
+- Drag windows by their title bar.
+- Add your own programs / icons here later!
+</textarea>
+    </div>
+    <div class="statusbar">Ln 1, Col 1</div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'notes')"></div>
+  </div>
+
+  <!-- ============ WINDOW: Paint ============ -->
+  <div class="window raised hidden" id="win-paint" data-default-width="460" data-default-height="420" style="left:300px; top:60px; width:460px; height:420px;">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'paint')">
+      <div class="ttitle"><span>🎨</span><span>untitled - Paint</span></div>
+      <div class="tbtns">
+        <div class="tbtn" onclick="OS.minimize('paint')">_</div>
+        <div class="tbtn" onclick="OS.toggleMax('paint')">□</div>
+        <div class="tbtn" onclick="OS.close('paint')">✕</div>
+      </div>
+    </div>
+    <div class="menubar"><span>File</span><span>Edit</span><span>View</span><span>Image</span><span>Help</span></div>
+    <div class="window-body">
+      <div class="paint-toolbar">
+        <span class="sref-small">Color:</span>
+        <div class="swatch selected" style="background:#000000" onclick="PaintApp.setColor('#000000',this)"></div>
+        <div class="swatch" style="background:#808080" onclick="PaintApp.setColor('#808080',this)"></div>
+        <div class="swatch" style="background:#ff0000" onclick="PaintApp.setColor('#ff0000',this)"></div>
+        <div class="swatch" style="background:#ffa500" onclick="PaintApp.setColor('#ffa500',this)"></div>
+        <div class="swatch" style="background:#ffff00" onclick="PaintApp.setColor('#ffff00',this)"></div>
+        <div class="swatch" style="background:#008000" onclick="PaintApp.setColor('#008000',this)"></div>
+        <div class="swatch" style="background:#00ffff" onclick="PaintApp.setColor('#00ffff',this)"></div>
+        <div class="swatch" style="background:#0000ff" onclick="PaintApp.setColor('#0000ff',this)"></div>
+        <div class="swatch" style="background:#800080" onclick="PaintApp.setColor('#800080',this)"></div>
+        <div class="swatch" style="background:#ffffff;border:1px solid #808080" onclick="PaintApp.setColor('#ffffff',this)"></div>
+        <span class="sref-small">Size:</span>
+        <select id="paintSize" class="field95" onchange="PaintApp.setSize(this.value)">
+          <option value="1">1px</option>
+          <option value="2" selected>2px</option>
+          <option value="4">4px</option>
+          <option value="8">8px</option>
+        </select>
+        <button class="btn95" onclick="PaintApp.clear()">Clear</button>
+      </div>
+      <canvas id="paintCanvas" class="sunken" width="420" height="250"></canvas>
+    </div>
+    <div class="statusbar">Ready</div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'paint')"></div>
+  </div>
+
+  <!-- ============ WINDOW: Recycle Bin ============ -->
+  <div class="window raised hidden" id="win-bin" data-default-width="400" data-default-height="280" style="left:340px; top:140px; width:400px; height:280px;">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'bin')">
+      <div class="ttitle"><span>🗑️</span><span>Recycle Bin</span></div>
+      <div class="tbtns">
+        <div class="tbtn" onclick="OS.minimize('bin')">_</div>
+        <div class="tbtn" onclick="OS.toggleMax('bin')">□</div>
+        <div class="tbtn" onclick="OS.close('bin')">✕</div>
+      </div>
+    </div>
+    <div class="menubar"><span>File</span><span>Edit</span><span>View</span><span>Help</span></div>
+    <div class="window-body">
+      <table class="bin-list" id="binList">
+        <tr><td>📄</td><td>old_prompt_ideas.txt (2 KB)</td></tr>
+        <tr><td>📄</td><td>unused_style_ref.png (1.1 MB)</td></tr>
+        <tr><td>📄</td><td>draft_v1_backup.zip (4.8 MB)</td></tr>
+      </table>
+      <div style="margin-top:10px"><button class="btn95" onclick="OS.emptyBin()">🗑️ Empty Recycle Bin</button></div>
+    </div>
+    <div class="statusbar">Deleted items — safe to purge</div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'bin')"></div>
+  </div>
+
+</div>
+
+<!-- ---------- taskbar ---------- -->
+<div id="taskbar">
+  <div id="startBtn" class="btn95" onclick="OS.toggleStart(event)"><span class="g">🪟</span>Start</div>
+  <div id="taskDivider"></div>
+  <div id="taskItems"></div>
+  <div id="clock">12:00 PM</div>
+</div>
+
+<div id="startMenu" class="hidden raised">
+  <div class="sidebar"><span>PROMPT OS</span></div>
+  <div class="items">
+    <div class="startitem" onclick="OS.open('sref');OS.closeStart()"><span class="g">🔗</span>Random Style Picker</div>
+    <div class="startitem" onclick="OS.open('mycomputer');OS.closeStart()"><span class="g">🖥️</span>My Computer</div>
+    <div class="startitem" onclick="OS.open('notes');OS.closeStart()"><span class="g">📝</span>Notes</div>
+    <div class="startitem" onclick="OS.open('paint');OS.closeStart()"><span class="g">🎨</span>Paint</div>
+    <div class="startitem" onclick="OS.open('bin');OS.closeStart()"><span class="g">🗑️</span>Recycle Bin</div>
+    <div class="startsep"></div>
+    <div class="startitem" style="opacity:.6"><span class="g">➕</span>Add Programs...</div>
+    <div class="startsep"></div>
+    <div class="startitem" onclick="OS.shutdown()"><span class="g">🚪</span>Shut Down...</div>
+  </div>
+</div>
+
+<div id="shutdownScreen">
+  <div>It's now safe to turn off<br>your computer.</div>
+  <button class="btn95" onclick="OS.restart()">🔄 Restart PromptOS</button>
+</div>
+
+<div id="srefLightbox" onclick="SrefApp.closeLightbox(event)">
+  <div class="window raised lb-window" onclick="event.stopPropagation()">
+    <div class="titlebar">
+      <div class="ttitle"><span>🖼️</span><span id="lbTitle">Style Reference</span></div>
+      <div class="tbtns">
+        <div class="tbtn" onclick="SrefApp.closeLightbox()">✕</div>
+      </div>
+    </div>
+    <div class="lb-body" id="lbBody"></div>
+    <div class="statusbar">Click outside the image, or ✕, to close</div>
+  </div>
+</div>
+
+<script>
+/* =====================================================
+   OS — window manager
+===================================================== */
+const OS = (function(){
+  let zTop = 10;
+  const openWins = {}; // id -> {taskbarEl, maximized, prevRect}
+  let drag = null;
+
+  function winEl(id){ return document.getElementById('win-'+id); }
+
+  function focusWin(id){
+    zTop++;
+    winEl(id).style.zIndex = zTop;
+    document.querySelectorAll('.window').forEach(w=>w.classList.add('inactive'));
+    winEl(id).classList.remove('inactive');
+    document.querySelectorAll('.taskitem').forEach(t=>t.classList.remove('active'));
+    if(openWins[id]) openWins[id].taskbarEl.classList.add('active');
+  }
+
+  function open(id){
+    const el = winEl(id);
+    el.classList.remove('hidden');
+    focusWin(id);
+    if(!openWins[id]){
+      const btn = document.createElement('div');
+      btn.className='taskitem btn95 active';
+      btn.textContent = el.querySelector('.ttitle span:last-child').textContent;
+      btn.onclick = ()=>{
+        if(el.classList.contains('hidden')){ el.classList.remove('hidden'); focusWin(id); }
+        else { focusWin(id); }
+      };
+      document.getElementById('taskItems').appendChild(btn);
+      openWins[id] = {taskbarEl:btn, maximized:false};
+    }
+  }
+
+  function close(id){
+    const el = winEl(id);
+    if(openWins[id]){
+      openWins[id].taskbarEl.remove();
+      delete openWins[id];
+    }
+    if(el && el.dataset.dynamic === 'true'){
+      el.remove(); // dynamically-created windows (e.g. moodboard viewer) are discarded entirely
+    } else if(el){
+      el.classList.add('hidden');
+      // reset back to its starting size so it reopens the same way every time
+      if(el.dataset.defaultWidth) el.style.width = el.dataset.defaultWidth + 'px';
+      if(el.dataset.defaultHeight) el.style.height = el.dataset.defaultHeight + 'px';
+    }
+  }
+
+  function minimize(id){
+    winEl(id).classList.add('hidden');
+  }
+
+  function toggleMax(id){
+    const el = winEl(id);
+    const st = openWins[id];
+    if(!st) return;
+    if(!st.maximized){
+      st.prevRect = {left:el.style.left, top:el.style.top, width:el.style.width, height:el.style.height};
+      el.style.left='0px'; el.style.top='0px';
+      el.style.width='100vw'; el.style.height='calc(100vh - 34px)';
+      st.maximized = true;
+    } else {
+      Object.assign(el.style, st.prevRect);
+      st.maximized = false;
+    }
+    focusWin(id);
+  }
+
+  function startDrag(e,id){
+    focusWin(id);
+    const el = winEl(id);
+    if(openWins[id] && openWins[id].maximized) return;
+    drag = {id, el, startX:e.clientX, startY:e.clientY,
+             origLeft:el.offsetLeft, origTop:el.offsetTop};
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+  }
+  function onDrag(e){
+    if(!drag) return;
+    const dx = e.clientX - drag.startX;
+    const dy = e.clientY - drag.startY;
+    drag.el.style.left = Math.max(0, drag.origLeft+dx) + 'px';
+    drag.el.style.top = Math.max(0, drag.origTop+dy) + 'px';
+  }
+  function endDrag(){
+    drag = null;
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', endDrag);
+  }
+
+  let resize = null;
+  function startResize(e,id){
+    e.stopPropagation();
+    e.preventDefault();
+    focusWin(id);
+    const el = winEl(id);
+    if(openWins[id] && openWins[id].maximized) return;
+    const minWidth = +el.dataset.defaultWidth || 260;
+    const minHeight = +el.dataset.defaultHeight || 180;
+    resize = {id, el, startX:e.clientX, startY:e.clientY,
+              origWidth:el.offsetWidth, origHeight:el.offsetHeight,
+              minWidth, minHeight};
+    document.addEventListener('mousemove', onResize);
+    document.addEventListener('mouseup', endResize);
+  }
+  function onResize(e){
+    if(!resize) return;
+    const dx = e.clientX - resize.startX;
+    const dy = e.clientY - resize.startY;
+    resize.el.style.width = Math.max(resize.minWidth, resize.origWidth+dx) + 'px';
+    resize.el.style.height = Math.max(resize.minHeight, resize.origHeight+dy) + 'px';
+  }
+  function endResize(){
+    resize = null;
+    document.removeEventListener('mousemove', onResize);
+    document.removeEventListener('mouseup', endResize);
+  }
+
+  function toggleStart(e){
+    e.stopPropagation();
+    document.getElementById('startMenu').classList.toggle('hidden');
+    document.getElementById('startBtn').classList.toggle('pressed');
+  }
+  function closeStart(){
+    document.getElementById('startMenu').classList.add('hidden');
+    document.getElementById('startBtn').classList.remove('pressed');
+  }
+  document.addEventListener('click', (e)=>{
+    const menu = document.getElementById('startMenu');
+    if(!menu.classList.contains('hidden') && !menu.contains(e.target)){
+      closeStart();
+    }
+  });
+
+  function emptyBin(){
+    document.getElementById('binList').innerHTML =
+      '<tr><td colspan="2" class="sref-small">Recycle Bin is empty.</td></tr>';
+  }
+
+  function shutdown(){
+    closeStart();
+    document.getElementById('shutdownScreen').classList.add('show');
+  }
+  function restart(){
+    document.getElementById('shutdownScreen').classList.remove('show');
+  }
+
+  function clock(){
+    const d = new Date();
+    let h = d.getHours();
+    const m = d.getMinutes().toString().padStart(2,'0');
+    const ampm = h>=12 ? 'PM':'AM';
+    h = h%12; if(h===0) h=12;
+    document.getElementById('clock').textContent = h+':'+m+' '+ampm;
+  }
+  setInterval(clock,1000); clock();
+
+  // make windows raise on any mousedown inside them
+  document.querySelectorAll('.window').forEach(w=>{
+    w.addEventListener('mousedown', ()=>{
+      const id = w.id.replace('win-','');
+      focusWin(id);
+    });
+  });
+
+  return {open, close, minimize, toggleMax, startDrag, startResize, toggleStart, closeStart, emptyBin, shutdown, restart};
+})();
+
+/* =====================================================
+   SrefApp — Random Style Picker (ported program)
+===================================================== */
+const SrefApp = (function(){
+  let data = {};
+  let moodboardData = {};
+
+  function switchTab(i){
+    const win = document.getElementById('win-sref');
+    win.querySelectorAll('.sref-tab').forEach((t,idx)=>{
+      t.classList.toggle('active', idx===i);
+    });
+    win.querySelectorAll('.sref-tabContent').forEach((c,idx)=>{
+      c.style.display = idx===i ? 'block' : 'none';
+    });
+  }
+
+  document.getElementById('sref-fileInput').addEventListener('change', e=>{
+    const r = new FileReader();
+    r.onload = ()=> parseFile(r.result);
+    r.readAsText(e.target.files[0]);
+  });
+
+  function parseFile(text){
+    data = {}; moodboardData = {}; let u = null;
+    text.split('\n').forEach(l=>{
+      l = l.trim(); if(!l) return;
+      if(l.toLowerCase().startsWith('username:')){
+        u = l.split(':')[1].trim(); data[u] = []; moodboardData[u] = [];
+      } else if(u && /moodboards\s*:/i.test(l)){
+        let inner = l.replace(/^.*moodboards\s*:/i,'').replace(/\)+\s*$/,'');
+        inner.split(',').forEach(x=>{ x=x.trim(); if(x) moodboardData[u].push(x); });
+      } else if(u){
+        l.split(',').forEach(x=>{ if(x.trim()) data[u].push(x.trim()); });
+      }
+    });
+    updateSummary();
+  }
+
+  function updateSummary(){
+    const el = document.getElementById('sref-summary');
+    const userCount = Object.keys(data).length;
+    const srefCount = Object.values(data).flat().length;
+    if(!srefCount){
+      el.textContent = '';
+      return;
+    }
+    el.textContent = `The collection contains ${srefCount} sref${srefCount===1?'':'s'} provided by ${userCount} user${userCount===1?'':'s'}`;
+  }
+
+  function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  function copy(btn, text){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(String(text)).catch(()=>fallback());
+    } else {
+      fallback();
+    }
+    function fallback(){
+      const ta = document.createElement('textarea');
+      ta.value = String(text);
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    btn.parentElement.classList.add('copied');
+    btn.textContent = 'Copied ✓';
+    setTimeout(()=>{
+      btn.parentElement.classList.remove('copied');
+      btn.textContent = 'Copy';
+    }, 1200);
+  }
+
+  function render(id, text){
+    document.getElementById(id).innerHTML = `
+      <div class="sref-out">
+        <span>${text}</span>
+        <button class="btn95 sref-copyBtn">Copy</button>
+      </div>`;
+    const btn = document.querySelector(`#${id} .sref-copyBtn`);
+    btn.addEventListener('click', ()=> copy(btn, text));
+  }
+
+  /* Fast, non-blocking image previews: each box shows a spinner immediately
+     and swaps in the image (or a fallback label) as soon as it's ready,
+     instead of leaving a blank box while a large remote image downloads.
+     An optional caption (e.g. the user it came from) is shown above the tile. */
+  function appendImageTile(box, url, caption=''){
+    const group = document.createElement('div');
+    group.className = 'sref-tile-group';
+
+    if(caption){
+      const cap = document.createElement('div');
+      cap.className = 'sref-tile-caption';
+      cap.textContent = caption;
+      group.appendChild(cap);
+    }
+
+    const wrap = document.createElement('div');
+    wrap.className = 'sref-image-box';
+
+    const spinner = document.createElement('div');
+    spinner.className = 'sref-spinner';
+    wrap.appendChild(spinner);
+
+    const img = new Image();
+    img.loading = 'eager';
+    img.decoding = 'async';
+    img.referrerPolicy = 'no-referrer';
+    img.alt = 'style reference';
+
+    img.onload = ()=>{
+      spinner.remove();
+      wrap.appendChild(img);
+    };
+    img.onerror = ()=>{
+      spinner.remove();
+      wrap.innerHTML = '<div class="sref-img-error">SREF CODE</div>';
+    };
+
+    wrap.addEventListener('click', ()=> openLightbox(url, caption));
+
+    img.src = url;
+    group.appendChild(wrap);
+    box.appendChild(group);
+  }
+
+  /* Moodboards have no image to preview — show a clickable tile. Midjourney's
+     site refuses to be displayed inside another page/iframe, so clicking a
+     tile opens the real moodboard page in a new browser tab. An optional
+     caption (e.g. the user it came from) is shown above the tile. */
+  function appendMoodboardTile(box, code, caption=''){
+    const bareCode = code.replace(/^m/i,'');
+    const url = `https://www.midjourney.com/moodboards/${bareCode}`;
+
+    const group = document.createElement('div');
+    group.className = 'sref-tile-group';
+
+    if(caption){
+      const cap = document.createElement('div');
+      cap.className = 'sref-tile-caption';
+      cap.textContent = caption;
+      group.appendChild(cap);
+    }
+
+    const wrap = document.createElement('div');
+    wrap.className = 'sref-image-box sref-moodboard-box';
+    wrap.title = url;
+    wrap.innerHTML = `
+      <div class="sref-moodboard-tile">
+        <div class="sref-moodboard-icon">🔮</div>
+        <div class="sref-moodboard-code">${code}</div>
+        <div class="sref-moodboard-open">Open ↗</div>
+      </div>`;
+    wrap.addEventListener('click', ()=>{
+      window.open(url, '_blank', 'noopener,noreferrer');
+    });
+    group.appendChild(wrap);
+    box.appendChild(group);
+  }
+
+  function showImages(urls, title=''){
+    document.getElementById('sref-output-label').textContent = '🖼 Style Reference';
+    const box = document.getElementById('sref-imageOutput');
+    box.innerHTML = '';
+    urls.forEach(u=> appendImageTile(box, u, title));
+  }
+
+  /* Renders sref tiles and/or moodboard tiles together in the shared output
+     area, in that order, for the merged Random Sref / Moodboard tab.
+     srefItems/moodboardItems are arrays of {value, user} — user is '' for
+     flat (whole-collection) picks, or "User: X" when picked per-user. */
+  function showCombined(srefItems, moodboardItems){
+    const box = document.getElementById('sref-imageOutput');
+    box.innerHTML = '';
+
+    const hasSref = srefItems.length > 0;
+    const hasMoodboard = moodboardItems.length > 0;
+
+    let labelText = '🖼 Style Reference';
+    if(hasSref && hasMoodboard) labelText = '🖼 Style Reference + 🔮 Moodboard';
+    else if(hasMoodboard) labelText = '🔮 Moodboard';
+    document.getElementById('sref-output-label').textContent = labelText;
+
+    srefItems.forEach(item=> appendImageTile(box, item.value, item.user));
+    moodboardItems.forEach(item=> appendMoodboardTile(box, item.value, item.user));
+  }
+
+  function openLightbox(url, title){
+    const overlay = document.getElementById('srefLightbox');
+    const body = document.getElementById('lbBody');
+    document.getElementById('lbTitle').textContent = title || 'Style Reference';
+    body.innerHTML = '';
+
+    const spinner = document.createElement('div');
+    spinner.className = 'sref-spinner';
+    body.appendChild(spinner);
+
+    const img = new Image();
+    img.decoding = 'async';
+    img.referrerPolicy = 'no-referrer';
+    img.alt = 'style reference (enlarged)';
+    img.onload = ()=>{
+      spinner.remove();
+      body.appendChild(img);
+    };
+    img.onerror = ()=>{
+      spinner.remove();
+      body.innerHTML = '<div class="lb-error">SREF CODE</div>';
+    };
+    img.src = url;
+
+    overlay.classList.add('show');
+  }
+
+  function closeLightbox(e){
+    if(e) e.stopPropagation();
+    document.getElementById('srefLightbox').classList.remove('show');
+  }
+
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape') closeLightbox();
+  });
+
+  /* Keeps the "pick a random user first" checkboxes in sync with the
+     Srefs/Moodboards include-toggles: a toggle only makes sense (and stays
+     enabled) when its source is actually included — it now works fine at
+     any count, since each pick gets its own random user. */
+  function refreshToggles(){
+    const includeSref = document.getElementById('sref-includeSref').checked;
+    const includeMoodboard = document.getElementById('sref-includeMoodboard').checked;
+
+    document.getElementById('sref-section-sref').classList.toggle('sref-section-disabled', !includeSref);
+    document.getElementById('sref-section-moodboard').classList.toggle('sref-section-disabled', !includeMoodboard);
+    document.getElementById('sref-includeSref-text').classList.toggle('sref-faded', !includeSref);
+    document.getElementById('sref-includeMoodboard-text').classList.toggle('sref-faded', !includeMoodboard);
+
+    const srefToggle = document.getElementById('sref-userToggle1');
+    const srefRow = document.getElementById('sref-toggle-row1');
+    srefToggle.disabled = !includeSref;
+    if(!includeSref) srefToggle.checked = false;
+    srefRow.classList.toggle('disabled', !includeSref);
+
+    const mbToggle = document.getElementById('sref-userToggle2');
+    const mbRow = document.getElementById('sref-toggle-row2');
+    mbToggle.disabled = !includeMoodboard;
+    if(!includeMoodboard) mbToggle.checked = false;
+    mbRow.classList.toggle('disabled', !includeMoodboard);
+  }
+
+  /* Include-Srefs / Include-Moodboards checkboxes: at least one must stay on,
+     so if unchecking one would leave both off, that change is reverted. */
+  function updateSourceToggles(changed){
+    const srefBox = document.getElementById('sref-includeSref');
+    const mbBox = document.getElementById('sref-includeMoodboard');
+
+    if(!srefBox.checked && !mbBox.checked){
+      if(changed === 'sref') srefBox.checked = true;
+      else mbBox.checked = true;
+    }
+
+    refreshToggles();
+  }
+
+  function randomCombined(){
+    const includeSref = document.getElementById('sref-includeSref').checked;
+    const includeMoodboard = document.getElementById('sref-includeMoodboard').checked;
+
+    let srefItems = [];
+    let moodboardItems = [];
+    let promptText = document.getElementById('sref-prompt1').value + ' ';
+
+    if(includeSref){
+      const count = +document.getElementById('sref-urlCount1').value;
+      const useUser = document.getElementById('sref-userToggle1').checked;
+
+      if(useUser){
+        const users = Object.keys(data).filter(u => data[u] && data[u].length);
+        if(users.length){
+          for(let i=0;i<count;i++){
+            const u = rand(users);
+            srefItems.push({ value: rand(data[u]), user: `User: ${u}` });
+          }
+        }
+      } else {
+        const urls = Object.values(data).flat();
+        if(urls.length){
+          const shuffled = [...urls].sort(()=>0.5-Math.random());
+          for(let i=0;i<count;i++){
+            srefItems.push({ value: shuffled[i % shuffled.length], user: '' });
+          }
+        }
+      }
+
+      srefItems.forEach((item,i)=>{
+        promptText += (i===0 ? '--sref ' : '') + item.value + ' ';
+      });
+    }
+
+    if(includeMoodboard){
+      const count = +document.getElementById('sref-moodboardCount').value;
+      const useUser = document.getElementById('sref-userToggle2').checked;
+
+      if(useUser){
+        const users = Object.keys(moodboardData).filter(u => moodboardData[u] && moodboardData[u].length);
+        if(users.length){
+          for(let i=0;i<count;i++){
+            const u = rand(users);
+            moodboardItems.push({ value: rand(moodboardData[u]), user: `User: ${u}` });
+          }
+        }
+      } else {
+        const allCodes = Object.values(moodboardData).flat();
+        if(allCodes.length){
+          const shuffled = [...allCodes].sort(()=>0.5-Math.random());
+          for(let i=0;i<count;i++){
+            moodboardItems.push({ value: shuffled[i % shuffled.length], user: '' });
+          }
+        }
+      }
+
+      moodboardItems.forEach((item,i)=>{
+        promptText += (i===0 ? '--p ' : '') + item.value + ' ';
+      });
+    }
+
+    if(!srefItems.length && !moodboardItems.length) return;
+
+    render('sref-out1', promptText.trim());
+    showCombined(srefItems, moodboardItems);
+  }
+
+  function buildWeights(){
+    const weights = document.getElementById('sref-weights');
+    weights.innerHTML = '';
+    const count = +document.getElementById('sref-urlCount').value;
+    for(let i=0;i<count;i++){
+      weights.innerHTML += `
+        <div class="sref-weight-row">
+          <input class="field95" placeholder="::1" value="::1">
+        </div>`;
+    }
+  }
+
+  function dynamicGenerate(){
+    const useUser = document.getElementById('sref-userToggle3').checked;
+    const ws = [...document.getElementById('sref-weights').querySelectorAll('input')];
+    let items = [];
+
+    if(useUser){
+      const users = Object.keys(data).filter(u => data[u] && data[u].length);
+      if(!users.length) return;
+      ws.forEach(()=>{
+        const u = rand(users);
+        items.push({ value: rand(data[u]), user: `User: ${u}` });
+      });
+    } else {
+      const allUrls = Object.values(data).flat();
+      if(!allUrls.length) return;
+      const shuffled = [...allUrls].sort(()=>0.5-Math.random());
+      ws.forEach((w,i)=>{
+        items.push({ value: shuffled[i % shuffled.length], user: '' });
+      });
+    }
+
+    let result = document.getElementById('sref-prompt3').value + ' ';
+    items.forEach((item,i)=>{
+      const w = ws[i];
+      if(i===0){
+        result += `--sref ${item.value} ${w.value} `;
+      } else {
+        result += `${item.value} ${w.value} `;
+      }
+    });
+
+    render('sref-out3', result.trim());
+
+    document.getElementById('sref-output-label').textContent = '🖼 Style Reference';
+    const box = document.getElementById('sref-imageOutput');
+    box.innerHTML = '';
+    items.forEach(item=> appendImageTile(box, item.value, item.user));
+  }
+
+  buildWeights();
+  refreshToggles();
+
+  return {switchTab, copy, buildWeights, dynamicGenerate, closeLightbox, randomCombined, updateSourceToggles, refreshToggles};
+})();
+
+/* =====================================================
+   PaintApp — simple canvas painter
+===================================================== */
+const PaintApp = (function(){
+  const canvas = document.getElementById('paintCanvas');
+  const ctx = canvas.getContext('2d');
+  let color = '#000000';
+  let size = 2;
+  let painting = false;
+
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  function pos(e){
+    const r = canvas.getBoundingClientRect();
+    return {x:e.clientX-r.left, y:e.clientY-r.top};
+  }
+
+  canvas.addEventListener('mousedown', e=>{
+    painting = true;
+    const p = pos(e);
+    ctx.beginPath();
+    ctx.moveTo(p.x,p.y);
+  });
+  canvas.addEventListener('mousemove', e=>{
+    if(!painting) return;
+    const p = pos(e);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = size;
+    ctx.lineTo(p.x,p.y);
+    ctx.stroke();
+  });
+  window.addEventListener('mouseup', ()=> painting=false);
+
+  function setColor(c, el){
+    color = c;
+    document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+  function setSize(v){ size = +v; }
+  function clear(){ ctx.clearRect(0,0,canvas.width,canvas.height); }
+
+  return {setColor, setSize, clear};
+})();
+</script>
+
+</body>
+</html>
