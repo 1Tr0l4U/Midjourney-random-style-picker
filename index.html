@@ -444,7 +444,7 @@ input.field95, textarea.field95, select.field95{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:4px;padding:8px;text-align:center;width:100%;height:100%;
 }
-.sref-moodboard-icon{font-size:32px}
+.sref-moodboard-icon{font-size:13px;font-weight:bold;color:#000}
 .sref-moodboard-code{
   font-size:10px;color:#333;word-break:break-all;font-family:"Courier New",monospace;
 }
@@ -1166,7 +1166,7 @@ const SrefApp = (function(){
     wrap.title = url;
     wrap.innerHTML = `
       <div class="sref-moodboard-tile">
-        <div class="sref-moodboard-icon">🔮</div>
+        <div class="sref-moodboard-icon">Moodboard</div>
         <div class="sref-moodboard-code">${code}</div>
         <div class="sref-moodboard-open">Open ↗</div>
       </div>`;
@@ -1196,8 +1196,8 @@ const SrefApp = (function(){
     const hasMoodboard = moodboardItems.length > 0;
 
     let labelText = '🖼 Style Reference';
-    if(hasSref && hasMoodboard) labelText = '🖼 Style Reference + 🔮 Moodboard';
-    else if(hasMoodboard) labelText = '🔮 Moodboard';
+    if(hasSref && hasMoodboard) labelText = '🖼 Style Reference + Moodboard';
+    else if(hasMoodboard) labelText = 'Moodboard';
     document.getElementById('sref-output-label').textContent = labelText;
 
     srefItems.forEach(item=> appendImageTile(box, item.value, item.user));
