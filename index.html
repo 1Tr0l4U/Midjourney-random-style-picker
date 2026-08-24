@@ -19,7 +19,10 @@
   --teal:#008080;
   --accent:#000080;
 }
-*{box-sizing:border-box;user-select:none}
+*{box-sizing:border-box;user-select:none;-webkit-tap-highlight-color:transparent}
+button, .taskitem, .icon, .tab, .sref-tab, .startitem, .btn95, .tbtn, .menu-item, .file-dropdown-item{
+  touch-action:manipulation;
+}
 html,body{height:100%;margin:0}
 body{
   font-family:Tahoma,"Segoe UI",Verdana,sans-serif;
@@ -130,6 +133,9 @@ input.field95, textarea.field95, select.field95{
   background:
     linear-gradient(135deg, transparent 0 50%, var(--gray-darker) 50% 55%, transparent 55% 65%, var(--gray-darker) 65% 70%, transparent 70% 80%, var(--gray-darker) 80% 85%, transparent 85%);
   z-index:5;
+}
+@media (max-width:700px){
+  .resize-handle{ display:none; } /* resizing from the corner isn't usable on phones */
 }
 .titlebar{
   background:linear-gradient(90deg,var(--titlebar1),var(--titlebar2));
@@ -563,7 +569,7 @@ input.field95, textarea.field95, select.field95{
 
   <!-- ============ WINDOW: Random Style Picker ============ -->
   <div class="window raised hidden" id="win-sref" data-default-width="560" data-default-height="560" style="left:120px; top:40px; width:560px; height:560px;">
-    <div class="titlebar" onmousedown="OS.startDrag(event,'sref')">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'sref')" ontouchstart="OS.startDrag(event,'sref')">
       <div class="ttitle"><span>🔗</span><span>Random Style Picker</span></div>
       <div class="tbtns">
         <div class="tbtn" onclick="OS.minimize('sref')">_</div>
@@ -669,12 +675,12 @@ input.field95, textarea.field95, select.field95{
 
     </div>
     <div class="statusbar">Ready</div>
-    <div class="resize-handle" onmousedown="OS.startResize(event,'sref')"></div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'sref')" ontouchstart="OS.startResize(event,'sref')"></div>
   </div>
 
   <!-- ============ WINDOW: My Computer ============ -->
   <div class="window raised hidden" id="win-mycomputer" data-default-width="420" data-default-height="320" style="left:200px; top:80px; width:420px; height:320px;">
-    <div class="titlebar" onmousedown="OS.startDrag(event,'mycomputer')">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'mycomputer')" ontouchstart="OS.startDrag(event,'mycomputer')">
       <div class="ttitle"><span>🖥️</span><span>My Computer</span></div>
       <div class="tbtns">
         <div class="tbtn" onclick="OS.minimize('mycomputer')">_</div>
@@ -693,12 +699,12 @@ input.field95, textarea.field95, select.field95{
       </table>
     </div>
     <div class="statusbar">5 object(s) | Free space: 512 MB</div>
-    <div class="resize-handle" onmousedown="OS.startResize(event,'mycomputer')"></div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'mycomputer')" ontouchstart="OS.startResize(event,'mycomputer')"></div>
   </div>
 
   <!-- ============ WINDOW: Notes ============ -->
   <div class="window raised hidden" id="win-notes" data-default-width="380" data-default-height="300" style="left:260px; top:120px; width:380px; height:300px;">
-    <div class="titlebar" onmousedown="OS.startDrag(event,'notes')">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'notes')" ontouchstart="OS.startDrag(event,'notes')">
       <div class="ttitle"><span>📝</span><span>Notes.txt - Notepad</span></div>
       <div class="tbtns">
         <div class="tbtn" onclick="OS.minimize('notes')">_</div>
@@ -717,12 +723,12 @@ NOTES
 </textarea>
     </div>
     <div class="statusbar">Ln 1, Col 1</div>
-    <div class="resize-handle" onmousedown="OS.startResize(event,'notes')"></div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'notes')" ontouchstart="OS.startResize(event,'notes')"></div>
   </div>
 
   <!-- ============ WINDOW: Paint ============ -->
   <div class="window raised hidden" id="win-paint" data-default-width="460" data-default-height="420" style="left:300px; top:60px; width:460px; height:420px;">
-    <div class="titlebar" onmousedown="OS.startDrag(event,'paint')">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'paint')" ontouchstart="OS.startDrag(event,'paint')">
       <div class="ttitle"><span>🎨</span><span>untitled - Paint</span></div>
       <div class="tbtns">
         <div class="tbtn" onclick="OS.minimize('paint')">_</div>
@@ -756,12 +762,12 @@ NOTES
       <canvas id="paintCanvas" class="sunken" width="420" height="250"></canvas>
     </div>
     <div class="statusbar">Ready</div>
-    <div class="resize-handle" onmousedown="OS.startResize(event,'paint')"></div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'paint')" ontouchstart="OS.startResize(event,'paint')"></div>
   </div>
 
   <!-- ============ WINDOW: Recycle Bin ============ -->
   <div class="window raised hidden" id="win-bin" data-default-width="400" data-default-height="280" style="left:340px; top:140px; width:400px; height:280px;">
-    <div class="titlebar" onmousedown="OS.startDrag(event,'bin')">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'bin')" ontouchstart="OS.startDrag(event,'bin')">
       <div class="ttitle"><span>🗑️</span><span>Recycle Bin</span></div>
       <div class="tbtns">
         <div class="tbtn" onclick="OS.minimize('bin')">_</div>
@@ -779,7 +785,7 @@ NOTES
       <div style="margin-top:10px"><button class="btn95" onclick="OS.emptyBin()">🗑️ Empty Recycle Bin</button></div>
     </div>
     <div class="statusbar">Deleted items — safe to purge</div>
-    <div class="resize-handle" onmousedown="OS.startResize(event,'bin')"></div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'bin')" ontouchstart="OS.startResize(event,'bin')"></div>
   </div>
 
 </div>
@@ -845,17 +851,52 @@ const OS = (function(){
     if(openWins[id]) openWins[id].taskbarEl.classList.add('active');
   }
 
+  function isMobile(){
+    return window.innerWidth <= 700;
+  }
+
+  /* On phones/small screens, open a window centered and shrunk to fit
+     the visible desktop area instead of at its fixed desktop coordinates
+     (which could otherwise land it partly or fully off-screen). */
+  function fitAndCenterWindow(el){
+    if(!isMobile()) return;
+    const desktop = document.getElementById('desktop');
+    const availW = desktop.clientWidth - 16;
+    const availH = desktop.clientHeight - 16;
+
+    let w = parseInt(el.style.width) || el.offsetWidth;
+    let h = parseInt(el.style.height) || el.offsetHeight;
+    if(w > availW) w = availW;
+    if(h > availH) h = availH;
+
+    el.style.width = w + 'px';
+    el.style.height = h + 'px';
+    el.style.left = Math.max(8, (desktop.clientWidth - w)/2) + 'px';
+    el.style.top = Math.max(8, (desktop.clientHeight - h)/2) + 'px';
+  }
+
   function open(id){
     const el = winEl(id);
     el.classList.remove('hidden');
+    fitAndCenterWindow(el);
     focusWin(id);
     if(!openWins[id]){
       const btn = document.createElement('div');
       btn.className='taskitem btn95 active';
       btn.textContent = el.querySelector('.ttitle span:last-child').textContent;
       btn.onclick = ()=>{
-        if(el.classList.contains('hidden')){ el.classList.remove('hidden'); focusWin(id); }
-        else { focusWin(id); }
+        if(el.classList.contains('hidden')){
+          // hidden/minimized -> bring it back up
+          el.classList.remove('hidden');
+          fitAndCenterWindow(el);
+          focusWin(id);
+        } else if(!el.classList.contains('inactive')){
+          // already visible and focused -> tapping it again minimizes it
+          minimize(id);
+        } else {
+          // visible but a different window is in front -> just bring it to front
+          focusWin(id);
+        }
       };
       document.getElementById('taskItems').appendChild(btn);
       openWins[id] = {taskbarEl:btn, maximized:false};
@@ -880,6 +921,7 @@ const OS = (function(){
 
   function minimize(id){
     winEl(id).classList.add('hidden');
+    if(openWins[id]) openWins[id].taskbarEl.classList.remove('active');
   }
 
   function toggleMax(id){
@@ -898,19 +940,32 @@ const OS = (function(){
     focusWin(id);
   }
 
+  /* Works with either a mouse event or a touch event so dragging/resizing
+     functions the same way on mobile as it does with a mouse. */
+  function pointerPos(e){
+    if(e.touches && e.touches.length) return {x:e.touches[0].clientX, y:e.touches[0].clientY};
+    if(e.changedTouches && e.changedTouches.length) return {x:e.changedTouches[0].clientX, y:e.changedTouches[0].clientY};
+    return {x:e.clientX, y:e.clientY};
+  }
+
   function startDrag(e,id){
     focusWin(id);
     const el = winEl(id);
     if(openWins[id] && openWins[id].maximized) return;
-    drag = {id, el, startX:e.clientX, startY:e.clientY,
+    const p = pointerPos(e);
+    drag = {id, el, startX:p.x, startY:p.y,
              origLeft:el.offsetLeft, origTop:el.offsetTop};
     document.addEventListener('mousemove', onDrag);
     document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDrag, {passive:false});
+    document.addEventListener('touchend', endDrag);
   }
   function onDrag(e){
     if(!drag) return;
-    const dx = e.clientX - drag.startX;
-    const dy = e.clientY - drag.startY;
+    if(e.cancelable) e.preventDefault(); // stop the page from scrolling while dragging on touch
+    const p = pointerPos(e);
+    const dx = p.x - drag.startX;
+    const dy = p.y - drag.startY;
     drag.el.style.left = Math.max(0, drag.origLeft+dx) + 'px';
     drag.el.style.top = Math.max(0, drag.origTop+dy) + 'px';
   }
@@ -918,10 +973,13 @@ const OS = (function(){
     drag = null;
     document.removeEventListener('mousemove', onDrag);
     document.removeEventListener('mouseup', endDrag);
+    document.removeEventListener('touchmove', onDrag);
+    document.removeEventListener('touchend', endDrag);
   }
 
   let resize = null;
   function startResize(e,id){
+    if(isMobile()) return; // resizing from the corner is disabled on phones
     e.stopPropagation();
     e.preventDefault();
     focusWin(id);
@@ -929,16 +987,21 @@ const OS = (function(){
     if(openWins[id] && openWins[id].maximized) return;
     const minWidth = +el.dataset.defaultWidth || 260;
     const minHeight = +el.dataset.defaultHeight || 180;
-    resize = {id, el, startX:e.clientX, startY:e.clientY,
+    const p = pointerPos(e);
+    resize = {id, el, startX:p.x, startY:p.y,
               origWidth:el.offsetWidth, origHeight:el.offsetHeight,
               minWidth, minHeight};
     document.addEventListener('mousemove', onResize);
     document.addEventListener('mouseup', endResize);
+    document.addEventListener('touchmove', onResize, {passive:false});
+    document.addEventListener('touchend', endResize);
   }
   function onResize(e){
     if(!resize) return;
-    const dx = e.clientX - resize.startX;
-    const dy = e.clientY - resize.startY;
+    if(e.cancelable) e.preventDefault();
+    const p = pointerPos(e);
+    const dx = p.x - resize.startX;
+    const dy = p.y - resize.startY;
     resize.el.style.width = Math.max(resize.minWidth, resize.origWidth+dx) + 'px';
     resize.el.style.height = Math.max(resize.minHeight, resize.origHeight+dy) + 'px';
   }
@@ -946,6 +1009,8 @@ const OS = (function(){
     resize = null;
     document.removeEventListener('mousemove', onResize);
     document.removeEventListener('mouseup', endResize);
+    document.removeEventListener('touchmove', onResize);
+    document.removeEventListener('touchend', endResize);
   }
 
   function toggleStart(e){
@@ -1067,6 +1132,42 @@ const SrefApp = (function(){
   }
 
   function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  /* Picks up to `count` unique values from the whole flat collection (no
+     duplicates), shuffled. If there aren't enough unique values to fill the
+     count, it just returns as many as exist rather than repeating any. */
+  function pickUniqueFlat(pool, count){
+    const unique = [...new Set(pool)];
+    const shuffled = unique.sort(()=>0.5-Math.random());
+    const targetCount = Math.min(count, shuffled.length);
+    return shuffled.slice(0, targetCount).map(value => ({ value, user: '' }));
+  }
+
+  /* Picks up to `count` unique values using "random user first, then random
+     item from that user" — rerolling internally whenever a pick would repeat
+     a value already chosen in this batch, so the same sref/moodboard never
+     comes up twice even across different users. */
+  function pickUniqueByUser(sourceData, count){
+    const users = Object.keys(sourceData).filter(u => sourceData[u] && sourceData[u].length);
+    const totalUnique = new Set(Object.values(sourceData).flat()).size;
+    const targetCount = Math.min(count, totalUnique);
+
+    const chosen = [];
+    const usedValues = new Set();
+    let attempts = 0;
+    const maxAttempts = (targetCount + 1) * 200;
+
+    while(chosen.length < targetCount && users.length && attempts < maxAttempts){
+      attempts++;
+      const u = rand(users);
+      const pool = sourceData[u].filter(v => !usedValues.has(v));
+      if(!pool.length) continue; // this user has nothing left unused this round — try again
+      const value = rand(pool);
+      usedValues.add(value);
+      chosen.push({ value, user: `User: ${u}` });
+    }
+    return chosen;
+  }
 
   function copy(btn, text){
     if(navigator.clipboard && navigator.clipboard.writeText){
@@ -1293,23 +1394,9 @@ const SrefApp = (function(){
       const count = +document.getElementById('sref-urlCount1').value;
       const useUser = document.getElementById('sref-userToggle1').checked;
 
-      if(useUser){
-        const users = Object.keys(data).filter(u => data[u] && data[u].length);
-        if(users.length){
-          for(let i=0;i<count;i++){
-            const u = rand(users);
-            srefItems.push({ value: rand(data[u]), user: `User: ${u}` });
-          }
-        }
-      } else {
-        const urls = Object.values(data).flat();
-        if(urls.length){
-          const shuffled = [...urls].sort(()=>0.5-Math.random());
-          for(let i=0;i<count;i++){
-            srefItems.push({ value: shuffled[i % shuffled.length], user: '' });
-          }
-        }
-      }
+      srefItems = useUser
+        ? pickUniqueByUser(data, count)
+        : pickUniqueFlat(Object.values(data).flat(), count);
 
       srefItems.forEach((item,i)=>{
         promptText += (i===0 ? '--sref ' : '') + item.value + ' ';
@@ -1320,23 +1407,9 @@ const SrefApp = (function(){
       const count = +document.getElementById('sref-moodboardCount').value;
       const useUser = document.getElementById('sref-userToggle2').checked;
 
-      if(useUser){
-        const users = Object.keys(moodboardData).filter(u => moodboardData[u] && moodboardData[u].length);
-        if(users.length){
-          for(let i=0;i<count;i++){
-            const u = rand(users);
-            moodboardItems.push({ value: rand(moodboardData[u]), user: `User: ${u}` });
-          }
-        }
-      } else {
-        const allCodes = Object.values(moodboardData).flat();
-        if(allCodes.length){
-          const shuffled = [...allCodes].sort(()=>0.5-Math.random());
-          for(let i=0;i<count;i++){
-            moodboardItems.push({ value: shuffled[i % shuffled.length], user: '' });
-          }
-        }
-      }
+      moodboardItems = useUser
+        ? pickUniqueByUser(moodboardData, count)
+        : pickUniqueFlat(Object.values(moodboardData).flat(), count);
 
       moodboardItems.forEach((item,i)=>{
         promptText += (i===0 ? '--p ' : '') + item.value + ' ';
@@ -1364,23 +1437,12 @@ const SrefApp = (function(){
   function dynamicGenerate(){
     const useUser = document.getElementById('sref-userToggle3').checked;
     const ws = [...document.getElementById('sref-weights').querySelectorAll('input')];
-    let items = [];
 
-    if(useUser){
-      const users = Object.keys(data).filter(u => data[u] && data[u].length);
-      if(!users.length) return;
-      ws.forEach(()=>{
-        const u = rand(users);
-        items.push({ value: rand(data[u]), user: `User: ${u}` });
-      });
-    } else {
-      const allUrls = Object.values(data).flat();
-      if(!allUrls.length) return;
-      const shuffled = [...allUrls].sort(()=>0.5-Math.random());
-      ws.forEach((w,i)=>{
-        items.push({ value: shuffled[i % shuffled.length], user: '' });
-      });
-    }
+    const items = useUser
+      ? pickUniqueByUser(data, ws.length)
+      : pickUniqueFlat(Object.values(data).flat(), ws.length);
+
+    if(!items.length) return;
 
     let result = document.getElementById('sref-prompt3').value + ' ';
     items.forEach((item,i)=>{
