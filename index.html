@@ -720,6 +720,7 @@ NOTES
 - This is your desktop. Double-click icons to open them.
 - Drag windows by their title bar.
 - Add your own programs / icons here later!
+- reminder: write something about vistor(s)
 </textarea>
     </div>
     <div class="statusbar">Ln 1, Col 1</div>
@@ -1512,6 +1513,74 @@ const PaintApp = (function(){
   function clear(){ ctx.clearRect(0,0,canvas.width,canvas.height); }
 
   return {setColor, setSize, clear};
+})();
+
+/* =====================================================
+   Quiet little visitor counter, tucked away in Notes.
+   Uses a free, no-auth hit-counter API (countapi.xyz) so the number is
+   shared across everyone who opens the page, not just this browser.
+   Only counts a given browser once (via a localStorage flag) so refreshing
+   or reopening the page doesn't inflate the number.
+===================================================== */
+const VisitorTracker = (function(){
+  const NAMESPACE = 'midjourney-random-style-picker-1tr0l4u';
+  const KEY = 'unique-visitors';
+  let count = null;
+  let reason = null; // 'local' | 'network' | null
+
+  async function init(){
+    if(location.protocol === 'file:'){
+      // browsers block fetch() to external APIs when the page is opened
+      // directly from disk — this only works once it's actually hosted
+      reason = 'local';
+      return;
+    }
+    try{
+      const alreadyCounted = localStorage.getItem('rsp_counted');
+      const url = alreadyCounted
+        ? `https://api.countapi.xyz/get/${NAMESPACE}/${KEY}`
+        : `https://api.countapi.xyz/hit/${NAMESPACE}/${KEY}`;
+      const res = await fetch(url);
+      const json = await res.json();
+      count = json.value;
+      if(!alreadyCounted) localStorage.setItem('rsp_counted', '1');
+    } catch(err){
+      reason = 'network'; // fails quietly — the secret just explains it couldn't connect
+    }
+  }
+
+  function getCount(){ return count; }
+  function getReason(){ return reason; }
+
+  return { init, getCount, getReason };
+})();
+VisitorTracker.init();
+
+/* Type the word "visitors" at the end of a line in Notes.txt to reveal it. */
+(function(){
+  const notesArea = document.getElementById('notesArea');
+  const TRIGGER = 'visitors';
+
+  notesArea.addEventListener('keyup', ()=>{
+    const val = notesArea.value;
+    if(!val.toLowerCase().trimEnd().endsWith(TRIGGER)) return;
+
+    const trimmed = val.replace(/\s+$/, '');
+    const withoutTrigger = trimmed.slice(0, trimmed.length - TRIGGER.length).replace(/\s+$/, '');
+    const count = VisitorTracker.getCount();
+    const reason = VisitorTracker.getReason();
+
+    let message;
+    if(count !== null){
+      message = `🌐 ${count} unique people have opened this app so far. You're one of them.`;
+    } else if(reason === 'local'){
+      message = `🌐 This only works once the page is actually hosted online (e.g. GitHub Pages) — opening the file locally can't reach the counter.`;
+    } else {
+      message = `🌐 Couldn't reach the visitor counter right now — try again in a bit.`;
+    }
+
+    notesArea.value = withoutTrigger + '\n\n' + message;
+  });
 })();
 </script>
 
