@@ -720,7 +720,7 @@ NOTES
 - This is your desktop. Double-click icons to open them.
 - Drag windows by their title bar.
 - Add your own programs / icons here later!
-- reminder: write something about vistor(s)
+- reminder: write something about visitor(s)
 </textarea>
     </div>
     <div class="statusbar">Ln 1, Col 1</div>
@@ -1517,7 +1517,8 @@ const PaintApp = (function(){
 
 /* =====================================================
    Quiet little visitor counter, tucked away in Notes.
-   Uses a free, no-auth hit-counter API (countapi.xyz) so the number is
+   Uses a free, no-auth hit-counter API (Abacus, by Jason Cameron) so the
+   number is
    shared across everyone who opens the page, not just this browser.
    Only counts a given browser once (via a localStorage flag) so refreshing
    or reopening the page doesn't inflate the number.
@@ -1538,8 +1539,8 @@ const VisitorTracker = (function(){
     try{
       const alreadyCounted = localStorage.getItem('rsp_counted');
       const url = alreadyCounted
-        ? `https://api.countapi.xyz/get/${NAMESPACE}/${KEY}`
-        : `https://api.countapi.xyz/hit/${NAMESPACE}/${KEY}`;
+        ? `https://abacus.jasoncameron.dev/get/${NAMESPACE}/${KEY}`
+        : `https://abacus.jasoncameron.dev/hit/${NAMESPACE}/${KEY}`;
       const res = await fetch(url);
       const json = await res.json();
       count = json.value;
