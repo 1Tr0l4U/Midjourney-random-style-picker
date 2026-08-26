@@ -570,34 +570,34 @@ input.field95, textarea.field95, select.field95{
 
 <div id="desktop">
 
-  <div class="icon" style="left:18px; top:18px" ondblclick="OS.open('sref')">
+  <div class="icon" style="left:18px; top:18px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('sref')">
     <div class="glyph">🔗</div>
     <div class="label">Random Style<br>Picker</div>
   </div>
 
-  <div class="icon" style="left:18px; top:118px" ondblclick="OS.open('mycomputer')">
+  <div class="icon" style="left:18px; top:118px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('perfectpixel')">
+    <div class="glyph">🧩</div>
+    <div class="label">PerfectPixel</div>
+  </div>
+
+  <div class="icon" style="left:18px; top:218px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('mycomputer')">
     <div class="glyph">🖥️</div>
     <div class="label">My Computer</div>
   </div>
 
-  <div class="icon" style="left:18px; top:218px" ondblclick="OS.open('notes')">
+  <div class="icon" style="left:18px; top:318px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('notes')">
     <div class="glyph">📝</div>
     <div class="label">Notes.txt</div>
   </div>
 
-  <div class="icon" style="left:18px; top:318px" ondblclick="OS.open('paint')">
+  <div class="icon" style="left:18px; top:418px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('paint')">
     <div class="glyph">🎨</div>
     <div class="label">Paint</div>
   </div>
 
-  <div class="icon" style="left:18px; top:418px" ondblclick="OS.open('bin')">
+  <div class="icon" style="left:18px; top:518px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('bin')">
     <div class="glyph">🗑️</div>
     <div class="label">Recycle Bin</div>
-  </div>
-
-  <div class="icon" style="left:18px; top:518px" ondblclick="OS.open('perfectpixel')">
-    <div class="glyph">🧩</div>
-    <div class="label">PerfectPixel</div>
   </div>
 
   <!-- ============ WINDOW: Random Style Picker ============ -->
@@ -1109,6 +1109,62 @@ const OS = (function(){
     document.removeEventListener('touchend', endResize);
   }
 
+  /* Desktop icons can be dragged around and dropped anywhere, like a real
+     desktop — double-click still opens them as before. A small movement
+     threshold keeps a plain click/double-click from being treated as a drag.
+     On drop, the icon snaps into the nearest cell of an invisible grid,
+     same as icons behave on a real desktop, instead of landing wherever
+     the cursor happened to be. */
+  const ICON_GRID_ORIGIN_X = 18;
+  const ICON_GRID_ORIGIN_Y = 18;
+  const ICON_GRID_CELL_W = 96;
+  const ICON_GRID_CELL_H = 100;
+
+  let iconDrag = null;
+  function startIconDrag(e, el){
+    const p = pointerPos(e);
+    iconDrag = { el, startX:p.x, startY:p.y, origLeft:el.offsetLeft, origTop:el.offsetTop };
+    document.addEventListener('mousemove', onIconDrag);
+    document.addEventListener('mouseup', endIconDrag);
+    document.addEventListener('touchmove', onIconDrag, {passive:false});
+    document.addEventListener('touchend', endIconDrag);
+  }
+  function onIconDrag(e){
+    if(!iconDrag) return;
+    const p = pointerPos(e);
+    const dx = p.x - iconDrag.startX;
+    const dy = p.y - iconDrag.startY;
+    if(Math.abs(dx) < 3 && Math.abs(dy) < 3) return; // ignore tiny jitters from a plain click
+    if(e.cancelable) e.preventDefault();
+    iconDrag.moved = true;
+    const desktop = document.getElementById('desktop');
+    const maxLeft = desktop.clientWidth - iconDrag.el.offsetWidth;
+    const maxTop = desktop.clientHeight - iconDrag.el.offsetHeight;
+    iconDrag.el.style.left = Math.min(maxLeft, Math.max(0, iconDrag.origLeft+dx)) + 'px';
+    iconDrag.el.style.top = Math.min(maxTop, Math.max(0, iconDrag.origTop+dy)) + 'px';
+  }
+  function endIconDrag(){
+    if(iconDrag && iconDrag.moved) snapIconToGrid(iconDrag.el);
+    iconDrag = null;
+    document.removeEventListener('mousemove', onIconDrag);
+    document.removeEventListener('mouseup', endIconDrag);
+    document.removeEventListener('touchmove', onIconDrag);
+    document.removeEventListener('touchend', endIconDrag);
+  }
+  function snapIconToGrid(el){
+    const desktop = document.getElementById('desktop');
+    const col = Math.max(0, Math.round((el.offsetLeft - ICON_GRID_ORIGIN_X) / ICON_GRID_CELL_W));
+    const row = Math.max(0, Math.round((el.offsetTop - ICON_GRID_ORIGIN_Y) / ICON_GRID_CELL_H));
+    let snappedLeft = ICON_GRID_ORIGIN_X + col*ICON_GRID_CELL_W;
+    let snappedTop = ICON_GRID_ORIGIN_Y + row*ICON_GRID_CELL_H;
+    const maxLeft = desktop.clientWidth - el.offsetWidth;
+    const maxTop = desktop.clientHeight - el.offsetHeight;
+    snappedLeft = Math.min(maxLeft, snappedLeft);
+    snappedTop = Math.min(maxTop, snappedTop);
+    el.style.left = snappedLeft + 'px';
+    el.style.top = snappedTop + 'px';
+  }
+
   function toggleStart(e){
     e.stopPropagation();
     document.getElementById('startMenu').classList.toggle('hidden');
@@ -1156,7 +1212,7 @@ const OS = (function(){
     });
   });
 
-  return {open, close, minimize, toggleMax, startDrag, startResize, toggleStart, closeStart, emptyBin, shutdown, restart};
+  return {open, close, minimize, toggleMax, startDrag, startResize, startIconDrag, toggleStart, closeStart, emptyBin, shutdown, restart};
 })();
 
 /* =====================================================
