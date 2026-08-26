@@ -508,6 +508,41 @@ input.field95, textarea.field95, select.field95{
   flex:1;min-width:100px;
 }
 
+/* Random Camera Shot */
+.cam-results{
+  display:flex;flex-direction:column;gap:8px;margin-top:12px;
+}
+.cam-result-card{
+  background:#fff;
+  border-top:2px solid var(--gray-darker);border-left:2px solid var(--gray-darker);
+  border-right:2px solid var(--gray-light);border-bottom:2px solid var(--gray-light);
+  padding:8px 10px;
+}
+.cam-result-top{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+}
+.cam-cardCopyBtn{flex-shrink:0;white-space:nowrap}
+.cam-result-name{font-weight:bold;font-size:13px;color:#000}
+.cam-result-desc{font-size:11px;color:#333;margin-top:2px}
+.cam-result-tag{font-size:10px;color:#555;margin-top:4px;font-style:italic}
+.cam-fulllist{
+  font-size:12px;max-height:100%;
+}
+.cam-fulllist h3{
+  font-size:13px;margin:14px 0 4px;color:#000;
+}
+.cam-fulllist h3:first-child{margin-top:0}
+.cam-fulllist h4{
+  font-size:12px;margin:8px 0 4px;color:#000;
+}
+.cam-fulllist ul{
+  margin:0 0 0 18px;padding:0;
+}
+.cam-fulllist li{
+  margin-bottom:4px;line-height:1.4;
+}
+.cam-fulllist b{color:#000}
+
 #notesArea{
   width:100%;height:100%;min-height:220px;
   border:none;outline:none;resize:none;
@@ -580,22 +615,27 @@ input.field95, textarea.field95, select.field95{
     <div class="label">PerfectPixel</div>
   </div>
 
-  <div class="icon" style="left:18px; top:218px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('mycomputer')">
+  <div class="icon" style="left:18px; top:218px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('camerashots')">
+    <div class="glyph" style="transform:translateY(-4px)">🎥</div>
+    <div class="label">Random Camera<br>Shot</div>
+  </div>
+
+  <div class="icon" style="left:18px; top:318px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('mycomputer')">
     <div class="glyph">🖥️</div>
     <div class="label">My Computer</div>
   </div>
 
-  <div class="icon" style="left:18px; top:318px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('notes')">
+  <div class="icon" style="left:18px; top:418px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('notes')">
     <div class="glyph">📝</div>
     <div class="label">Notes.txt</div>
   </div>
 
-  <div class="icon" style="left:18px; top:418px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('paint')">
+  <div class="icon" style="left:18px; top:518px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('paint')">
     <div class="glyph">🎨</div>
     <div class="label">Paint</div>
   </div>
 
-  <div class="icon" style="left:18px; top:518px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('bin')">
+  <div class="icon" style="left:18px; top:618px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('bin')">
     <div class="glyph">🗑️</div>
     <div class="label">Recycle Bin</div>
   </div>
@@ -730,6 +770,7 @@ input.field95, textarea.field95, select.field95{
         <tr><td>📁</td><td>My Programs <span class="sref-small">(empty — add your own later)</span></td></tr>
         <tr><td>🔗</td><td>Random Style Picker.exe</td></tr>
         <tr><td>🧩</td><td>PerfectPixel.exe</td></tr>
+        <tr><td>🎥</td><td>Random Camera Shot.exe</td></tr>
       </table>
     </div>
     <div class="statusbar">5 object(s) | Free space: 512 MB</div>
@@ -883,6 +924,51 @@ NOTES
     <div class="resize-handle" onmousedown="OS.startResize(event,'perfectpixel')" ontouchstart="OS.startResize(event,'perfectpixel')"></div>
   </div>
 
+  <!-- ============ WINDOW: Random Camera Shot ============ -->
+  <div class="window raised hidden" id="win-camerashots" data-default-width="520" data-default-height="560" style="left:180px; top:60px; width:520px; height:560px;">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'camerashots')" ontouchstart="OS.startDrag(event,'camerashots')">
+      <div class="ttitle"><span>🎥</span><span>Random Camera Shot</span></div>
+      <div class="tbtns">
+        <div class="tbtn" onclick="OS.minimize('camerashots')">_</div>
+        <div class="tbtn" onclick="OS.toggleMax('camerashots')">□</div>
+        <div class="tbtn" onclick="OS.close('camerashots')">✕</div>
+      </div>
+    </div>
+    <div class="menubar"><span>File</span><span>Edit</span><span>View</span><span>Help</span></div>
+
+    <div class="sref-tabs" style="margin:6px 10px 0">
+      <div class="sref-tab active" onclick="CameraApp.switchTab(0)">Roll</div>
+      <div class="sref-tab" onclick="CameraApp.switchTab(1)">Full List</div>
+    </div>
+
+    <div class="window-body">
+
+      <!-- TAB 1: Roll -->
+      <div class="sref-card cam-tabContent">
+        <label class="sref-label">Number of Results</label>
+        <select id="cam-count" class="field95">
+          <option>1</option><option selected>2</option><option>3</option><option>4</option>
+          <option>5</option><option>6</option><option>7</option><option>8</option>
+        </select>
+        <div style="margin-top:10px">
+          <button class="btn95" onclick="CameraApp.roll()" style="width:100%;padding:12px;font-weight:bold">🎲 Random Camera Shots</button>
+        </div>
+        <div id="cam-results" class="cam-results"></div>
+        <div style="margin-top:10px">
+          <button class="btn95" id="cam-copyBtn" onclick="CameraApp.copyResults(this)" disabled>📋 Copy Results</button>
+        </div>
+      </div>
+
+      <!-- TAB 2: Full List -->
+      <div class="sref-card cam-tabContent" style="display:none">
+        <div id="cam-fulllist" class="cam-fulllist"></div>
+      </div>
+
+    </div>
+    <div class="statusbar">Ready</div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'camerashots')" ontouchstart="OS.startResize(event,'camerashots')"></div>
+  </div>
+
 </div>
 
 <!-- ---------- taskbar ---------- -->
@@ -902,6 +988,7 @@ NOTES
     <div class="startitem" onclick="OS.open('paint');OS.closeStart()"><span class="g">🎨</span>Paint</div>
     <div class="startitem" onclick="OS.open('bin');OS.closeStart()"><span class="g">🗑️</span>Recycle Bin</div>
     <div class="startitem" onclick="OS.open('perfectpixel');OS.closeStart()"><span class="g">🧩</span>PerfectPixel</div>
+    <div class="startitem" onclick="OS.open('camerashots');OS.closeStart()"><span class="g">🎥</span>Random Camera Shot</div>
     <div class="startsep"></div>
     <div class="startitem" style="opacity:.6"><span class="g">➕</span>Add Programs...</div>
     <div class="startsep"></div>
@@ -1151,10 +1238,49 @@ const OS = (function(){
     document.removeEventListener('touchmove', onIconDrag);
     document.removeEventListener('touchend', endIconDrag);
   }
+  function getIconGridPos(el){
+    const col = Math.round((el.offsetLeft - ICON_GRID_ORIGIN_X) / ICON_GRID_CELL_W);
+    const row = Math.round((el.offsetTop - ICON_GRID_ORIGIN_Y) / ICON_GRID_CELL_H);
+    return {col, row};
+  }
+
+  function isIconCellOccupied(col, row, excludeEl){
+    const icons = document.querySelectorAll('#desktop > .icon');
+    for(const icon of icons){
+      if(icon === excludeEl) continue;
+      const pos = getIconGridPos(icon);
+      if(pos.col===col && pos.row===row) return true;
+    }
+    return false;
+  }
+
+  /* If the target cell is already taken by another icon, spiral outward
+     from it to find the nearest free cell instead — so dropping one icon
+     on top of another just nudges it into the closest open spot rather
+     than letting two icons stack invisibly on top of each other. */
+  function findNearestFreeIconCell(col, row, excludeEl){
+    if(!isIconCellOccupied(col, row, excludeEl)) return {col, row};
+    for(let radius=1; radius<50; radius++){
+      for(let dc=-radius; dc<=radius; dc++){
+        for(let dr=-radius; dr<=radius; dr++){
+          if(Math.max(Math.abs(dc), Math.abs(dr)) !== radius) continue;
+          const c = col+dc, r = row+dr;
+          if(c<0 || r<0) continue;
+          if(!isIconCellOccupied(c, r, excludeEl)) return {col:c, row:r};
+        }
+      }
+    }
+    return {col, row};
+  }
+
   function snapIconToGrid(el){
     const desktop = document.getElementById('desktop');
-    const col = Math.max(0, Math.round((el.offsetLeft - ICON_GRID_ORIGIN_X) / ICON_GRID_CELL_W));
-    const row = Math.max(0, Math.round((el.offsetTop - ICON_GRID_ORIGIN_Y) / ICON_GRID_CELL_H));
+    let col = Math.max(0, Math.round((el.offsetLeft - ICON_GRID_ORIGIN_X) / ICON_GRID_CELL_W));
+    let row = Math.max(0, Math.round((el.offsetTop - ICON_GRID_ORIGIN_Y) / ICON_GRID_CELL_H));
+
+    const free = findNearestFreeIconCell(col, row, el);
+    col = free.col; row = free.row;
+
     let snappedLeft = ICON_GRID_ORIGIN_X + col*ICON_GRID_CELL_W;
     let snappedTop = ICON_GRID_ORIGIN_Y + row*ICON_GRID_CELL_H;
     const maxLeft = desktop.clientWidth - el.offsetWidth;
@@ -2267,6 +2393,195 @@ const PerfectPixelApp = (function(){
   }
 
   return { process, download };
+})();
+
+/* =====================================================
+   PaintApp — simple canvas painter
+===================================================== */
+/* =====================================================
+   CameraApp — Random Camera Shot
+===================================================== */
+const CameraApp = (function(){
+
+  const DATA = [
+    { title: "📸 SHOT COMPOSITIONS (FRAMING TYPES)", subs: [
+      { sub: "🎯 By Subject Size in Frame", items: [
+        { name: "Extreme Wide Shot (EWS)", desc: "Establishes location; subject is tiny or not visible." },
+        { name: "Wide Shot (WS) / Long Shot (LS)", desc: "Shows full body of the subject." },
+        { name: "Full Shot (FS)", desc: "Entire subject from head to toe, often centered." },
+        { name: "Medium Long Shot (MLS)", desc: "From knees up; also called the \"cowboy shot.\"" },
+        { name: "Medium Shot (MS)", desc: "Waist up; emphasizes body language." },
+        { name: "Medium Close-Up (MCU)", desc: "Chest or shoulders up; blends intimacy and context." },
+        { name: "Close-Up (CU)", desc: "Just the face or object; reveals emotion." },
+        { name: "Extreme Close-Up (ECU)", desc: "Focus on one facial feature or object detail." }
+      ]},
+      { sub: "🧭 By Camera Angle", items: [
+        { name: "Eye-Level", desc: "Neutral and natural." },
+        { name: "High Angle", desc: "Camera looks down; makes subject seem small or weak." },
+        { name: "Low Angle", desc: "Camera looks up; makes subject seem powerful or intimidating." },
+        { name: "Overhead / Bird's Eye", desc: "Directly above; abstract or strategic feel." },
+        { name: "Worm's Eye View", desc: "Extreme low angle; dramatic or surreal." },
+        { name: "Dutch Angle (Tilted)", desc: "Diagonal horizon; conveys unease, tension, or disorientation." },
+        { name: "Over-the-Shoulder (OTS)", desc: "From behind a character's shoulder; used in dialogue." },
+        { name: "Point-of-View (POV)", desc: "As if through the eyes of a character." },
+        { name: "Tracking / Following Shot", desc: "Camera follows a character's movement." }
+      ]}
+    ]},
+    { title: "🎭 BLOCKING TECHNIQUES (ACTOR PLACEMENT & MOVEMENT)", subs: [
+      { sub: "🔁 Static Blocking", items: [
+        { name: "Centered Blocking", desc: "Subject placed center-frame; suggests control or focus." },
+        { name: "Rule of Thirds", desc: "Actor placed at 1/3rd of the frame; visually balanced." },
+        { name: "Foreground/Background Interaction", desc: "One actor close to lens, another far; creates depth or power dynamic." },
+        { name: "Symmetrical Blocking", desc: "Actors or elements mirrored; often formal or stylized (e.g., Wes Anderson)." },
+        { name: "Isolated Blocking", desc: "Actor alone in a wide shot; emphasizes solitude or vulnerability." }
+      ]},
+      { sub: "🎬 Dynamic Blocking", items: [
+        { name: "Crossing Paths", desc: "Characters move past each other; shows conflict, missed connection." },
+        { name: "Overlapping Movement", desc: "One actor moves into or out of another's space; can show intimacy or tension." },
+        { name: "Depth Blocking", desc: "Characters arranged at varying distances from camera to imply hierarchy or emotional distance." },
+        { name: "Circular Blocking", desc: "Characters orbit around each other; suggests shifting power or negotiation." },
+        { name: "Triangular Blocking", desc: "Three-character layout forming a triangle; used in love triangles, power struggles." }
+      ]},
+      { sub: "👟 Movement-Based Blocking", items: [
+        { name: "Walk and Talk", desc: "Characters converse while moving; energetic or expository." },
+        { name: "Push In / Pull Out", desc: "Camera moves toward/away from actor while they remain still." },
+        { name: "Switching Focus", desc: "Focus shifts from one character to another without moving the camera." },
+        { name: "Tableau Blocking", desc: "Actors pose or remain fixed as in a painting; dramatic and formal." },
+        { name: "Re-blocking", desc: "Actors reposition during a take; can shift tone, power dynamics, or emphasis." }
+      ]}
+    ]},
+    { title: "🎨 ADVANCED COMPOSITION TECHNIQUES", subs: [
+      { sub: "🪞 Framing Devices", items: [
+        { name: "Frame Within a Frame", desc: "Doors, windows, mirrors used to isolate or spotlight subjects." },
+        { name: "Silhouetting", desc: "Subject in shadow against a lit background; emphasizes form." },
+        { name: "Reflections", desc: "Mirrors, puddles, glass used for thematic layering." }
+      ]},
+      { sub: "🌀 Lens Effects", items: [
+        { name: "Deep Focus", desc: "Everything in frame (foreground to background) is in focus (e.g., Citizen Kane)." },
+        { name: "Shallow Focus", desc: "One plane in focus, rest blurred; guides viewer attention." },
+        { name: "Rack Focus", desc: "Shift focus from one subject to another during a shot." }
+      ]},
+      { sub: "👁 Perspective & Line", items: [
+        { name: "Leading Lines", desc: "Roads, hallways, or beams guiding the eye to the subject." },
+        { name: "Diagonals", desc: "Angled elements create dynamic tension." },
+        { name: "Negative Space", desc: "Empty areas around a subject; conveys isolation or vulnerability." }
+      ]}
+    ]},
+    { title: "🛠 SHOT FUNCTION (NARRATIVE PURPOSE)", subs: [
+      { sub: null, items: [
+        { name: "Establishing Shot", desc: "Sets the scene." },
+        { name: "Master Shot", desc: "Covers the entire scene/action." },
+        { name: "Insert Shot", desc: "Focus on an object or detail." },
+        { name: "Reaction Shot", desc: "Shows a character's response." },
+        { name: "Cutaway", desc: "Temporarily shifts to something outside the main action." },
+        { name: "Two-Shot / Group Shot", desc: "Two or more characters in frame, often for dialogue or relationships." },
+        { name: "Shot/Reverse Shot", desc: "Alternates between characters during conversation." },
+        { name: "Montage", desc: "Series of shots conveying passage of time or thematic connection." }
+      ]}
+    ]}
+  ];
+
+  // Flat pool of every item, tagged with which category/sub-category it came from
+  const FLAT = [];
+  DATA.forEach(cat=>{
+    cat.subs.forEach(subcat=>{
+      subcat.items.forEach(item=>{
+        FLAT.push({ ...item, category: cat.title, sub: subcat.sub });
+      });
+    });
+  });
+
+  function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  function switchTab(i){
+    const win = document.getElementById('win-camerashots');
+    win.querySelectorAll('.sref-tab').forEach((t,idx)=>{
+      t.classList.toggle('active', idx===i);
+    });
+    win.querySelectorAll('.cam-tabContent').forEach((c,idx)=>{
+      c.style.display = idx===i ? 'block' : 'none';
+    });
+    if(i===1) renderFullList();
+  }
+
+  let lastResults = [];
+
+  function roll(){
+    const count = Math.min(+document.getElementById('cam-count').value, FLAT.length);
+    const shuffled = [...FLAT].sort(()=>0.5-Math.random());
+    const picked = shuffled.slice(0, count);
+    lastResults = picked;
+
+    const box = document.getElementById('cam-results');
+    box.innerHTML = '';
+    picked.forEach(item=>{
+      const card = document.createElement('div');
+      card.className = 'cam-result-card';
+      card.innerHTML = `
+        <div class="cam-result-top">
+          <div>
+            <div class="cam-result-name">${item.name}</div>
+            <div class="cam-result-desc">${item.desc}</div>
+            <div class="cam-result-tag">${item.category.replace(/^[^\w]+/,'').trim()}${item.sub ? ' — ' + item.sub.replace(/^[^\w]+/,'').trim() : ''}</div>
+          </div>
+          <button class="btn95 cam-cardCopyBtn">Copy</button>
+        </div>
+      `;
+      const cardBtn = card.querySelector('.cam-cardCopyBtn');
+      cardBtn.addEventListener('click', ()=> copyText(`${item.name} – ${item.desc}`, cardBtn));
+      box.appendChild(card);
+    });
+
+    document.getElementById('cam-copyBtn').disabled = picked.length===0;
+  }
+
+  function copyText(text, btn){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).catch(()=>fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
+    }
+
+    const original = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    setTimeout(()=>{ btn.textContent = original; }, 1200);
+  }
+
+  function copyResults(btn){
+    if(!lastResults.length) return;
+    const text = lastResults.map(item => `${item.name} – ${item.desc}`).join('\n');
+    copyText(text, btn);
+  }
+
+  function fallbackCopy(text){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+  }
+
+  function renderFullList(){
+    const box = document.getElementById('cam-fulllist');
+    if(box.dataset.rendered) return; // static content, only needs to be built once
+    let html = '';
+    DATA.forEach(cat=>{
+      html += `<h3>${cat.title}</h3>`;
+      cat.subs.forEach(subcat=>{
+        if(subcat.sub) html += `<h4>${subcat.sub}</h4>`;
+        html += '<ul>';
+        subcat.items.forEach(item=>{
+          html += `<li><b>${item.name}</b> – ${item.desc}</li>`;
+        });
+        html += '</ul>';
+      });
+    });
+    box.innerHTML = html;
+    box.dataset.rendered = 'true';
+  }
+
+  return { switchTab, roll, copyResults };
 })();
 
 /* =====================================================
