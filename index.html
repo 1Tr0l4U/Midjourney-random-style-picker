@@ -480,6 +480,34 @@ input.field95, textarea.field95, select.field95{
 }
 .sref-label{font-weight:bold;font-size:11px;display:block;margin-top:6px}
 
+/* PerfectPixel */
+.pp-credit{
+  font-size:10px;color:#444;margin-bottom:8px;
+}
+.pp-credit a{
+  color:var(--titlebar1);
+}
+.pp-preview-box{
+  background:#fff;
+  min-height:160px;
+  display:flex;align-items:center;justify-content:center;
+  overflow:auto;padding:6px;
+}
+.pp-preview-placeholder{font-size:11px;color:#666;font-style:italic}
+.pp-preview-box img{
+  max-width:100%;max-height:220px;object-fit:contain;
+}
+.pp-preview-box img.pp-pixelated{
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+}
+.pp-zoom-row{
+  display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;
+}
+.pp-zoom-row input[type="range"]{
+  flex:1;min-width:100px;
+}
+
 #notesArea{
   width:100%;height:100%;min-height:220px;
   border:none;outline:none;resize:none;
@@ -565,6 +593,11 @@ input.field95, textarea.field95, select.field95{
   <div class="icon" style="left:18px; top:418px" ondblclick="OS.open('bin')">
     <div class="glyph">🗑️</div>
     <div class="label">Recycle Bin</div>
+  </div>
+
+  <div class="icon" style="left:18px; top:518px" ondblclick="OS.open('perfectpixel')">
+    <div class="glyph">🧩</div>
+    <div class="label">PerfectPixel</div>
   </div>
 
   <!-- ============ WINDOW: Random Style Picker ============ -->
@@ -696,6 +729,7 @@ input.field95, textarea.field95, select.field95{
         <tr><td>💿</td><td>CD-ROM (D:)</td></tr>
         <tr><td>📁</td><td>My Programs <span class="sref-small">(empty — add your own later)</span></td></tr>
         <tr><td>🔗</td><td>Random Style Picker.exe</td></tr>
+        <tr><td>🧩</td><td>PerfectPixel.exe</td></tr>
       </table>
     </div>
     <div class="statusbar">5 object(s) | Free space: 512 MB</div>
@@ -789,6 +823,66 @@ NOTES
     <div class="resize-handle" onmousedown="OS.startResize(event,'bin')" ontouchstart="OS.startResize(event,'bin')"></div>
   </div>
 
+  <!-- ============ WINDOW: PerfectPixel ============ -->
+  <div class="window raised hidden" id="win-perfectpixel" data-default-width="480" data-default-height="560" style="left:160px; top:50px; width:480px; height:560px;">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'perfectpixel')" ontouchstart="OS.startDrag(event,'perfectpixel')">
+      <div class="ttitle"><span>🧩</span><span>PerfectPixel</span></div>
+      <div class="tbtns">
+        <div class="tbtn" onclick="OS.minimize('perfectpixel')">_</div>
+        <div class="tbtn" onclick="OS.toggleMax('perfectpixel')">□</div>
+        <div class="tbtn" onclick="OS.close('perfectpixel')">✕</div>
+      </div>
+    </div>
+    <div class="menubar"><span>File</span><span>Edit</span><span>View</span><span>Help</span></div>
+    <div class="window-body">
+
+      <div class="pp-credit">
+        Credits: Project by theamusing —
+        <a href="https://github.com/theamusing/perfectPixel" target="_blank" rel="noopener noreferrer">GitHub</a> ·
+        <a href="https://theamusing.github.io/perfectPixel_webdemo/" target="_blank" rel="noopener noreferrer">web demo</a>
+      </div>
+
+      <div class="sref-card">
+        <label><b>Original Image</b></label><br>
+        <div class="sref-small">Upload messy AI pixel-art and snap it to a clean, aligned grid.</div>
+        <input type="file" id="pp-fileInput" accept="image/*" class="field95" style="margin-top:8px;width:100%">
+        <div class="pp-preview-box sunken" id="pp-inputPreview" style="margin-top:8px">
+          <span class="pp-preview-placeholder">No image yet</span>
+        </div>
+      </div>
+
+      <div class="sref-card">
+        <label class="sref-label">Sampling Method</label>
+        <select id="pp-samplingMethod" class="field95">
+          <option value="center">Center Sample</option>
+          <option value="majority">Majority Cluster</option>
+        </select>
+        <div style="margin-top:8px">
+          <button class="btn95" id="pp-processBtn" onclick="PerfectPixelApp.process()" disabled>Generate Scaled Image</button>
+        </div>
+        <div class="sref-small" id="pp-status" style="margin-top:6px"></div>
+      </div>
+
+      <div class="sref-card">
+        <label><b>Perfect Pixel Result</b></label>
+        <div class="pp-preview-box sunken" id="pp-outputPreview" style="margin-top:8px">
+          <span class="pp-preview-placeholder">No output yet</span>
+        </div>
+        <div class="pp-zoom-row">
+          <label class="sref-small" style="margin:0">Zoom / Export Scale:</label>
+          <input type="range" id="pp-zoomSlider" min="1" max="16" step="1" value="4">
+          <span id="pp-zoomLabel" class="sref-small" style="margin:0;font-weight:bold">4x</span>
+        </div>
+        <div style="margin-top:8px">
+          <button class="btn95" id="pp-downloadBtn" onclick="PerfectPixelApp.download()" disabled>💾 Download Scaled Image</button>
+        </div>
+      </div>
+
+    </div>
+    <div class="statusbar" id="pp-statusbar">Ready</div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'perfectpixel')" ontouchstart="OS.startResize(event,'perfectpixel')"></div>
+  </div>
+
 </div>
 
 <!-- ---------- taskbar ---------- -->
@@ -807,6 +901,7 @@ NOTES
     <div class="startitem" onclick="OS.open('notes');OS.closeStart()"><span class="g">📝</span>Notes</div>
     <div class="startitem" onclick="OS.open('paint');OS.closeStart()"><span class="g">🎨</span>Paint</div>
     <div class="startitem" onclick="OS.open('bin');OS.closeStart()"><span class="g">🗑️</span>Recycle Bin</div>
+    <div class="startitem" onclick="OS.open('perfectpixel');OS.closeStart()"><span class="g">🧩</span>PerfectPixel</div>
     <div class="startsep"></div>
     <div class="startitem" style="opacity:.6"><span class="g">➕</span>Add Programs...</div>
     <div class="startsep"></div>
@@ -1170,6 +1265,47 @@ const SrefApp = (function(){
     return chosen;
   }
 
+  /* Inserts new values into a prompt smartly instead of always tacking on
+     a fresh flag at the end:
+     - If `flag` (e.g. "--sref" or "--p") isn't in the prompt yet, appends
+       "<flag> <values>" at the end, same as before.
+     - If `flag` IS already in the prompt, the new values are inserted right
+       after whatever values already follow that flag (and before the next
+       "--something" flag, if any), so the prompt keeps a single, valid
+       flag section instead of getting a second duplicate flag — and every
+       other part of the prompt is left untouched. */
+  /* `flagAliases` can be a single flag string, or an array of aliases that
+     all mean the same flag (e.g. "--p" / "--profile" / "--personalize"),
+     so an already-existing alias is detected and used, while a brand-new
+     insertion still defaults to the canonical (first) form. */
+  function insertIntoPrompt(promptText, flagAliases, newValues){
+    const flags = Array.isArray(flagAliases) ? flagAliases : [flagAliases];
+    const canonical = flags[0];
+    const valuesStr = newValues.join(' ');
+
+    const escapeRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const flagPattern = flags.map(escapeRe).join('|');
+    const flagRegex = new RegExp(`(^|\\s)(${flagPattern})(?=\\s|$)`);
+    const match = promptText.match(flagRegex);
+
+    if(!match){
+      const base = promptText.trimEnd();
+      const sep = base.length ? ' ' : '';
+      return base + sep + canonical + ' ' + valuesStr;
+    }
+
+    const matchedFlag = match[2];
+    const flagStart = match.index + match[0].lastIndexOf(matchedFlag);
+    const afterFlag = flagStart + matchedFlag.length;
+    const rest = promptText.slice(afterFlag);
+    const nextFlagMatch = rest.match(/\s--\S+/);
+    const insertPos = nextFlagMatch ? (afterFlag + nextFlagMatch.index) : promptText.length;
+
+    const before = promptText.slice(0, insertPos).trimEnd();
+    const after = promptText.slice(insertPos);
+    return before + ' ' + valuesStr + after;
+  }
+
   function copy(btn, text){
     if(navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(String(text)).catch(()=>fallback());
@@ -1389,7 +1525,7 @@ const SrefApp = (function(){
 
     let srefItems = [];
     let moodboardItems = [];
-    let promptText = document.getElementById('sref-prompt1').value + ' ';
+    let promptText = document.getElementById('sref-prompt1').value;
 
     if(includeSref){
       const count = +document.getElementById('sref-urlCount1').value;
@@ -1399,9 +1535,9 @@ const SrefApp = (function(){
         ? pickUniqueByUser(data, count)
         : pickUniqueFlat(Object.values(data).flat(), count);
 
-      srefItems.forEach((item,i)=>{
-        promptText += (i===0 ? '--sref ' : '') + item.value + ' ';
-      });
+      if(srefItems.length){
+        promptText = insertIntoPrompt(promptText, '--sref', srefItems.map(item=>item.value));
+      }
     }
 
     if(includeMoodboard){
@@ -1412,9 +1548,9 @@ const SrefApp = (function(){
         ? pickUniqueByUser(moodboardData, count)
         : pickUniqueFlat(Object.values(moodboardData).flat(), count);
 
-      moodboardItems.forEach((item,i)=>{
-        promptText += (i===0 ? '--p ' : '') + item.value + ' ';
-      });
+      if(moodboardItems.length){
+        promptText = insertIntoPrompt(promptText, ['--p', '--profile', '--personalize'], moodboardItems.map(item=>item.value));
+      }
     }
 
     if(!srefItems.length && !moodboardItems.length) return;
@@ -1445,17 +1581,10 @@ const SrefApp = (function(){
 
     if(!items.length) return;
 
-    let result = document.getElementById('sref-prompt3').value + ' ';
-    items.forEach((item,i)=>{
-      const w = ws[i];
-      if(i===0){
-        result += `--sref ${item.value} ${w.value} `;
-      } else {
-        result += `${item.value} ${w.value} `;
-      }
-    });
+    const pairs = items.map((item,i)=> `${item.value} ${ws[i].value}`);
+    const promptText = insertIntoPrompt(document.getElementById('sref-prompt3').value, '--sref', pairs);
 
-    render('sref-out3', result.trim());
+    render('sref-out3', promptText.trim());
 
     document.getElementById('sref-output-label').textContent = '🖼 Style Reference';
     const box = document.getElementById('sref-imageOutput');
@@ -1468,6 +1597,620 @@ const SrefApp = (function(){
   loadRemoteData();
 
   return {switchTab, copy, buildWeights, dynamicGenerate, closeLightbox, randomCombined, updateSourceToggles, refreshToggles, loadRemoteData, toggleFileMenu};
+})();
+
+/* =====================================================
+   PaintApp — simple canvas painter
+===================================================== */
+/* =====================================================
+   PerfectPixelApp — client-side port of theamusing/perfectPixel
+   (https://github.com/theamusing/perfectPixel, MIT licensed) and its
+   official web demo (https://github.com/theamusing/perfectPixel_webdemo).
+   The grid-detection/refinement algorithm below is ported directly from
+   that project's TypeScript source so this runs fully offline, inside this
+   single file — it has no runtime dependency on the original repos at all,
+   so it keeps working even if either of them ever goes away.
+===================================================== */
+const PerfectPixelApp = (function(){
+
+  /* ---------- ndarray-lite (ported) ---------- */
+  function createNdArray(data, shape){
+    const stride = [];
+    let s = 1;
+    for(let i=shape.length-1; i>=0; i--){ stride[i]=s; s*=shape[i]; }
+    return {
+      data, shape, stride, offset:0, size:data.length,
+      get(...indices){
+        let idx=0;
+        for(let i=0;i<indices.length;i++) idx += indices[i]*stride[i];
+        return data[idx];
+      },
+      set(...args){
+        const val = args.pop();
+        let idx=0;
+        for(let i=0;i<args.length;i++) idx += args[i]*stride[i];
+        data[idx]=val;
+      }
+    };
+  }
+  const ndOps = { assigns(array, value){ array.data.fill(value); } };
+
+  function fft1d(dir, real, imag){
+    const n = real.length;
+    if(n<=1) return;
+    let j=0;
+    for(let i=0;i<n;i++){
+      if(i<j){
+        [real[i],real[j]]=[real[j],real[i]];
+        [imag[i],imag[j]]=[imag[j],imag[i]];
+      }
+      let m=n>>1;
+      while(m>=1 && j>=m){ j-=m; m>>=1; }
+      j+=m;
+    }
+    for(let len=2; len<=n; len<<=1){
+      const angle = (2*Math.PI*dir)/len;
+      const wlenR = Math.cos(angle), wlenI = Math.sin(angle);
+      for(let i=0;i<n;i+=len){
+        let wR=1, wI=0;
+        for(let k=0;k<len/2;k++){
+          const uR=real[i+k], uI=imag[i+k];
+          const vR=real[i+k+len/2]*wR - imag[i+k+len/2]*wI;
+          const vI=real[i+k+len/2]*wI + imag[i+k+len/2]*wR;
+          real[i+k]=uR+vR; imag[i+k]=uI+vI;
+          real[i+k+len/2]=uR-vR; imag[i+k+len/2]=uI-vI;
+          const tmpR = wR*wlenR - wI*wlenI;
+          wI = wR*wlenI + wI*wlenR;
+          wR = tmpR;
+        }
+      }
+    }
+    if(dir===-1){ for(let i=0;i<n;i++){ real[i]/=n; imag[i]/=n; } }
+  }
+
+  function fft2d(dir, real, imag){
+    const [rows, cols] = real.shape;
+    for(let i=0;i<rows;i++){
+      const r=new Float32Array(cols), m=new Float32Array(cols);
+      for(let j=0;j<cols;j++){ r[j]=real.get(i,j); m[j]=imag.get(i,j); }
+      fft1d(dir, r, m);
+      for(let j=0;j<cols;j++){ real.set(i,j,r[j]); imag.set(i,j,m[j]); }
+    }
+    for(let j=0;j<cols;j++){
+      const r=new Float32Array(rows), m=new Float32Array(rows);
+      for(let i=0;i<rows;i++){ r[i]=real.get(i,j); m[i]=imag.get(i,j); }
+      fft1d(dir, r, m);
+      for(let i=0;i<rows;i++){ real.set(i,j,r[i]); imag.set(i,j,m[i]); }
+    }
+  }
+
+  /* ---------- perfectPixelService (ported) ---------- */
+  function nextPow2(n, maxVal){ return Math.min(Math.pow(2, Math.ceil(Math.log2(n))), maxVal); }
+
+  function rgbToGray(imageRgb){
+    const [h,w,c] = imageRgb.shape;
+    const grayData = new Float32Array(h*w);
+    const gray = createNdArray(grayData, [h,w]);
+    for(let i=0;i<h;i++){
+      for(let j=0;j<w;j++){
+        if(c>=3){
+          const r=imageRgb.get(i,j,0), g=imageRgb.get(i,j,1), b=imageRgb.get(i,j,2);
+          gray.set(i,j, 0.299*r + 0.587*g + 0.114*b);
+        } else {
+          gray.set(i,j, imageRgb.get(i,j,0));
+        }
+      }
+    }
+    return gray;
+  }
+
+  function normalizeMinMax(x, a=0.0, b=1.0){
+    const size=x.size, data=x.data;
+    let mn=Infinity, mx=-Infinity;
+    for(let i=0;i<size;i++){ if(data[i]<mn) mn=data[i]; if(data[i]>mx) mx=data[i]; }
+    const out = createNdArray(new Float32Array(size), x.shape);
+    const diff = mx-mn;
+    if(diff<1e-8){ ndOps.assigns(out,a); return out; }
+    for(let i=0;i<size;i++){ out.data[i] = a + (b-a)*(data[i]-mn)/diff; }
+    return out;
+  }
+
+  function conv2dSame(image, kernel){
+    const [ih,iw]=image.shape;
+    const [kh,kw]=kernel.shape;
+    const ph=Math.floor(kh/2), pw=Math.floor(kw/2);
+    const out = createNdArray(new Float32Array(ih*iw), [ih,iw]);
+    for(let i=0;i<ih;i++){
+      for(let j=0;j<iw;j++){
+        let sum=0;
+        for(let ky=0;ky<kh;ky++){
+          for(let kx=0;kx<kw;kx++){
+            let py=i+ky-ph, px=j+kx-pw;
+            py=Math.min(Math.max(py,0),ih-1);
+            px=Math.min(Math.max(px,0),iw-1);
+            sum += image.get(py,px)*kernel.get(ky,kx);
+          }
+        }
+        out.set(i,j,sum);
+      }
+    }
+    return out;
+  }
+
+  function sobelXy(gray, ksize=3){
+    let kx, ky;
+    if(ksize===3){
+      kx = createNdArray(new Float32Array([-1,0,1,-2,0,2,-1,0,1]), [3,3]);
+      ky = createNdArray(new Float32Array([-1,-2,-1,0,0,0,1,2,1]), [3,3]);
+    } else if(ksize===5){
+      const kxData = [-5,-4,0,4,5, -8,-10,0,10,8, -10,-20,0,20,10, -8,-10,0,10,8, -5,-4,0,4,5];
+      kx = createNdArray(new Float32Array(kxData), [5,5]);
+      ky = createNdArray(new Float32Array(25), [5,5]);
+      for(let r=0;r<5;r++) for(let c=0;c<5;c++) ky.set(c,r,kx.get(r,c));
+    } else {
+      throw new Error("ksize must be 3 or 5");
+    }
+    return { gx: conv2dSame(gray,kx), gy: conv2dSame(gray,ky) };
+  }
+
+  function computeFftMagnitude(grayImage){
+    const [h,w] = grayImage.shape;
+    const ph = nextPow2(h,1024), pw = nextPow2(w,1024);
+    const real = createNdArray(new Float32Array(ph*pw), [ph,pw]);
+    const imag = createNdArray(new Float32Array(ph*pw), [ph,pw]);
+    ndOps.assigns(real,0); ndOps.assigns(imag,0);
+    for(let i=0;i<Math.min(h,ph);i++){
+      for(let j=0;j<Math.min(w,pw);j++){ real.set(i,j, grayImage.get(i,j)); }
+    }
+    fft2d(1, real, imag);
+    const mag = createNdArray(new Float32Array(ph*pw), [ph,pw]);
+    const halfH=Math.floor(ph/2), halfW=Math.floor(pw/2);
+    for(let i=0;i<ph;i++){
+      for(let j=0;j<pw;j++){
+        const ni=(i+halfH)%ph, nj=(j+halfW)%pw;
+        const r=real.get(ni,nj), im=imag.get(ni,nj);
+        const m=Math.sqrt(r*r+im*im);
+        mag.set(i,j, 1.0-Math.log1p(m));
+      }
+    }
+    return normalizeMinMax(mag,0.0,1.0);
+  }
+
+  function smooth1d(v, k=17){
+    if(k<3) return new Float32Array(v);
+    if(k%2===0) k+=1;
+    const sigma=k/6.0, center=Math.floor(k/2);
+    const kernel=new Float32Array(k);
+    let kernelSum=0;
+    for(let i=0;i<k;i++){ const x=i-center; kernel[i]=Math.exp(-(x*x)/(2*sigma*sigma)); kernelSum+=kernel[i]; }
+    const normSum = kernelSum+1e-8;
+    const out = new Float32Array(v.length);
+    for(let i=0;i<v.length;i++){
+      let acc=0;
+      for(let j=0;j<k;j++){
+        const idx=i+j-center;
+        if(idx>=0 && idx<v.length) acc += v[idx]*(kernel[j]/normSum);
+      }
+      out[i]=acc;
+    }
+    return out;
+  }
+
+  function detectPeak(proj, relThr=0.35, minDist=6){
+    const center = Math.floor(proj.length/2);
+    let mx=0;
+    for(let i=0;i<proj.length;i++) if(proj[i]>mx) mx=proj[i];
+    if(mx<1e-6) return null;
+    const thr = mx*relThr;
+    const peakWidth = 6;
+    const candidates = [];
+    for(let i=1;i<proj.length-1;i++){
+      let isPeak=true;
+      for(let j=1;j<peakWidth;j++){
+        if(i-j<0 || i+j>=proj.length) continue;
+        if(proj[i-j+1]<proj[i-j] || proj[i+j-1]<proj[i+j]){ isPeak=false; break; }
+      }
+      if(isPeak && proj[i]>=thr){
+        let leftClimb=0;
+        for(let k=i;k>0;k--){ if(proj[k]>proj[k-1]) leftClimb=Math.abs(proj[i]-proj[k-1]); else break; }
+        let rightFall=0;
+        for(let k=i;k<proj.length-1;k++){ if(proj[k]>proj[k+1]) rightFall=Math.abs(proj[i]-proj[k+1]); else break; }
+        candidates.push({ index:i, score: Math.max(leftClimb,rightFall) });
+      }
+    }
+    const left = candidates.filter(c=>c.index<center-minDist && c.index>center*0.15).sort((a,b)=>b.score-a.score);
+    const right = candidates.filter(c=>c.index>center+minDist && c.index<center*1.85).sort((a,b)=>b.score-a.score);
+    if(left.length===0 || right.length===0) return null;
+    const lIdx=left[0].index, rIdx=right[0].index;
+    return { period: Math.abs(rIdx-lIdx)/2, left:lIdx, right:rIdx };
+  }
+
+  function findBestGrid(origin, rangeMin, rangeMax, gradMag, thr=0){
+    let best = Math.round(origin);
+    let mx=0;
+    for(let i=0;i<gradMag.length;i++) if(gradMag[i]>mx) mx=gradMag[i];
+    if(mx<1e-6) return best;
+    const relThr = mx*thr;
+    const lo = -Math.round(rangeMin), hi = Math.round(rangeMax);
+    const peaks = [];
+    for(let i=lo;i<=hi;i++){
+      const candidate = Math.round(origin+i);
+      if(candidate<=0 || candidate>=gradMag.length-1) continue;
+      if(gradMag[candidate]>gradMag[candidate-1] && gradMag[candidate]>gradMag[candidate+1] && gradMag[candidate]>=relThr){
+        peaks.push({ val: gradMag[candidate], idx: candidate });
+      }
+    }
+    if(peaks.length===0) return best;
+    peaks.sort((a,b)=>b.val-a.val);
+    return peaks[0].idx;
+  }
+
+  function sampleCenter(image, xCoords, yCoords){
+    const nx=xCoords.length-1, ny=yCoords.length-1;
+    const C=image.shape[2];
+    const out = createNdArray(new Float32Array(ny*nx*C), [ny,nx,C]);
+    for(let j=0;j<ny;j++){
+      const cy = Math.floor((yCoords[j]+yCoords[j+1])*0.5);
+      for(let i=0;i<nx;i++){
+        const cx = Math.floor((xCoords[i]+xCoords[i+1])*0.5);
+        for(let k=0;k<C;k++) out.set(j,i,k, image.get(cy,cx,k));
+      }
+    }
+    return out;
+  }
+
+  function sampleMajority(image, xCoords, yCoords, maxSamples=256, iters=6, seed=0){
+    const [H,W,C]=image.shape;
+    const nx=xCoords.length-1, ny=yCoords.length-1;
+    const out = createNdArray(new Float32Array(ny*nx*C), [ny,nx,C]);
+    let seedVal=seed;
+    const lcg = ()=>{ seedVal=(1103515245*seedVal+12345)&0x7fffffff; return seedVal/0x7fffffff; };
+    for(let j=0;j<ny;j++){
+      let y0=Math.max(0,Math.min(H,Math.floor(yCoords[j])));
+      let y1=Math.max(0,Math.min(H,Math.floor(yCoords[j+1])));
+      if(y1<=y0) y1=Math.min(y0+1,H);
+      for(let i=0;i<nx;i++){
+        let x0=Math.max(0,Math.min(W,Math.floor(xCoords[i])));
+        let x1=Math.max(0,Math.min(W,Math.floor(xCoords[i+1])));
+        if(x1<=x0) x1=Math.min(x0+1,W);
+        const cellPixels=[];
+        for(let py=y0;py<y1;py++){
+          for(let px=x0;px<x1;px++){
+            const p=new Float32Array(C);
+            for(let k=0;k<C;k++) p[k]=image.get(py,px,k);
+            cellPixels.push(p);
+          }
+        }
+        if(cellPixels.length===0){ for(let k=0;k<C;k++) out.set(j,i,k,0); continue; }
+        let samples=cellPixels;
+        if(cellPixels.length>maxSamples){
+          samples=[];
+          for(let s=0;s<maxSamples;s++) samples.push(cellPixels[Math.floor(lcg()*cellPixels.length)]);
+        }
+        let c0=new Float32Array(samples[0]);
+        let c1=new Float32Array(samples[0]);
+        let maxDist=-1;
+        for(let s=0;s<samples.length;s++){
+          let d=0;
+          for(let k=0;k<C;k++) d += Math.pow(samples[s][k]-c0[k],2);
+          if(d>maxDist){ maxDist=d; c1=new Float32Array(samples[s]); }
+        }
+        let finalC=c0;
+        for(let it=0;it<iters;it++){
+          let sum0=new Float32Array(C), count0=0;
+          let sum1=new Float32Array(C), count1=0;
+          for(let s=0;s<samples.length;s++){
+            let d0=0,d1=0;
+            for(let k=0;k<C;k++){ d0+=Math.pow(samples[s][k]-c0[k],2); d1+=Math.pow(samples[s][k]-c1[k],2); }
+            if(d1<d0){ for(let k=0;k<C;k++) sum1[k]+=samples[s][k]; count1++; }
+            else { for(let k=0;k<C;k++) sum0[k]+=samples[s][k]; count0++; }
+          }
+          if(count0>0) for(let k=0;k<C;k++) c0[k]=sum0[k]/count0;
+          if(count1>0) for(let k=0;k<C;k++) c1[k]=sum1[k]/count1;
+          finalC = (count1>=count0) ? c1 : c0;
+        }
+        for(let k=0;k<C;k++) out.set(j,i,k, finalC[k]);
+      }
+    }
+    return out;
+  }
+
+  function refineGrids(image, gridX, gridY){
+    const [H,W]=image.shape;
+    const cellW=W/gridX, cellH=H/gridY;
+    const gray = rgbToGray(image);
+    const { gx, gy } = sobelXy(gray,3);
+    const gradXSum=new Float32Array(W), gradYSum=new Float32Array(H);
+    for(let i=0;i<H;i++){
+      for(let j=0;j<W;j++){ gradXSum[j]+=Math.abs(gx.get(i,j)); gradYSum[i]+=Math.abs(gy.get(i,j)); }
+    }
+
+    let xCoords=[], yCoords=[];
+    let x = findBestGrid(W/2, cellW, cellW, gradXSum);
+    while(x < W+cellW/2){ x = findBestGrid(x, cellW/3, cellW/3, gradXSum); xCoords.push(x); x+=cellW; }
+    x = findBestGrid(W/2, cellW, cellW, gradXSum) - cellW;
+    while(x > -cellW/2 && xCoords.length <= W/cellW){ x = findBestGrid(x, cellW/3, cellW/3, gradXSum); xCoords.push(x); x-=cellW; }
+
+    let y = findBestGrid(H/2, cellH, cellH, gradYSum);
+    while(y < H+cellH/2){ y = findBestGrid(y, cellH/3, cellH/3, gradYSum); yCoords.push(y); y+=cellH; }
+    y = findBestGrid(H/2, cellH, cellH, gradYSum) - cellH;
+    while(y > -cellH/2 && yCoords.length <= H/cellH){ y = findBestGrid(y, cellH/3, cellH/3, gradYSum); yCoords.push(y); y-=cellH; }
+
+    if(Math.abs(xCoords.length - yCoords.length) < 2){
+      if(xCoords.length % 2 === 0){
+        if(xCoords.length > yCoords.length) xCoords.pop();
+        else if(xCoords.length < yCoords.length) xCoords.push(0);
+        else { xCoords.push(0); yCoords.push(0); }
+      } else {
+        if(xCoords.length > yCoords.length) yCoords.push(0);
+        else if(xCoords.length < yCoords.length) yCoords.pop();
+      }
+    }
+    return { xCoords: xCoords.sort((a,b)=>a-b), yCoords: yCoords.sort((a,b)=>a-b) };
+  }
+
+  function getMedian(arr){
+    if(arr.length===0) return 0;
+    const sorted=[...arr].sort((a,b)=>a-b);
+    const mid=Math.floor(sorted.length/2);
+    return sorted.length%2!==0 ? sorted[mid] : (sorted[mid-1]+sorted[mid])/2;
+  }
+
+  function estimateGridGradient(image, relThr=0.2){
+    const gray = rgbToGray(image);
+    const [H,W] = gray.shape;
+    const { gx, gy } = sobelXy(gray,3);
+    const gXSum=new Float32Array(W), gYSum=new Float32Array(H);
+    for(let i=0;i<H;i++) for(let j=0;j<W;j++){ gXSum[j]+=Math.abs(gx.get(i,j)); gYSum[i]+=Math.abs(gy.get(i,j)); }
+    const findPeaks = (arr, thr)=>{
+      const p=[];
+      for(let i=1;i<arr.length-1;i++){
+        if(arr[i]>arr[i-1] && arr[i]>arr[i+1] && arr[i]>=thr){
+          if(p.length===0 || i-p[p.length-1]>=4) p.push(i);
+        }
+      }
+      return p;
+    };
+    let mxX=0; for(const v of gXSum) if(v>mxX) mxX=v;
+    let mxY=0; for(const v of gYSum) if(v>mxY) mxY=v;
+    const pX = findPeaks(gXSum, mxX*relThr), pY = findPeaks(gYSum, mxY*relThr);
+    if(pX.length<4 || pY.length<4) return null;
+    const getIntv = (p)=>{ const d=[]; for(let i=1;i<p.length;i++) d.push(p[i]-p[i-1]); return getMedian(d); };
+    return { scaleCol: W/getIntv(pX), scaleRow: H/getIntv(pY) };
+  }
+
+  function estimateGridFft(image){
+    const gray = rgbToGray(image);
+    const mag = computeFftMagnitude(gray);
+    const [PH,PW] = mag.shape;
+    const bandRow=Math.floor(PW/2), bandCol=Math.floor(PH/2);
+    const rowSum=new Float32Array(PH), colSum=new Float32Array(PW);
+    for(let i=0;i<PH;i++){
+      for(let j=Math.floor(PW/2-bandRow); j<Math.floor(PW/2+bandRow); j++){
+        if(j>=0 && j<PW) rowSum[i]+=mag.get(i,j);
+      }
+    }
+    for(let j=0;j<PW;j++){
+      for(let i=Math.floor(PH/2-bandCol); i<Math.floor(PH/2+bandCol); i++){
+        if(i>=0 && i<PH) colSum[j]+=mag.get(i,j);
+      }
+    }
+    const normRow = normalizeMinMax(createNdArray(rowSum,[PH])).data;
+    const normCol = normalizeMinMax(createNdArray(colSum,[PW])).data;
+    const smoothRow = smooth1d(normRow,17);
+    const smoothCol = smooth1d(normCol,17);
+    const rowResult = detectPeak(smoothRow);
+    const colResult = detectPeak(smoothCol);
+    const [H,W] = image.shape;
+    const scaleRow = rowResult ? (rowResult.period*H/PH) : null;
+    const scaleCol = colResult ? (colResult.period*W/PW) : null;
+    return { scaleCol, scaleRow };
+  }
+
+  function getPerfectPixel(image, options={}){
+    const { sampleMethod="center", gridSize=null, minSize=4.0 } = options;
+    const [H,W] = image.shape;
+    let scaleCol=null, scaleRow=null;
+
+    if(gridSize){
+      scaleCol = gridSize[0]; scaleRow = gridSize[1];
+    } else {
+      const est = estimateGridFft(image);
+      let fftSuccess = est.scaleCol!==null && est.scaleRow!==null && est.scaleCol>0 && est.scaleRow>0;
+      if(fftSuccess){
+        const psx = W/est.scaleCol, psy = H/est.scaleRow;
+        const maxRatio=1.5, maxPixelSize=20.0;
+        const ratio = psx/psy;
+        if(Math.min(psx,psy)<minSize || Math.max(psx,psy)>maxPixelSize || ratio>maxRatio || (1.0/ratio)>maxRatio){
+          fftSuccess=false;
+        } else {
+          scaleCol = est.scaleCol; scaleRow = est.scaleRow;
+        }
+      }
+      if(!fftSuccess){
+        const est2 = estimateGridGradient(image);
+        if(est2){ scaleCol=est2.scaleCol; scaleRow=est2.scaleRow; }
+        else { const pixelSize=8.0; scaleCol=W/pixelSize; scaleRow=H/pixelSize; }
+      }
+      if(scaleCol!==null && scaleRow!==null){
+        const psx=W/scaleCol, psy=H/scaleRow;
+        const maxRatio=1.5;
+        let finalPixelSize;
+        const ratio = psx/psy;
+        if(ratio>maxRatio || (1.0/ratio)>maxRatio) finalPixelSize = Math.min(psx,psy);
+        else finalPixelSize = (psx+psy)/2.0;
+        scaleCol = Math.round(W/finalPixelSize);
+        scaleRow = Math.round(H/finalPixelSize);
+      }
+    }
+
+    if(scaleCol===null || scaleRow===null || scaleCol<=0 || scaleRow<=0){
+      return { refinedW:null, refinedH:null, scaled:image };
+    }
+
+    const { xCoords, yCoords } = refineGrids(image, scaleCol, scaleRow);
+    const refinedW = xCoords.length-1, refinedH = yCoords.length-1;
+    if(refinedW<=0 || refinedH<=0) return { refinedW:null, refinedH:null, scaled:image };
+
+    const scaled = (sampleMethod==="majority")
+      ? sampleMajority(image, xCoords, yCoords)
+      : sampleCenter(image, xCoords, yCoords);
+
+    return { refinedW, refinedH, scaled };
+  }
+
+  /* ---------- UI wiring ---------- */
+  let inputImageEl = null;
+  let outputCanvas = null;
+  let refinedSize = null;
+
+  function setStatus(msg){
+    document.getElementById('pp-status').textContent = msg;
+    document.getElementById('pp-statusbar').textContent = msg || 'Ready';
+  }
+
+  document.getElementById('pp-fileInput').addEventListener('change', e=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        inputImageEl = img;
+        const box = document.getElementById('pp-inputPreview');
+        box.innerHTML = '';
+        const previewImg = document.createElement('img');
+        previewImg.src = ev.target.result;
+        box.appendChild(previewImg);
+
+        document.getElementById('pp-outputPreview').innerHTML = '<span class="pp-preview-placeholder">No output yet</span>';
+        document.getElementById('pp-downloadBtn').disabled = true;
+        document.getElementById('pp-processBtn').disabled = false;
+        refinedSize = null; outputCanvas = null;
+        setStatus('Image loaded — ready to process.');
+      };
+      img.onerror = ()=> setStatus('Could not load that image.');
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  async function process(){
+    if(!inputImageEl) return;
+    setStatus('Analyzing grid…');
+    document.getElementById('pp-processBtn').disabled = true;
+
+    // let the "Analyzing…" status paint before the (synchronous, sometimes
+    // heavy) algorithm runs
+    await new Promise(r=>setTimeout(r,20));
+
+    try{
+      const img = inputImageEl;
+      const maxDim=1024, minThreshold=64, targetMin=256;
+      let w=img.width, h=img.height;
+      const minSide = Math.min(w,h);
+      if(minSide < minThreshold){
+        const k = Math.ceil((targetMin+1)/minSide);
+        w*=k; h*=k;
+      }
+      if(Math.max(w,h) > maxDim){
+        const s = maxDim/Math.max(w,h);
+        w = Math.round(w*s); h = Math.round(h*s);
+      } else {
+        w = Math.round(w); h = Math.round(h);
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      const ctx = canvas.getContext('2d');
+      if(w > img.width) ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, 0, 0, w, h);
+      const imageData = ctx.getImageData(0,0,w,h);
+      const data = new Float32Array(w*h*4);
+      for(let i=0;i<imageData.data.length;i++) data[i]=imageData.data[i];
+
+      const inputNd = createNdArray(data, [h,w,4]);
+      const samplingMethod = document.getElementById('pp-samplingMethod').value;
+      const result = getPerfectPixel(inputNd, { sampleMethod: samplingMethod });
+
+      if(result.refinedW===null || result.refinedH===null){
+        throw new Error('Failed to refine grid. Try a different sampling method or image.');
+      }
+
+      refinedSize = { w: result.refinedW, h: result.refinedH };
+      const [resH, resW, resC] = result.scaled.shape;
+      outputCanvas = document.createElement('canvas');
+      outputCanvas.width = resW; outputCanvas.height = resH;
+      const outCtx = outputCanvas.getContext('2d');
+      const outImageData = outCtx.createImageData(resW, resH);
+      for(let y=0;y<resH;y++){
+        for(let x=0;x<resW;x++){
+          const outIdx = (y*resW+x)*4;
+          if(resC>=3){
+            outImageData.data[outIdx]   = result.scaled.get(y,x,0);
+            outImageData.data[outIdx+1] = result.scaled.get(y,x,1);
+            outImageData.data[outIdx+2] = result.scaled.get(y,x,2);
+            outImageData.data[outIdx+3] = (resC===4) ? result.scaled.get(y,x,3) : 255;
+          } else {
+            const val = result.scaled.get(y,x,0);
+            outImageData.data[outIdx]=val; outImageData.data[outIdx+1]=val;
+            outImageData.data[outIdx+2]=val; outImageData.data[outIdx+3]=255;
+          }
+        }
+      }
+      outCtx.putImageData(outImageData, 0, 0);
+
+      renderOutputPreview();
+      document.getElementById('pp-downloadBtn').disabled = false;
+      setStatus(`Detected grid: ${refinedSize.w} × ${refinedSize.h}`);
+    } catch(err){
+      document.getElementById('pp-outputPreview').innerHTML =
+        `<span class="pp-preview-placeholder">${err.message || 'Something went wrong processing that image.'}</span>`;
+      setStatus('Detection failed — try the other sampling method.');
+    } finally {
+      document.getElementById('pp-processBtn').disabled = false;
+    }
+  }
+
+  function renderOutputPreview(){
+    if(!outputCanvas || !refinedSize) return;
+    const zoom = +document.getElementById('pp-zoomSlider').value;
+    const box = document.getElementById('pp-outputPreview');
+    box.innerHTML = '';
+    const img = document.createElement('img');
+    img.className = 'pp-pixelated';
+    img.src = outputCanvas.toDataURL();
+    img.style.width = (refinedSize.w * zoom) + 'px';
+    img.style.height = (refinedSize.h * zoom) + 'px';
+    img.style.maxWidth = 'none';
+    img.style.maxHeight = 'none';
+    box.appendChild(img);
+  }
+
+  document.getElementById('pp-zoomSlider').addEventListener('input', function(){
+    document.getElementById('pp-zoomLabel').textContent = this.value + 'x';
+    renderOutputPreview();
+  });
+
+  function download(){
+    if(!outputCanvas || !refinedSize) return;
+    const zoom = +document.getElementById('pp-zoomSlider').value;
+    const outW = refinedSize.w * zoom, outH = refinedSize.h * zoom;
+    const scaledCanvas = document.createElement('canvas');
+    scaledCanvas.width = outW; scaledCanvas.height = outH;
+    const ctx = scaledCanvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(outputCanvas, 0, 0, outW, outH);
+
+    const a = document.createElement('a');
+    a.href = scaledCanvas.toDataURL('image/png');
+    a.download = 'perfect-pixel.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  return { process, download };
 })();
 
 /* =====================================================
