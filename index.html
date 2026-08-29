@@ -525,8 +525,18 @@ input.field95, textarea.field95, select.field95{
 .cam-result-name{font-weight:bold;font-size:13px;color:#000}
 .cam-result-desc{font-size:11px;color:#333;margin-top:2px}
 .cam-result-tag{font-size:10px;color:#555;margin-top:4px;font-style:italic}
+.cam-result-card, .cam-result-card *{
+  user-select:text;
+}
+.cam-result-name, .cam-result-desc, .cam-result-tag{
+  cursor:text;
+}
+.cam-fulllist, .cam-fulllist *{
+  user-select:text;
+}
 .cam-fulllist{
   font-size:12px;max-height:100%;
+  cursor:text;
 }
 .cam-fulllist h3{
   font-size:13px;margin:14px 0 4px;color:#000;
