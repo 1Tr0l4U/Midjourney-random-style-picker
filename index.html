@@ -1065,6 +1065,8 @@ NOTES
 - Add your own programs / icons here later!
 - reminder: write something about visitor(s)
 - can admin powers destroy worlds?
+
+- Last Character Portal update (9/9/2026, 11:25:06 PM): Victor edited
 </textarea>
     </div>
     <div class="statusbar">Ln 1, Col 1</div>
@@ -1239,7 +1241,7 @@ NOTES
   </div>
 
   <!-- ============ WINDOW: Character Portal ============ -->
-  <div class="window raised hidden" id="win-charportal" data-default-width="640" data-default-height="640" style="left: 329px; top: 33px; width: 640px; height: 640px;">
+  <div class="window raised hidden" id="win-charportal" data-default-width="640" data-default-height="640" style="left: 338px; top: 17px; width: 640px; height: 640px;">
     <div class="titlebar" onmousedown="OS.startDrag(event,'charportal')" ontouchstart="OS.startDrag(event,'charportal')">
       <div class="ttitle"><span>🎭</span><span>Character Portal</span></div>
       <div class="tbtns">
@@ -1263,15 +1265,15 @@ NOTES
       <div class="cp-worldtabs" id="cp-worldtabs"><div class="sref-tab active">User OC's</div></div>
 
       <div class="cp-banner" id="cp-banner" style="background: linear-gradient(90deg, rgb(0, 0, 0), rgb(11, 31, 42));">
-      <div class="cp-avatar" id="cp-avatarBox"><div class="cp-avatar-img" style="background-image:url('https://s.mj.run/vanWOO9_CnI'); background-size:105%; background-position:68.98148148148148% 20.833333333333332%;"></div></div>
+      <div class="cp-avatar" id="cp-avatarBox"><div class="cp-avatar-img" style="background-image:url('https://s.mj.run/34IG_syTkmk'); background-size:310%; background-position:16.20370370370371% 10.648148148148147%;"></div></div>
       <div class="cp-banner-text">
-        <div class="cp-banner-name">Mayhair</div>
+        <div class="cp-banner-name">Victor</div>
         <div class="cp-banner-role"></div>
       </div>
-      
+      <a class="cp-portal-link" href="https://discord.com/channels/1066330825844609034/1284576560204218448" target="_blank" rel="noopener noreferrer">🌀 Character Portal</a>
     </div>
 
-      <div class="cp-roster" id="cp-roster"><div class="cp-roster-btn btn95">Victor</div><div class="cp-roster-btn btn95">Rhapsody</div><div class="cp-roster-btn btn95">1Tr0l4U</div><div class="cp-roster-btn btn95">Legal Beagle</div><div class="cp-roster-btn btn95">Drolanac</div><div class="cp-roster-btn btn95">TheFungimancer</div><div class="cp-roster-btn btn95">Lolosoon</div><div class="cp-roster-btn btn95">Gompasta</div><div class="cp-roster-btn btn95">Tanner</div><div class="cp-roster-btn btn95">Alara</div><div class="cp-roster-btn btn95">BlijeMark</div><div class="cp-roster-btn btn95">Bomba</div><div class="cp-roster-btn btn95">KinkyKong</div><div class="cp-roster-btn btn95">Ancient Chaos</div><div class="cp-roster-btn btn95">Snoopytimelord</div><div class="cp-roster-btn btn95">Xslayer</div><div class="cp-roster-btn btn95">PotatoPropagator</div><div class="cp-roster-btn btn95">Revelee</div><div class="cp-roster-btn btn95">Little Angry</div><div class="cp-roster-btn btn95">Katsumi</div><div class="cp-roster-btn btn95">Oswen</div><div class="cp-roster-btn btn95">MastaDon</div><div class="cp-roster-btn btn95">Amethystea</div><div class="cp-roster-btn btn95 cp-roster-selected">Mayhair</div></div>
+      <div class="cp-roster" id="cp-roster"><div class="cp-roster-btn btn95 cp-roster-selected">Victor</div><div class="cp-roster-btn btn95">Rhapsody</div><div class="cp-roster-btn btn95">1Tr0l4U</div><div class="cp-roster-btn btn95">Legal Beagle</div><div class="cp-roster-btn btn95">Drolanac</div><div class="cp-roster-btn btn95">TheFungimancer</div><div class="cp-roster-btn btn95">Lolosoon</div><div class="cp-roster-btn btn95">Gompasta</div><div class="cp-roster-btn btn95">Tanner</div><div class="cp-roster-btn btn95">Alara</div><div class="cp-roster-btn btn95">BlijeMark</div><div class="cp-roster-btn btn95">Bomba</div><div class="cp-roster-btn btn95">KinkyKong</div><div class="cp-roster-btn btn95">Ancient Chaos</div><div class="cp-roster-btn btn95">Snoopytimelord</div><div class="cp-roster-btn btn95">Xslayer</div><div class="cp-roster-btn btn95">PotatoPropagator</div><div class="cp-roster-btn btn95">Revelee</div><div class="cp-roster-btn btn95">Little Angry</div><div class="cp-roster-btn btn95">Katsumi</div><div class="cp-roster-btn btn95">Oswen</div><div class="cp-roster-btn btn95">MastaDon</div><div class="cp-roster-btn btn95">Amethystea</div><div class="cp-roster-btn btn95">Mayhair</div></div>
 
       <div class="cp-infobox-row">
         <div class="cp-infobox">
@@ -1286,7 +1288,11 @@ NOTES
             <span>REFERENCES</span>
             <button class="cp-infobox-editBtn" id="cp-refsEditBtn" onclick="CharPortal.toggleInlineEdit('references')" title="Edit">✏️</button>
           </div>
-          <div class="cp-infobox-content" id="cp-references">(no references yet)</div>
+          <div class="cp-infobox-content" id="cp-references">Full body ref https://s.mj.run/b4n-WqvewUQ 
+
+Expression sheet https://s.mj.run/hpnEYBILkHM 
+
+Full character sheet https://s.mj.run/VKrP9HNFn-0</div>
         </div>
       </div>
 
@@ -1426,7 +1432,7 @@ NOTES
 
   <!-- ============ MODAL: Export JSON ============ -->
   <div class="cp-modal-overlay" id="cp-exportOverlay" onclick="CharPortal.closeExport()">
-    <div class="window raised cp-modal-window hidden" id="win-export" onclick="event.stopPropagation()" style="transform: none; left: 570px; top: 295.5px;">
+    <div class="window raised cp-modal-window hidden" id="win-export" onclick="event.stopPropagation()" style="transform: none; left: 570px; top: 278.5px;">
       <div class="titlebar" onmousedown="OS.startDrag(event,'export')" ontouchstart="OS.startDrag(event,'export')">
         <div class="ttitle"><span>📤</span><span>Export Character Data (JSON)</span></div>
         <div class="tbtns"><div class="tbtn" onclick="CharPortal.closeExport()">✕</div></div>
@@ -1458,7 +1464,7 @@ NOTES
       <div class="cm-toolbar-title">
         🌍 <span id="cm-worldLabel">User OC's</span>
         <button class="btn95 cm-renameWorldBtn" onclick="CharPortal.openRenameWorldModal()" title="Rename this world">✏️ Rename World</button>
-        <button class="btn95 cm-deleteWorldBtn" onclick="CharPortal.deleteCurrentWorld()" title="Delete this world">🗑 Delete World</button>
+        <button class="btn95 cm-deleteWorldBtn" onclick="CharPortal.deleteCurrentWorld()" title="Delete this world" style="display: none;">🗑 Delete World</button>
       </div>
       <div class="cm-toolbar-actions">
         <button class="btn95" onclick="CharPortal.openReorganizer()">🔀 Launch Drag &amp; Drop</button>
@@ -1488,7 +1494,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1505,7 +1511,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1522,7 +1528,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1539,7 +1545,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1556,7 +1562,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1573,7 +1579,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1590,7 +1596,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1607,7 +1613,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1624,7 +1630,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1641,7 +1647,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1658,7 +1664,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1675,7 +1681,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1692,7 +1698,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1709,7 +1715,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1726,7 +1732,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1743,7 +1749,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1760,7 +1766,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1777,7 +1783,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1794,7 +1800,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1811,7 +1817,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1828,7 +1834,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1845,7 +1851,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1862,7 +1868,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div><div class="cm-row">
         <div class="cm-col-order">
@@ -1879,7 +1885,7 @@ NOTES
         </div>
         <div class="cm-col-actions">
           <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
-          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+          
         </div>
       </div></div>
     </div>
@@ -1979,7 +1985,7 @@ NOTES
   <div id="startBtn" class="btn95" onclick="OS.toggleStart(event)"><span class="g">🪟</span>Start</div>
   <div id="taskDivider"></div>
   <div id="taskItems"></div>
-  <div id="clock">11:37 PM</div>
+  <div id="clock">11:25 PM</div>
 </div>
 
 <div id="startMenu" class="hidden raised">
@@ -3606,7 +3612,7 @@ const CharPortal = (function(){
     "role": "",
     "world": "User OC's",
     "description": "",
-    "references": "",
+    "references": "Full body ref https://s.mj.run/b4n-WqvewUQ \n\nExpression sheet https://s.mj.run/hpnEYBILkHM \n\nFull character sheet https://s.mj.run/VKrP9HNFn-0",
     "avatarUrl": "https://s.mj.run/34IG_syTkmk",
     "themeColor": "#000000",
     "portalLink": "https://discord.com/channels/1066330825844609034/1284576560204218448",
@@ -4979,6 +4985,7 @@ VisitorTracker.init();
   });
 })();
 </script>
+
 
 
 
