@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="UTF-8">
 <title>PromptOS 95</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -114,6 +113,7 @@ input.field95, textarea.field95, select.field95{
   font-family:inherit;
   font-size:12px;
   color:#000;
+  width:100%;
 }
 
 /* ---------- window ---------- */
@@ -553,6 +553,248 @@ input.field95, textarea.field95, select.field95{
 }
 .cam-fulllist b{color:#000}
 
+/* Character Portal */
+.cp-header{
+  display:flex;justify-content:flex-end;align-items:center;
+  flex-wrap:wrap;gap:8px;margin-bottom:10px;
+}
+.cp-header-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.cp-header-actions .btn95{
+  height:26px;
+  box-sizing:border-box;
+  display:inline-flex;
+  align-items:center;
+}
+#cp-rosterSearch{width:170px;flex:0 0 auto;height:26px;box-sizing:border-box;margin:0}
+.cp-admin-badge{
+  display:none;align-items:center;gap:4px;
+  font-size:11px;font-weight:bold;
+  color:#0b6e2f;background:#d4f7d4;
+  border:1px solid #4caf50;border-radius:10px;
+  padding:0 9px;height:26px;box-sizing:border-box;
+}
+body.cp-admin .cp-admin-badge{display:inline-flex}
+.cp-worldtabs{
+  display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;
+}
+.cp-banner{
+  display:flex;gap:16px;align-items:center;
+  padding:14px;border-radius:4px;margin-bottom:10px;
+  background:linear-gradient(90deg,#0f6e5f,#0b1f2a);
+  box-shadow:0 4px 10px rgba(0,0,0,.35) inset;
+  min-height:100px;
+  position:relative;
+}
+.cp-portal-link{
+  position:absolute;right:10px;bottom:8px;
+  font-size:11px;color:#fff;
+  background:rgba(0,0,0,.35);
+  padding:3px 9px;border-radius:10px;
+  text-decoration:none;
+  display:flex;align-items:center;gap:4px;
+  cursor:pointer;
+}
+.cp-portal-link:hover{background:rgba(0,0,0,.55);text-decoration:underline}
+.cp-banner-empty{
+  color:#fff;font-size:12px;padding:20px;text-align:center;width:100%;
+}
+.cp-avatar{
+  width:90px;height:90px;flex-shrink:0;
+  border:3px solid #6fd9ff;border-radius:4px;
+  background:#0b1f2a;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.cp-avatar img{width:100%;height:100%;object-fit:cover}
+.cp-avatar-placeholder{font-size:38px}
+.cp-banner-text{color:#fff;min-width:0}
+.cp-banner-name{
+  font-size:22px;font-weight:bold;color:#fdfa72;
+  font-family:"Courier New",monospace;letter-spacing:1px;
+}
+.cp-banner-role{
+  font-size:13px;color:#7fffd4;font-family:"Courier New",monospace;
+  margin-top:2px;
+}
+.cp-roster{
+  display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;
+}
+.cp-roster-btn{
+  flex:0 0 auto;
+  min-width:70px;
+  font-size:11px;
+  cursor:pointer;
+}
+.cp-roster-selected{
+  background:var(--titlebar1)!important;color:#fff!important;
+  border-top:2px solid var(--gray-darker)!important;border-left:2px solid var(--gray-darker)!important;
+  border-right:2px solid var(--gray-light)!important;border-bottom:2px solid var(--gray-light)!important;
+}
+.cp-roster-nomatch{opacity:.35}
+mark.cp-roster-highlight{
+  background:#fdfa72;color:#000;padding:0;border-radius:2px;
+}
+.cp-roster-selected mark.cp-roster-highlight{background:#fff;color:#000}
+.cp-infobox-row{
+  display:flex;gap:10px;flex-wrap:wrap;
+}
+#win-charportal .window-body{display:flex;flex-direction:column;min-height:0}
+#win-charportal .cp-infobox-row{flex:1;min-height:150px}
+#win-charportal .cp-infobox{display:flex;flex-direction:column}
+.cp-infobox{
+  flex:1;min-width:200px;
+}
+.cp-infobox-title{
+  background:#1b2a5e;color:#fff;font-size:11px;font-weight:bold;
+  padding:5px 8px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.cp-infobox-editBtn{
+  background:none;border:none;cursor:pointer;
+  font-size:12px;line-height:1;padding:2px 4px;
+  color:#fff;
+}
+.cp-infobox-editBtn:hover{opacity:.7}
+.cp-infobox-content{
+  background:#fff;min-height:100px;max-height:160px;overflow:auto;
+  padding:8px;font-size:12px;white-space:pre-wrap;word-break:break-word;
+  border-top:2px solid var(--gray-darker);border-left:2px solid var(--gray-darker);
+  border-right:2px solid var(--gray-light);border-bottom:2px solid var(--gray-light);
+  user-select:text;cursor:text;
+}
+#win-charportal .cp-infobox-content{
+  flex:1;max-height:none;
+}
+.cp-infobox-content, .cp-infobox-content *{user-select:text}
+.cp-inline-edit-textarea{
+  width:100%;height:100%;min-height:92px;
+  border:none;outline:none;resize:vertical;
+  font-family:inherit;font-size:12px;padding:0;
+  background:#fffef0;
+}
+
+/* Character Portal modals */
+.cp-modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);
+  display:none;
+  z-index:100000;
+}
+.cp-modal-overlay.show{display:block}
+#cp-worldOverlay{z-index:100010}
+.cp-modal-window{
+  position:absolute;
+  width:460px;max-width:92vw;max-height:88vh;
+  display:flex;flex-direction:column;
+}
+.cp-modal-window.cp-small-modal{width:340px}
+.cp-modal-window .window-body{
+  overflow:auto;
+}
+.cp-textarea{min-height:70px;resize:vertical}
+.cp-modal-row{
+  display:flex;gap:10px;margin-top:6px;flex-wrap:wrap;
+}
+.cp-colorInput{
+  padding:2px;height:34px;width:80px!important;cursor:pointer;
+}
+.cp-world-row{
+  display:flex;gap:6px;align-items:stretch;
+}
+.cp-world-row input{flex:1}
+.cp-worldAddBtn{
+  flex-shrink:0;width:auto!important;padding:0 12px;font-weight:bold;font-size:14px;
+}
+.cp-modal-buttons{
+  display:flex;justify-content:flex-end;gap:8px;margin-top:14px;
+}
+.cp-cancelBtn{background:#e8a0a0!important}
+.cp-saveBtn{background:#8fe08f!important}
+.cp-error{color:#a01818;font-weight:bold;min-height:14px;margin-top:6px}
+
+.cp-crop-viewport{
+  width:220px;height:220px;margin:10px auto 0;
+  border-top:2px solid var(--gray-darker);border-left:2px solid var(--gray-darker);
+  border-right:2px solid var(--gray-light);border-bottom:2px solid var(--gray-light);
+  background:#000;
+  overflow:hidden;
+  position:relative;
+  cursor:move;
+  touch-action:none;
+}
+.cp-crop-image{
+  position:absolute;
+  inset:0;
+  width:100%;height:100%;
+  background-repeat:no-repeat;
+  background-position:50% 50%;
+  background-size:100%;
+  pointer-events:none;
+}
+.cp-avatar-img{
+  width:100%;height:100%;
+  background-repeat:no-repeat;
+}
+
+/* Character Manager */
+.cm-toolbar{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:8px;flex-wrap:wrap;
+  padding:6px 10px;background:var(--gray);border-bottom:1px solid var(--gray-dark);
+}
+.cm-toolbar-title{font-weight:bold;font-size:12px;display:flex;align-items:center;gap:8px}
+.cm-deleteWorldBtn{font-size:11px;padding:3px 8px;color:#a01818}
+.cm-renameWorldBtn{font-size:11px;padding:3px 8px;color:#1b4a8a}
+.cm-toolbar-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.cm-count{font-size:11px;color:#333;font-weight:bold;white-space:nowrap}
+.cm-table-head{
+  display:flex;background:#1b2a5e;color:#fff;font-size:11px;font-weight:bold;
+  padding:6px 10px;gap:8px;flex-shrink:0;
+}
+.cm-table-body{background:#fff;overflow:auto;flex:1}
+.cm-row{
+  display:flex;gap:8px;align-items:flex-start;
+  padding:8px 10px;border-bottom:1px solid #ddd;
+  font-size:12px;
+}
+.cm-row:hover{background:#eef3ff}
+.cm-col-order{width:40px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px}
+.cm-order-btn{width:22px;height:16px;font-size:10px;line-height:1;padding:0;cursor:pointer}
+.cm-col-name{width:110px;flex-shrink:0;display:flex;align-items:center;gap:6px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cm-swatch{width:12px;height:12px;flex-shrink:0;border:1px solid #888}
+.cm-col-role{flex:1;min-width:120px}
+.cm-role-title{font-weight:bold}
+.cm-role-desc{
+  color:#666;font-size:11px;margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.cm-col-actions{width:66px;flex-shrink:0;display:flex;flex-direction:column;gap:4px}
+.cm-action-btn{font-size:11px;padding:3px 6px;cursor:pointer;width:100%}
+.cm-edit-btn{color:#a05a00}
+.cm-del-btn{color:#a01818}
+.cm-empty{padding:30px;text-align:center;color:#666;font-size:12px}
+
+/* Character Roster Re-Organizer */
+.ro-toolbar{
+  display:flex;gap:6px;align-items:center;flex-wrap:wrap;
+  padding:8px 10px;background:var(--gray);border-bottom:1px solid var(--gray-dark);
+}
+.ro-filter-input{flex:1;min-width:160px}
+.ro-list{background:#fff;overflow:auto;flex:1}
+.ro-row{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 10px;border-bottom:1px solid #ddd;font-size:12px;
+}
+.ro-row.dragging{opacity:.4}
+.ro-row.drag-over{border-top:2px solid var(--titlebar1)}
+.ro-handle{cursor:grab;font-size:14px;color:#888;flex-shrink:0;user-select:none}
+.ro-order-num{width:26px;flex-shrink:0;font-weight:bold;color:#555;font-size:11px}
+.ro-swatch{width:12px;height:12px;flex-shrink:0;border:1px solid #888}
+.ro-name{width:100px;flex-shrink:0;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ro-role{flex:1;min-width:90px;font-style:italic;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ro-order-btns{display:flex;gap:3px;flex-shrink:0}
+.ro-order-btns button{font-size:10px;padding:2px 5px;cursor:pointer}
+.ro-empty{padding:30px;text-align:center;color:#666;font-size:12px}
+
 #notesArea{
   width:100%;height:100%;min-height:220px;
   border:none;outline:none;resize:none;
@@ -562,6 +804,7 @@ input.field95, textarea.field95, select.field95{
 
 #paintCanvas{background:#fff;cursor:crosshair;display:block}
 .paint-toolbar{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+#paintSize{width:auto!important;flex-shrink:0}
 .swatch{
   width:18px;height:18px;border:1px solid #000;cursor:pointer;
 }
@@ -630,22 +873,27 @@ input.field95, textarea.field95, select.field95{
     <div class="label">Random Camera<br>Shot</div>
   </div>
 
-  <div class="icon" style="left:18px; top:318px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('mycomputer')">
+  <div class="icon" style="left:18px; top:318px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('charportal')">
+    <div class="glyph">🎭</div>
+    <div class="label">Character Portal</div>
+  </div>
+
+  <div class="icon" style="left:18px; top:418px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('mycomputer')">
     <div class="glyph">🖥️</div>
     <div class="label">My Computer</div>
   </div>
 
-  <div class="icon" style="left:18px; top:418px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('notes')">
+  <div class="icon" style="left:18px; top:518px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('notes')">
     <div class="glyph">📝</div>
     <div class="label">Notes.txt</div>
   </div>
 
-  <div class="icon" style="left:18px; top:518px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('paint')">
+  <div class="icon" style="left:18px; top:618px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('paint')">
     <div class="glyph">🎨</div>
     <div class="label">Paint</div>
   </div>
 
-  <div class="icon" style="left:18px; top:618px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('bin')">
+  <div class="icon" style="left:18px; top:718px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('bin')">
     <div class="glyph">🗑️</div>
     <div class="label">Recycle Bin</div>
   </div>
@@ -671,7 +919,7 @@ input.field95, textarea.field95, select.field95{
     </div>
     <div class="window-body">
 
-      <div id="sref-summary" class="sref-small" style="font-weight:bold;margin-bottom:8px">Loading…</div>
+      <div id="sref-summary" class="sref-small" style="font-weight:bold;margin-bottom:8px">The collection contains 2586 srefs and 70 moodboards, provided by 8 users</div>
 
       <div class="sref-tabs">
         <div class="sref-tab active" onclick="SrefApp.switchTab(0)">Random Sref / Moodboard</div>
@@ -681,11 +929,11 @@ input.field95, textarea.field95, select.field95{
       <div class="sref-card sref-tabContent">
         <div class="sref-count-row">
           <div class="sref-source-section">
-            <label><input type="checkbox" id="sref-includeSref" checked onchange="SrefApp.updateSourceToggles('sref')"> <span id="sref-includeSref-text">Srefs</span></label>
+            <label><input type="checkbox" id="sref-includeSref" checked="" onchange="SrefApp.updateSourceToggles('sref')"> <span id="sref-includeSref-text">Srefs</span></label>
             <div id="sref-section-sref" class="sref-source-inner">
               <label class="sref-label">Number of Srefs</label>
               <select id="sref-urlCount1" class="field95" onchange="SrefApp.refreshToggles()">
-                <option selected>1</option><option>2</option><option>3</option><option>4</option>
+                <option selected="">1</option><option>2</option><option>3</option><option>4</option>
                 <option>5</option><option>6</option><option>7</option><option>8</option>
                 <option>9</option><option>10</option><option>11</option><option>12</option>
                 <option>13</option><option>14</option><option>15</option><option>16</option>
@@ -695,11 +943,11 @@ input.field95, textarea.field95, select.field95{
           </div>
 
           <div class="sref-source-section">
-            <label><input type="checkbox" id="sref-includeMoodboard" onchange="SrefApp.updateSourceToggles('moodboard')"> <span id="sref-includeMoodboard-text">Moodboards</span></label>
+            <label><input type="checkbox" id="sref-includeMoodboard" onchange="SrefApp.updateSourceToggles('moodboard')"> <span id="sref-includeMoodboard-text" class="sref-faded">Moodboards</span></label>
             <div id="sref-section-moodboard" class="sref-source-inner sref-section-disabled">
               <label class="sref-label">Number of Moodboards</label>
               <select id="sref-moodboardCount" class="field95" onchange="SrefApp.refreshToggles()">
-                <option selected>1</option><option>2</option><option>3</option><option>4</option>
+                <option selected="">1</option><option>2</option><option>3</option><option>4</option>
                 <option>5</option><option>6</option><option>7</option><option>8</option>
                 <option>9</option><option>10</option><option>11</option><option>12</option>
                 <option>13</option><option>14</option><option>15</option><option>16</option>
@@ -714,8 +962,8 @@ input.field95, textarea.field95, select.field95{
           <label class="sref-toggle-row" id="sref-toggle-row1">
             <input type="checkbox" id="sref-userToggle1">
           </label>
-          <label class="sref-toggle-row" id="sref-toggle-row2">
-            <input type="checkbox" id="sref-userToggle2">
+          <label class="sref-toggle-row disabled" id="sref-toggle-row2">
+            <input type="checkbox" id="sref-userToggle2" disabled="">
           </label>
         </div>
 
@@ -729,7 +977,7 @@ input.field95, textarea.field95, select.field95{
       <div class="sref-card sref-tabContent" style="display:none">
         <label class="sref-label">Number of Srefs</label>
         <select id="sref-urlCount" class="field95" onchange="SrefApp.buildWeights()">
-          <option>1</option><option>2</option><option selected>3</option>
+          <option>1</option><option>2</option><option selected="">3</option>
           <option>4</option><option>5</option><option>6</option>
           <option>7</option><option>8</option><option>9</option><option>10</option>
           <option>11</option><option>12</option><option>13</option><option>14</option>
@@ -737,7 +985,16 @@ input.field95, textarea.field95, select.field95{
           <option>19</option><option>20</option>
         </select>
 
-        <div id="sref-weights"></div>
+        <div id="sref-weights">
+        <div class="sref-weight-row">
+          <input class="field95" placeholder="::1" value="::1">
+        </div>
+        <div class="sref-weight-row">
+          <input class="field95" placeholder="::1" value="::1">
+        </div>
+        <div class="sref-weight-row">
+          <input class="field95" placeholder="::1" value="::1">
+        </div></div>
 
         <div class="sref-toggle-row" id="sref-toggle-row3" style="margin-top:8px">
           <input type="checkbox" id="sref-userToggle3">
@@ -774,14 +1031,15 @@ input.field95, textarea.field95, select.field95{
     <div class="menubar"><span>File</span><span>Edit</span><span>View</span><span>Help</span></div>
     <div class="window-body">
       <table class="mycomp-list">
-        <tr><td>💾</td><td>3½ Floppy (A:)</td></tr>
+        <tbody><tr><td>💾</td><td>3½ Floppy (A:)</td></tr>
         <tr><td>💽</td><td>Local Disk (C:)</td></tr>
         <tr><td>💿</td><td>CD-ROM (D:)</td></tr>
         <tr><td>📁</td><td>My Programs <span class="sref-small">(empty — add your own later)</span></td></tr>
         <tr><td>🔗</td><td>Random Style Picker.exe</td></tr>
         <tr><td>🧩</td><td>PerfectPixel.exe</td></tr>
         <tr><td>🎥</td><td>Random Camera Shot.exe</td></tr>
-      </table>
+        <tr><td>🎭</td><td>Character Portal.exe</td></tr>
+      </tbody></table>
     </div>
     <div class="statusbar">5 object(s) | Free space: 512 MB</div>
     <div class="resize-handle" onmousedown="OS.startResize(event,'mycomputer')" ontouchstart="OS.startResize(event,'mycomputer')"></div>
@@ -806,6 +1064,7 @@ NOTES
 - Drag windows by their title bar.
 - Add your own programs / icons here later!
 - reminder: write something about visitor(s)
+- can admin powers destroy worlds?
 </textarea>
     </div>
     <div class="statusbar">Ln 1, Col 1</div>
@@ -839,7 +1098,7 @@ NOTES
         <span class="sref-small">Size:</span>
         <select id="paintSize" class="field95" onchange="PaintApp.setSize(this.value)">
           <option value="1">1px</option>
-          <option value="2" selected>2px</option>
+          <option value="2" selected="">2px</option>
           <option value="4">4px</option>
           <option value="8">8px</option>
         </select>
@@ -864,10 +1123,10 @@ NOTES
     <div class="menubar"><span>File</span><span>Edit</span><span>View</span><span>Help</span></div>
     <div class="window-body">
       <table class="bin-list" id="binList">
-        <tr><td>📄</td><td>old_prompt_ideas.txt (2 KB)</td></tr>
+        <tbody><tr><td>📄</td><td>old_prompt_ideas.txt (2 KB)</td></tr>
         <tr><td>📄</td><td>unused_style_ref.png (1.1 MB)</td></tr>
         <tr><td>📄</td><td>draft_v1_backup.zip (4.8 MB)</td></tr>
-      </table>
+      </tbody></table>
       <div style="margin-top:10px"><button class="btn95" onclick="OS.emptyBin()">🗑️ Empty Recycle Bin</button></div>
     </div>
     <div class="statusbar">Deleted items — safe to purge</div>
@@ -909,7 +1168,7 @@ NOTES
           <option value="majority">Majority Cluster</option>
         </select>
         <div style="margin-top:8px">
-          <button class="btn95" id="pp-processBtn" onclick="PerfectPixelApp.process()" disabled>Generate Scaled Image</button>
+          <button class="btn95" id="pp-processBtn" onclick="PerfectPixelApp.process()" disabled="">Generate Scaled Image</button>
         </div>
         <div class="sref-small" id="pp-status" style="margin-top:6px"></div>
       </div>
@@ -925,7 +1184,7 @@ NOTES
           <span id="pp-zoomLabel" class="sref-small" style="margin:0;font-weight:bold">4x</span>
         </div>
         <div style="margin-top:8px">
-          <button class="btn95" id="pp-downloadBtn" onclick="PerfectPixelApp.download()" disabled>💾 Download Scaled Image</button>
+          <button class="btn95" id="pp-downloadBtn" onclick="PerfectPixelApp.download()" disabled="">💾 Download Scaled Image</button>
         </div>
       </div>
 
@@ -957,7 +1216,7 @@ NOTES
       <div class="sref-card cam-tabContent">
         <label class="sref-label">Number of Results</label>
         <select id="cam-count" class="field95">
-          <option>1</option><option selected>2</option><option>3</option><option>4</option>
+          <option>1</option><option selected="">2</option><option>3</option><option>4</option>
           <option>5</option><option>6</option><option>7</option><option>8</option>
         </select>
         <div style="margin-top:10px">
@@ -965,7 +1224,7 @@ NOTES
         </div>
         <div id="cam-results" class="cam-results"></div>
         <div style="margin-top:10px">
-          <button class="btn95" id="cam-copyBtn" onclick="CameraApp.copyResults(this)" disabled>📋 Copy Results</button>
+          <button class="btn95" id="cam-copyBtn" onclick="CameraApp.copyResults(this)" disabled="">📋 Copy Results</button>
         </div>
       </div>
 
@@ -979,6 +1238,740 @@ NOTES
     <div class="resize-handle" onmousedown="OS.startResize(event,'camerashots')" ontouchstart="OS.startResize(event,'camerashots')"></div>
   </div>
 
+  <!-- ============ WINDOW: Character Portal ============ -->
+  <div class="window raised hidden" id="win-charportal" data-default-width="640" data-default-height="640" style="left: 329px; top: 33px; width: 640px; height: 640px;">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'charportal')" ontouchstart="OS.startDrag(event,'charportal')">
+      <div class="ttitle"><span>🎭</span><span>Character Portal</span></div>
+      <div class="tbtns">
+        <div class="tbtn" onclick="OS.minimize('charportal')">_</div>
+        <div class="tbtn" onclick="OS.toggleMax('charportal')">□</div>
+        <div class="tbtn" onclick="OS.close('charportal')">✕</div>
+      </div>
+    </div>
+    <div class="menubar"><span>File</span><span>Edit</span><span>View</span><span>Help</span></div>
+    <div class="window-body">
+
+      <div class="cp-header">
+        <div class="cp-header-actions">
+          <input type="text" id="cp-rosterSearch" class="field95 cp-roster-search" placeholder="🔎 Search characters..." oninput="CharPortal.filterRoster(this.value)" onkeydown="CharPortal.handleRosterSearchKey(event)">
+          <button class="btn95" onclick="CharPortal.openExport()">📤 Export</button>
+          <button class="btn95" onclick="CharPortal.openCharManager()">🗂️ Character Manager</button>
+          <span class="cp-admin-badge" id="cp-adminBadge" title="Admin mode active — deletion unlocked">🔓 Admin</span>
+        </div>
+      </div>
+
+      <div class="cp-worldtabs" id="cp-worldtabs"><div class="sref-tab active">User OC's</div></div>
+
+      <div class="cp-banner" id="cp-banner" style="background: linear-gradient(90deg, rgb(0, 0, 0), rgb(11, 31, 42));">
+      <div class="cp-avatar" id="cp-avatarBox"><div class="cp-avatar-img" style="background-image:url('https://s.mj.run/vanWOO9_CnI'); background-size:105%; background-position:68.98148148148148% 20.833333333333332%;"></div></div>
+      <div class="cp-banner-text">
+        <div class="cp-banner-name">Mayhair</div>
+        <div class="cp-banner-role"></div>
+      </div>
+      
+    </div>
+
+      <div class="cp-roster" id="cp-roster"><div class="cp-roster-btn btn95">Victor</div><div class="cp-roster-btn btn95">Rhapsody</div><div class="cp-roster-btn btn95">1Tr0l4U</div><div class="cp-roster-btn btn95">Legal Beagle</div><div class="cp-roster-btn btn95">Drolanac</div><div class="cp-roster-btn btn95">TheFungimancer</div><div class="cp-roster-btn btn95">Lolosoon</div><div class="cp-roster-btn btn95">Gompasta</div><div class="cp-roster-btn btn95">Tanner</div><div class="cp-roster-btn btn95">Alara</div><div class="cp-roster-btn btn95">BlijeMark</div><div class="cp-roster-btn btn95">Bomba</div><div class="cp-roster-btn btn95">KinkyKong</div><div class="cp-roster-btn btn95">Ancient Chaos</div><div class="cp-roster-btn btn95">Snoopytimelord</div><div class="cp-roster-btn btn95">Xslayer</div><div class="cp-roster-btn btn95">PotatoPropagator</div><div class="cp-roster-btn btn95">Revelee</div><div class="cp-roster-btn btn95">Little Angry</div><div class="cp-roster-btn btn95">Katsumi</div><div class="cp-roster-btn btn95">Oswen</div><div class="cp-roster-btn btn95">MastaDon</div><div class="cp-roster-btn btn95">Amethystea</div><div class="cp-roster-btn btn95 cp-roster-selected">Mayhair</div></div>
+
+      <div class="cp-infobox-row">
+        <div class="cp-infobox">
+          <div class="cp-infobox-title">
+            <span>DESCRIPTION / INFO</span>
+            <button class="cp-infobox-editBtn" id="cp-descEditBtn" onclick="CharPortal.toggleInlineEdit('description')" title="Edit">✏️</button>
+          </div>
+          <div class="cp-infobox-content" id="cp-description">(no description yet)</div>
+        </div>
+        <div class="cp-infobox">
+          <div class="cp-infobox-title">
+            <span>REFERENCES</span>
+            <button class="cp-infobox-editBtn" id="cp-refsEditBtn" onclick="CharPortal.toggleInlineEdit('references')" title="Edit">✏️</button>
+          </div>
+          <div class="cp-infobox-content" id="cp-references">(no references yet)</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="statusbar" id="cp-statusbar">Ready</div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'charportal')" ontouchstart="OS.startResize(event,'charportal')"></div>
+  </div>
+
+  <!-- ============ MODAL: Add New Character ============ -->
+  <div class="cp-modal-overlay" id="cp-addOverlay" onclick="CharPortal.closeAddModal()">
+    <div class="window raised cp-modal-window hidden" id="win-addcharacter" onclick="event.stopPropagation()" style="transform: none; left: 570px; top: 98px;">
+      <div class="titlebar" onmousedown="OS.startDrag(event,'addcharacter')" ontouchstart="OS.startDrag(event,'addcharacter')">
+        <div class="ttitle"><span id="cp-addModalIcon">➕</span><span id="cp-addModalTitle">Add New Character</span></div>
+        <div class="tbtns"><div class="tbtn" onclick="CharPortal.closeAddModal()">✕</div></div>
+      </div>
+      <div class="window-body">
+
+        <label class="sref-label">👤 Character Name:</label>
+        <input type="text" id="cp-inputName" class="field95" placeholder="e.g. Hero">
+
+        <label class="sref-label">🏷️ Role / Occupation / Speciality:</label>
+        <input type="text" id="cp-inputRole" class="field95" placeholder="e.g. Lead Protagonist &amp; Adventurer">
+
+        <label class="sref-label">🌍 World:</label>
+        <div class="cp-world-row">
+          <input type="text" id="cp-inputWorld" class="field95" list="cp-worldList" placeholder="Pick an existing world or type a new one">
+          <button type="button" class="btn95 cp-worldAddBtn" onclick="CharPortal.openCreateWorldModal()" title="Create a new world">＋</button>
+        </div>
+        <datalist id="cp-worldList"><option value="User OC's"></option></datalist>
+
+        <div class="cp-modal-row">
+          <div style="flex:1">
+            <label class="sref-label">🖼️ External Avatar Image URL (optional):</label>
+            <input type="text" id="cp-inputAvatar" class="field95" placeholder="https://example.com/avatar.jpg">
+            <button type="button" class="btn95" onclick="CharPortal.openAvatarCropModal()" style="margin-top:6px">🔍 Adjust Avatar View</button>
+          </div>
+          <div>
+            <label class="sref-label">🎨 Theme Color:</label>
+            <input type="color" id="cp-inputColor" class="field95 cp-colorInput" value="#2ecc71">
+          </div>
+        </div>
+
+        <label class="sref-label">🌀 Character Portal Link (optional):</label>
+        <input type="text" id="cp-inputPortalLink" class="field95" placeholder="https://example.com/characters/hero">
+
+        <label class="sref-label">📝 Description / Info:</label>
+        <textarea id="cp-inputDesc" class="field95 cp-textarea" placeholder="Full biography and lore notes..."></textarea>
+
+        <label class="sref-label">🔗 References:</label>
+        <textarea id="cp-inputRefs" class="field95 cp-textarea" placeholder="Reference URLs or notes, one per line..."></textarea>
+
+        <div class="sref-small cp-error" id="cp-addError"></div>
+
+        <div class="cp-modal-buttons">
+          <button class="btn95 cp-cancelBtn" onclick="CharPortal.closeAddModal()">Cancel</button>
+          <button class="btn95 cp-saveBtn" id="cp-saveCharBtn" onclick="CharPortal.saveCharacter()">💾 Save Character</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: Create New World ============ -->
+  <div class="cp-modal-overlay" id="cp-worldOverlay" onclick="CharPortal.closeCreateWorldModal()">
+    <div class="window raised cp-modal-window cp-small-modal hidden" id="win-createworld" onclick="event.stopPropagation()" style="transform: none; left: 630px; top: 306px;">
+      <div class="titlebar" onmousedown="OS.startDrag(event,'createworld')" ontouchstart="OS.startDrag(event,'createworld')">
+        <div class="ttitle"><span>🌍</span><span>Create New World</span></div>
+        <div class="tbtns"><div class="tbtn" onclick="CharPortal.closeCreateWorldModal()">✕</div></div>
+      </div>
+      <div class="window-body">
+
+        <label class="sref-label">World Name:</label>
+        <input type="text" id="cp-newWorldName" class="field95" placeholder="e.g. Earth-616">
+        <div class="sref-small cp-error" id="cp-worldError"></div>
+
+        <div class="cp-modal-buttons">
+          <button class="btn95 cp-cancelBtn" onclick="CharPortal.closeCreateWorldModal()">Cancel</button>
+          <button class="btn95 cp-saveBtn" onclick="CharPortal.saveNewWorld()">💾 Save World</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: Rename World ============ -->
+  <div class="cp-modal-overlay" id="cp-renameWorldOverlay" onclick="CharPortal.closeRenameWorldModal()">
+    <div class="window raised cp-modal-window cp-small-modal hidden" id="win-renameworld" onclick="event.stopPropagation()">
+      <div class="titlebar" onmousedown="OS.startDrag(event,'renameworld')" ontouchstart="OS.startDrag(event,'renameworld')">
+        <div class="ttitle"><span>✏️</span><span>Rename World</span></div>
+        <div class="tbtns"><div class="tbtn" onclick="CharPortal.closeRenameWorldModal()">✕</div></div>
+      </div>
+      <div class="window-body">
+
+        <label class="sref-label">World Name:</label>
+        <input type="text" id="cp-renameWorldInput" class="field95" placeholder="e.g. Earth-616">
+        <div class="sref-small">Renaming to a name that already exists will merge both worlds together.</div>
+        <div class="sref-small cp-error" id="cp-renameWorldError"></div>
+
+        <div class="cp-modal-buttons">
+          <button class="btn95 cp-cancelBtn" onclick="CharPortal.closeRenameWorldModal()">Cancel</button>
+          <button class="btn95 cp-saveBtn" onclick="CharPortal.saveRenameWorld()">💾 Save Name</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: Adjust Avatar View ============ -->
+  <div class="cp-modal-overlay" id="cp-avatarCropOverlay" onclick="CharPortal.closeAvatarCropModal()">
+    <div class="window raised cp-modal-window cp-small-modal hidden" id="win-avatarcrop" onclick="event.stopPropagation()" style="transform: none; left: 630px; top: 200px;">
+      <div class="titlebar" onmousedown="OS.startDrag(event,'avatarcrop')" ontouchstart="OS.startDrag(event,'avatarcrop')">
+        <div class="ttitle"><span>🔍</span><span>Adjust Avatar View</span></div>
+        <div class="tbtns"><div class="tbtn" onclick="CharPortal.closeAvatarCropModal()">✕</div></div>
+      </div>
+      <div class="window-body">
+
+        <div class="sref-small" id="cp-cropHint">Drag the image to reposition it, use the slider to zoom.</div>
+
+        <div class="cp-crop-viewport" id="cp-cropViewport">
+          <div class="cp-crop-image" id="cp-cropImage" style="background-image: url(&quot;https://s.mj.run/vanWOO9_CnI&quot;); background-size: 105% auto; background-position: 68.9815% 20.8333%;"></div>
+        </div>
+
+        <div class="cp-zoom-row" style="margin-top:10px">
+          <label class="sref-small" style="margin:0">Zoom:</label>
+          <input type="range" id="cp-cropZoom" min="100" max="400" step="5" value="100">
+          <span id="cp-cropZoomLabel" class="sref-small" style="margin:0;font-weight:bold">105%</span>
+        </div>
+
+        <div class="cp-modal-buttons">
+          <button class="btn95 cp-cancelBtn" onclick="CharPortal.closeAvatarCropModal()">Cancel</button>
+          <button class="btn95 cp-saveBtn" onclick="CharPortal.saveAvatarCrop()">💾 Save Position</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: Export JSON ============ -->
+  <div class="cp-modal-overlay" id="cp-exportOverlay" onclick="CharPortal.closeExport()">
+    <div class="window raised cp-modal-window hidden" id="win-export" onclick="event.stopPropagation()" style="transform: none; left: 570px; top: 295.5px;">
+      <div class="titlebar" onmousedown="OS.startDrag(event,'export')" ontouchstart="OS.startDrag(event,'export')">
+        <div class="ttitle"><span>📤</span><span>Export Character Data (JSON)</span></div>
+        <div class="tbtns"><div class="tbtn" onclick="CharPortal.closeExport()">✕</div></div>
+      </div>
+      <div class="window-body">
+        <div class="sref-small">Select all &amp; copy, or use the buttons below — this JSON can be stored, version-controlled, or loaded back in elsewhere.</div>
+        <textarea id="cp-exportText" class="field95 cp-export-textarea" readonly=""></textarea>
+        <div class="cp-modal-buttons">
+          <button class="btn95" onclick="CharPortal.closeExport()">Close</button>
+          <button class="btn95" id="cp-copyJsonBtn" onclick="CharPortal.copyExport(this)">📋 Copy JSON</button>
+          <button class="btn95" onclick="CharPortal.downloadExport()">💾 Download .json</button>
+          <button class="btn95" onclick="CharPortal.downloadFullHtml()">🖥️ Download Full HTML</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ WINDOW: Character Manager ============ -->
+  <div class="window raised hidden" id="win-charmanager" data-default-width="700" data-default-height="520" style="left: 375px; top: 88px; width: 700px; height: 520px;">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'charmanager')" ontouchstart="OS.startDrag(event,'charmanager')">
+      <div class="ttitle"><span>🗂️</span><span>Character Manager</span></div>
+      <div class="tbtns">
+        <div class="tbtn" onclick="OS.minimize('charmanager')">_</div>
+        <div class="tbtn" onclick="OS.toggleMax('charmanager')">□</div>
+        <div class="tbtn" onclick="OS.close('charmanager')">✕</div>
+      </div>
+    </div>
+    <div class="cm-toolbar">
+      <div class="cm-toolbar-title">
+        🌍 <span id="cm-worldLabel">User OC's</span>
+        <button class="btn95 cm-renameWorldBtn" onclick="CharPortal.openRenameWorldModal()" title="Rename this world">✏️ Rename World</button>
+        <button class="btn95 cm-deleteWorldBtn" onclick="CharPortal.deleteCurrentWorld()" title="Delete this world">🗑 Delete World</button>
+      </div>
+      <div class="cm-toolbar-actions">
+        <button class="btn95" onclick="CharPortal.openReorganizer()">🔀 Launch Drag &amp; Drop</button>
+        <button class="btn95" onclick="CharPortal.openAddModal()">➕ Add Character</button>
+        <span class="cm-count" id="cm-count">24 Characters</span>
+      </div>
+    </div>
+    <div class="window-body" style="padding:0;display:flex;flex-direction:column">
+      <div class="cm-table-head">
+        <div class="cm-col-order">Order</div>
+        <div class="cm-col-name">Name</div>
+        <div class="cm-col-role">Role</div>
+        <div class="cm-col-actions">Actions</div>
+      </div>
+      <div class="cm-table-body" id="cm-tableBody"><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up" disabled="">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#000000"></span>
+          Victor
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#d80e0e"></span>
+          Rhapsody
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#1dd3d0"></span>
+          1Tr0l4U
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#2ecc71"></span>
+          Legal Beagle
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#14617b"></span>
+          Drolanac
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#ffda24"></span>
+          TheFungimancer
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#e65c00"></span>
+          Lolosoon
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#dbdf11"></span>
+          Gompasta
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#1daef7"></span>
+          Tanner
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#cc2e2e"></span>
+          Alara
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#ff7b00"></span>
+          BlijeMark
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#e51515"></span>
+          Bomba
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#e81111"></span>
+          KinkyKong
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#e605b5"></span>
+          Ancient Chaos
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#6600ff"></span>
+          Snoopytimelord
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#1683e9"></span>
+          Xslayer
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#612f00"></span>
+          PotatoPropagator
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#d1d1d1"></span>
+          Revelee
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#f5b400"></span>
+          Little Angry
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#5fbdf7"></span>
+          Katsumi
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#c20000"></span>
+          Oswen
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#af2ac0"></span>
+          MastaDon
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#24b6ff"></span>
+          Amethystea
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc">Oc name is Arthur</div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div><div class="cm-row">
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up">▲</button>
+          <button class="btn95 cm-order-btn" title="Move down" disabled="">▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:#000000"></span>
+          Mayhair
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title"></div>
+          <div class="cm-role-desc"></div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          <button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>
+        </div>
+      </div></div>
+    </div>
+    <div class="statusbar">Ready</div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'charmanager')" ontouchstart="OS.startResize(event,'charmanager')"></div>
+  </div>
+
+  <!-- ============ WINDOW: Character Roster Re-Organizer ============ -->
+  <div class="window raised hidden" id="win-reorganizer" data-default-width="640" data-default-height="520" style="left: 150px; top: 66px; width: 640px; height: 520px;">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'reorganizer')" ontouchstart="OS.startDrag(event,'reorganizer')">
+      <div class="ttitle"><span>🔀</span><span>Character Roster Re-Organizer</span></div>
+      <div class="tbtns">
+        <div class="tbtn" onclick="OS.minimize('reorganizer')">_</div>
+        <div class="tbtn" onclick="OS.toggleMax('reorganizer')">□</div>
+        <div class="tbtn" onclick="CharPortal.closeReorganizer()">✕</div>
+      </div>
+    </div>
+    <div class="ro-toolbar">
+      <input type="text" id="ro-filter" class="field95 ro-filter-input" placeholder="🔍 Search by name, role, bio...">
+      <button class="btn95" onclick="CharPortal.sortReorganizer('az')">Name: A to Z</button>
+      <button class="btn95" onclick="CharPortal.sortReorganizer('za')">Name: Z to A</button>
+      <button class="btn95" onclick="CharPortal.resetReorganizerOrder()">↺ Reset Order</button>
+      <button class="btn95 cp-saveBtn" onclick="CharPortal.saveReorganizerOrder()">💾 Save &amp; Apply Order</button>
+      <button class="btn95 cp-cancelBtn" onclick="CharPortal.closeReorganizer()">✕ Close</button>
+    </div>
+    <div class="window-body" style="padding:0;display:flex;flex-direction:column">
+      <div class="ro-list" id="ro-list"><div class="ro-row" draggable="true" data-id="c1788898901865p06ye">
+        <span class="ro-handle">⠿</span>
+        <span class="ro-order-num">#1</span>
+        <span class="ro-swatch" style="background:#000000"></span>
+        <span class="ro-name">Victor</span>
+        <span class="ro-role"></span>
+        <span class="ro-order-btns">
+          <button class="btn95" title="Move to top">⬆Top</button>
+          <button class="btn95" title="Move up">▲</button>
+          <button class="btn95" title="Move down">▼</button>
+          <button class="btn95" title="Move to bottom">⬇Bot</button>
+        </span>
+      </div><div class="ro-row" draggable="true" data-id="c17888990100834r712">
+        <span class="ro-handle">⠿</span>
+        <span class="ro-order-num">#2</span>
+        <span class="ro-swatch" style="background:#d80e0e"></span>
+        <span class="ro-name">Rhapsody</span>
+        <span class="ro-role"></span>
+        <span class="ro-order-btns">
+          <button class="btn95" title="Move to top">⬆Top</button>
+          <button class="btn95" title="Move up">▲</button>
+          <button class="btn95" title="Move down">▼</button>
+          <button class="btn95" title="Move to bottom">⬇Bot</button>
+        </span>
+      </div><div class="ro-row" draggable="true" data-id="c1788899187953bszws">
+        <span class="ro-handle">⠿</span>
+        <span class="ro-order-num">#3</span>
+        <span class="ro-swatch" style="background:#1dd3d0"></span>
+        <span class="ro-name">1Tr0l4U</span>
+        <span class="ro-role"></span>
+        <span class="ro-order-btns">
+          <button class="btn95" title="Move to top">⬆Top</button>
+          <button class="btn95" title="Move up">▲</button>
+          <button class="btn95" title="Move down">▼</button>
+          <button class="btn95" title="Move to bottom">⬇Bot</button>
+        </span>
+      </div><div class="ro-row" draggable="true" data-id="c1788899518181cgdqw">
+        <span class="ro-handle">⠿</span>
+        <span class="ro-order-num">#4</span>
+        <span class="ro-swatch" style="background:#2ecc71"></span>
+        <span class="ro-name">Legal Beagle</span>
+        <span class="ro-role"></span>
+        <span class="ro-order-btns">
+          <button class="btn95" title="Move to top">⬆Top</button>
+          <button class="btn95" title="Move up">▲</button>
+          <button class="btn95" title="Move down">▼</button>
+          <button class="btn95" title="Move to bottom">⬇Bot</button>
+        </span>
+      </div><div class="ro-row" draggable="true" data-id="c1788899359520hkkyq">
+        <span class="ro-handle">⠿</span>
+        <span class="ro-order-num">#5</span>
+        <span class="ro-swatch" style="background:#14617b"></span>
+        <span class="ro-name">Drolanac</span>
+        <span class="ro-role"></span>
+        <span class="ro-order-btns">
+          <button class="btn95" title="Move to top">⬆Top</button>
+          <button class="btn95" title="Move up">▲</button>
+          <button class="btn95" title="Move down">▼</button>
+          <button class="btn95" title="Move to bottom">⬇Bot</button>
+        </span>
+      </div></div>
+    </div>
+    <div class="statusbar">Drag the ⠿ handle, or use the arrow buttons, to reorder — then Save &amp; Apply.</div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'reorganizer')" ontouchstart="OS.startResize(event,'reorganizer')"></div>
+  </div>
+
 </div>
 
 <!-- ---------- taskbar ---------- -->
@@ -986,7 +1979,7 @@ NOTES
   <div id="startBtn" class="btn95" onclick="OS.toggleStart(event)"><span class="g">🪟</span>Start</div>
   <div id="taskDivider"></div>
   <div id="taskItems"></div>
-  <div id="clock">12:00 PM</div>
+  <div id="clock">11:37 PM</div>
 </div>
 
 <div id="startMenu" class="hidden raised">
@@ -999,6 +1992,7 @@ NOTES
     <div class="startitem" onclick="OS.open('bin');OS.closeStart()"><span class="g">🗑️</span>Recycle Bin</div>
     <div class="startitem" onclick="OS.open('perfectpixel');OS.closeStart()"><span class="g">🧩</span>PerfectPixel</div>
     <div class="startitem" onclick="OS.open('camerashots');OS.closeStart()"><span class="g">🎥</span>Random Camera Shot</div>
+    <div class="startitem" onclick="OS.open('charportal');OS.closeStart()"><span class="g">🎭</span>Character Portal</div>
     <div class="startsep"></div>
     <div class="startitem" style="opacity:.6"><span class="g">➕</span>Add Programs...</div>
     <div class="startsep"></div>
@@ -1012,7 +2006,7 @@ NOTES
 </div>
 
 <div id="srefLightbox" onclick="SrefApp.closeLightbox(event)">
-  <div class="window raised lb-window" onclick="event.stopPropagation()">
+  <div class="window raised lb-window hidden" onclick="event.stopPropagation()">
     <div class="titlebar">
       <div class="ttitle"><span>🖼️</span><span id="lbTitle">Style Reference</span></div>
       <div class="tbtns">
@@ -2597,6 +3591,1280 @@ const CameraApp = (function(){
 /* =====================================================
    PaintApp — simple canvas painter
 ===================================================== */
+/* =====================================================
+   CharPortal — Character Portal (cast / world database)
+===================================================== */
+const CharPortal = (function(){
+
+  let worlds = ["User OC's"];
+
+  let characters = [
+  {
+    "id": "c1788898901865p06ye",
+    "dateAdded": "2026-09-08",
+    "name": "Victor",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/34IG_syTkmk",
+    "themeColor": "#000000",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1284576560204218448",
+    "avatarZoom": 310,
+    "avatarPosX": 16.20370370370371,
+    "avatarPosY": 10.648148148148147
+  },
+  {
+    "id": "c17888990100834r712",
+    "dateAdded": "2026-09-08",
+    "name": "Rhapsody",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "full body front pose ref https://s.mj.run/TJ5XTS1OWcs\n\n\n\n\n\n\n\n \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "avatarUrl": "https://s.mj.run/TJ5XTS1OWcs",
+    "themeColor": "#d80e0e",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1465360730415956050",
+    "avatarZoom": 275,
+    "avatarPosX": 52.77777777777778,
+    "avatarPosY": 3.7037037037037033
+  },
+  {
+    "id": "c1788899187953bszws",
+    "dateAdded": "2026-09-08",
+    "name": "1Tr0l4U",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/G-KgGhtMvoQ",
+    "themeColor": "#1dd3d0",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1241458804520915025",
+    "avatarZoom": 400,
+    "avatarPosX": 2.314814814814815,
+    "avatarPosY": 12.962962962962958
+  },
+  {
+    "id": "c1788899518181cgdqw",
+    "dateAdded": "2026-09-08",
+    "name": "Legal Beagle",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/Em8aaBPPQYo",
+    "themeColor": "#2ecc71",
+    "portalLink": "",
+    "avatarZoom": 115,
+    "avatarPosX": 50.925925925925924,
+    "avatarPosY": 0
+  },
+  {
+    "id": "c1788899359520hkkyq",
+    "dateAdded": "2026-09-08",
+    "name": "Drolanac",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/1FcomXvWcVo",
+    "themeColor": "#14617b",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1418732796955852880",
+    "avatarZoom": 265,
+    "avatarPosX": 23.148148148148145,
+    "avatarPosY": 6.481481481481481
+  },
+  {
+    "id": "c17888997812517zbtf",
+    "dateAdded": "2026-09-08",
+    "name": "TheFungimancer",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/u7j5fhPp3UI",
+    "themeColor": "#ffda24",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1215669355485073479",
+    "avatarZoom": 190,
+    "avatarPosX": 47.22222222222222,
+    "avatarPosY": 29.62962962962963
+  },
+  {
+    "id": "c1788900672375flpx3",
+    "dateAdded": "2026-09-08",
+    "name": "Lolosoon",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/eu0C5wQC3oY",
+    "themeColor": "#e65c00",
+    "portalLink": "",
+    "avatarZoom": 135,
+    "avatarPosX": 25,
+    "avatarPosY": 0
+  },
+  {
+    "id": "c1788900011055xkls6",
+    "dateAdded": "2026-09-08",
+    "name": "Gompasta",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/UZT0d_6YJyY",
+    "themeColor": "#dbdf11",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1286819402200645642",
+    "avatarZoom": 120,
+    "avatarPosX": 49.53703703703704,
+    "avatarPosY": 0
+  },
+  {
+    "id": "c1788899886893faxkv",
+    "dateAdded": "2026-09-08",
+    "name": "Tanner",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/CmrYMa0H6k0",
+    "themeColor": "#1daef7",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1448816993875787879",
+    "avatarZoom": 120,
+    "avatarPosX": 31.944444444444443,
+    "avatarPosY": 6.0185185185185155
+  },
+  {
+    "id": "c1788900188206n9gxb",
+    "dateAdded": "2026-09-08",
+    "name": "Alara",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/t2Odw0_ZFC8",
+    "themeColor": "#cc2e2e",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1304602768815689728",
+    "avatarZoom": 240,
+    "avatarPosX": 54.166666666666664,
+    "avatarPosY": 5.092592592592593
+  },
+  {
+    "id": "c1788900339986b02au",
+    "dateAdded": "2026-09-08",
+    "name": "BlijeMark",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/WcKGeUoBYbM",
+    "themeColor": "#ff7b00",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1456786862088781925",
+    "avatarZoom": 355,
+    "avatarPosX": 48.61111111111111,
+    "avatarPosY": 23.148148148148145
+  },
+  {
+    "id": "c17889004788238o76z",
+    "dateAdded": "2026-09-08",
+    "name": "Bomba",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/QMsgk5BgoLc",
+    "themeColor": "#e51515",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1449102737215328316",
+    "avatarZoom": 240,
+    "avatarPosX": 73.14814814814814,
+    "avatarPosY": 11.574074074074076
+  },
+  {
+    "id": "c17889009205163dme3",
+    "dateAdded": "2026-09-08",
+    "name": "KinkyKong",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/geG_IdlFjtk",
+    "themeColor": "#e81111",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1238566072685166682",
+    "avatarZoom": 145,
+    "avatarPosX": 37.96296296296296,
+    "avatarPosY": 0
+  },
+  {
+    "id": "c17889010339019qx5k",
+    "dateAdded": "2026-09-08",
+    "name": "Ancient Chaos",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/7lhcOhrnxto",
+    "themeColor": "#e605b5",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1261044313127653426",
+    "avatarZoom": 315,
+    "avatarPosX": 34.25925925925926,
+    "avatarPosY": 11.11111111111111
+  },
+  {
+    "id": "c1788901294035yiwog",
+    "dateAdded": "2026-09-08",
+    "name": "Snoopytimelord",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/TtK778JPytY",
+    "themeColor": "#6600ff",
+    "portalLink": "",
+    "avatarZoom": 395,
+    "avatarPosX": 2.7777777777777777,
+    "avatarPosY": 78.24074074074075
+  },
+  {
+    "id": "c1788901533199it1tw",
+    "dateAdded": "2026-09-08",
+    "name": "Xslayer",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/GdSw0kELF58",
+    "themeColor": "#1683e9",
+    "portalLink": "",
+    "avatarZoom": 400,
+    "avatarPosX": 21.296296296296298,
+    "avatarPosY": 55.092592592592595
+  },
+  {
+    "id": "c1788901959019blzv8",
+    "dateAdded": "2026-09-08",
+    "name": "PotatoPropagator",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/kGb-JIMqaTg",
+    "themeColor": "#612f00",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1338633905619603507",
+    "avatarZoom": 100,
+    "avatarPosX": 48.611111111111114,
+    "avatarPosY": 22.685185185185187
+  },
+  {
+    "id": "c1788902149739xtxc9",
+    "dateAdded": "2026-09-08",
+    "name": "Revelee",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "Full body reference https://s.mj.run/cjkkE0ZSG-I ",
+    "avatarUrl": "https://s.mj.run/cjkkE0ZSG-I",
+    "themeColor": "#d1d1d1",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1441405043675758633",
+    "avatarZoom": 270,
+    "avatarPosX": 72.22222222222221,
+    "avatarPosY": 8.796296296296294
+  },
+  {
+    "id": "c1788902364141shqpm",
+    "dateAdded": "2026-09-08",
+    "name": "Little Angry",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/jaBqQUPXB8w",
+    "themeColor": "#f5b400",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1310932280700829747",
+    "avatarZoom": 110,
+    "avatarPosX": 50,
+    "avatarPosY": 59.25925925925926
+  },
+  {
+    "id": "c1788902523235z3iy4",
+    "dateAdded": "2026-09-08",
+    "name": "Katsumi",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "Character sheet https://s.mj.run/V-LXGrSdtJ0",
+    "avatarUrl": "https://s.mj.run/LhGfPEgzm68",
+    "themeColor": "#5fbdf7",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1532760904544948274",
+    "avatarZoom": 100,
+    "avatarPosX": 50,
+    "avatarPosY": 50
+  },
+  {
+    "id": "c1788902657014157jw",
+    "dateAdded": "2026-09-08",
+    "name": "Oswen",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "Character sheet https://s.mj.run/zdcB3lQ0zgY",
+    "avatarUrl": "https://s.mj.run/C-PGa8IfVNc",
+    "themeColor": "#c20000",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1531394865307324630",
+    "avatarZoom": 155,
+    "avatarPosX": 40.277777777777786,
+    "avatarPosY": 9.722222222222221
+  },
+  {
+    "id": "c17889028704405797u",
+    "dateAdded": "2026-09-08",
+    "name": "MastaDon",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "Wizard clothing character sheet https://s.mj.run/ZosdA4GCwro \nNormal clothing character sheet https://s.mj.run/FtWv1rMtQeo",
+    "avatarUrl": "https://s.mj.run/L1A5_tInj0c",
+    "themeColor": "#af2ac0",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1533884157015490590",
+    "avatarZoom": 175,
+    "avatarPosX": 50.46296296296296,
+    "avatarPosY": 24.074074074074076
+  },
+  {
+    "id": "c1788903148543elz22",
+    "dateAdded": "2026-09-08",
+    "name": "Amethystea",
+    "role": "",
+    "world": "User OC's",
+    "description": "Oc name is Arthur",
+    "references": "character sheet normal design https://s.mj.run/mcLW6dq7DRI\n \ncharacter sheet black clothing https://s.mj.run/Suma5HjxWBk\n\ncharacter sheet swim shorts\n https://s.mj.run/MoRmrJcS7KY\n\ncharacter sheet adventurer https://s.mj.run/4u4SlcMIzR4",
+    "avatarUrl": "https://s.mj.run/mcLW6dq7DRI",
+    "themeColor": "#24b6ff",
+    "portalLink": "https://discord.com/channels/1066330825844609034/1531104020301615235",
+    "avatarZoom": 400,
+    "avatarPosX": 0,
+    "avatarPosY": 0
+  },
+  {
+    "id": "c1788903425143k53kt",
+    "dateAdded": "2026-09-08",
+    "name": "Mayhair",
+    "role": "",
+    "world": "User OC's",
+    "description": "",
+    "references": "",
+    "avatarUrl": "https://s.mj.run/vanWOO9_CnI",
+    "themeColor": "#000000",
+    "portalLink": "",
+    "avatarZoom": 105,
+    "avatarPosX": 68.98148148148148,
+    "avatarPosY": 20.833333333333332
+  }
+];
+
+  let currentWorld = characters[0].world;
+  let currentCharId = characters[0].id;
+  let rosterSearchQuery = '';
+  let isAdmin = false;
+  let userAddedWorlds = new Set();
+  let changeLog = { added: [], edited: [], deleted: [], worldsAdded: [], worldsDeleted: [] };
+  let editingCharId = null; // set while the Add/Edit modal is editing an existing character
+
+  let roItems = [];      // working copy of the current world's characters, in display order, while the Re-Organizer is open
+  let roOriginal = [];   // snapshot of roItems at open-time, for "Reset Order"
+  let roDragId = null;   // id of the row currently being dragged in the Re-Organizer
+
+  // avatar crop/zoom state — "pending" values belong to whichever character is
+  // currently being added/edited (committed onto the character on Save Character);
+  // the crop-modal's own working values start from those pending ones each time it opens
+  let pendingAvatarZoom = 100, pendingAvatarPosX = 50, pendingAvatarPosY = 50;
+  let cropZoom = 100, cropPosX = 50, cropPosY = 50;
+  let cropDragging = false, cropDragStartX = 0, cropDragStartY = 0, cropStartPosX = 50, cropStartPosY = 50;
+
+  function getWorlds(){
+    const set = new Set(worlds);
+    characters.forEach(c=> set.add(c.world)); // safety net in case a character's world was never explicitly registered
+    return [...set];
+  }
+  function createWorld(name){
+    name = (name || '').trim();
+    if(!name) return null;
+    if(!worlds.includes(name)){
+      worlds.push(name);
+      userAddedWorlds.add(name); // brand-new world -> deletable by its creator, no admin needed
+      changeLog.worldsAdded.push(name);
+    }
+    return name;
+  }
+  function canDeleteCharacter(c){
+    return isAdmin || !!(c && c.isUserAdded);
+  }
+  function canDeleteWorld(world){
+    return isAdmin || userAddedWorlds.has(world);
+  }
+  function charsInWorld(world){
+    return characters.filter(c=>c.world===world);
+  }
+  function formatDate(iso){
+    if(!iso) return '—';
+    const d = new Date(iso+'T00:00:00');
+    if(isNaN(d)) return iso;
+    return d.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  }
+
+  function renderWorldTabs(){
+    const worldList = getWorlds();
+    const box = document.getElementById('cp-worldtabs');
+    box.innerHTML = '';
+    if(!worldList.length){
+      box.innerHTML = '<div class="sref-small">No worlds yet — click "➕ Add New Character" to create one.</div>';
+      return;
+    }
+    if(!worldList.includes(currentWorld)) currentWorld = worldList[0];
+    worldList.forEach(w=>{
+      const tab = document.createElement('div');
+      tab.className = 'sref-tab' + (w===currentWorld ? ' active' : '');
+      tab.textContent = w;
+      tab.onclick = ()=>{
+        currentWorld = w;
+        const inWorld = charsInWorld(w);
+        currentCharId = inWorld.length ? inWorld[0].id : null;
+        renderAll();
+      };
+      box.appendChild(tab);
+    });
+  }
+
+  function highlightRosterName(name, query){
+    if(!query) return escapeHtml(name);
+    const lower = name.toLowerCase();
+    const q = query.toLowerCase();
+    let out = '';
+    let i = 0;
+    let matched = false;
+    while(i < name.length){
+      const idx = lower.indexOf(q, i);
+      if(idx === -1){
+        out += escapeHtml(name.slice(i));
+        break;
+      }
+      matched = true;
+      out += escapeHtml(name.slice(i, idx));
+      out += '<mark class="cp-roster-highlight">' + escapeHtml(name.slice(idx, idx + q.length)) + '</mark>';
+      i = idx + q.length;
+    }
+    return matched ? out : escapeHtml(name);
+  }
+
+  function filterRoster(query){
+    rosterSearchQuery = query || '';
+    renderRoster();
+  }
+
+  function handleRosterSearchKey(e){
+    if(e.key !== 'Enter') return;
+    const val = (e.target.value || '').trim().toLowerCase();
+    if(val !== 'admin') return;
+    isAdmin = !isAdmin;
+    e.target.value = '';
+    rosterSearchQuery = '';
+    document.body.classList.toggle('cp-admin', isAdmin);
+    renderRoster();
+    renderCharManagerList();
+    const status = document.getElementById('cp-statusbar');
+    if(status) status.textContent = isAdmin
+      ? '🔓 Admin mode enabled — deleting worlds and characters is now unlocked.'
+      : '🔒 Admin mode disabled — deletion locked again.';
+  }
+
+  function renderRoster(){
+    const box = document.getElementById('cp-roster');
+    box.innerHTML = '';
+    const list = charsInWorld(currentWorld);
+    if(!list.length){
+      box.innerHTML = '<div class="sref-small">No characters in this world yet.</div>';
+      return;
+    }
+    if(!list.find(c=>c.id===currentCharId)) currentCharId = list[0].id;
+    const query = rosterSearchQuery.trim();
+    list.forEach(c=>{
+      const btn = document.createElement('div');
+      const isMatch = !query || c.name.toLowerCase().includes(query.toLowerCase());
+      btn.className = 'cp-roster-btn btn95' + (c.id===currentCharId ? ' cp-roster-selected' : '') + (query && !isMatch ? ' cp-roster-nomatch' : '');
+      btn.innerHTML = highlightRosterName(c.name, query);
+      btn.onclick = ()=>{ currentCharId = c.id; renderBanner(); renderRoster(); };
+      box.appendChild(btn);
+    });
+  }
+
+  function renderBanner(){
+    const banner = document.getElementById('cp-banner');
+    const desc = document.getElementById('cp-description');
+    const refs = document.getElementById('cp-references');
+    const c = characters.find(ch=>ch.id===currentCharId);
+
+    // any in-progress inline edit is for whichever character was showing
+    // before — discard it cleanly rather than risk saving it onto the wrong
+    // character if the selection changed underneath it
+    if(inlineEditing.description){ inlineEditing.description = false; document.getElementById('cp-descEditBtn').textContent = '✏️'; }
+    if(inlineEditing.references){ inlineEditing.references = false; document.getElementById('cp-refsEditBtn').textContent = '✏️'; }
+
+    if(!c){
+      banner.style.background = 'linear-gradient(90deg,#0f6e5f,#0b1f2a)';
+      banner.innerHTML = '<div class="cp-banner-empty">No character selected yet. Click "➕ Add New Character" to get started.</div>';
+      desc.textContent = '';
+      refs.textContent = '';
+      return;
+    }
+
+    const color = c.themeColor || '#2ecc71';
+    banner.style.background = `linear-gradient(90deg, ${color}, #0b1f2a)`;
+    banner.innerHTML = `
+      <div class="cp-avatar" id="cp-avatarBox"><div class="cp-avatar-placeholder">👤</div></div>
+      <div class="cp-banner-text">
+        <div class="cp-banner-name">${escapeHtml(c.name)}</div>
+        <div class="cp-banner-role">${escapeHtml(c.role || '')}</div>
+      </div>
+      ${c.portalLink ? `<a class="cp-portal-link" href="${escapeHtml(c.portalLink)}" target="_blank" rel="noopener noreferrer">🌀 Character Portal</a>` : ''}
+    `;
+
+    if(c.avatarUrl){
+      // preload before swapping in the background-image version, so a broken
+      // URL falls back to the placeholder instead of showing a blank box
+      const test = new Image();
+      const zoom = c.avatarZoom || 100;
+      const posX = c.avatarPosX != null ? c.avatarPosX : 50;
+      const posY = c.avatarPosY != null ? c.avatarPosY : 50;
+      test.onload = ()=>{
+        const box = document.getElementById('cp-avatarBox');
+        if(box) box.innerHTML = `<div class="cp-avatar-img" style="background-image:url('${c.avatarUrl.replace(/'/g,"\\'")}'); background-size:${zoom}%; background-position:${posX}% ${posY}%;"></div>`;
+      };
+      test.onerror = ()=>{
+        const box = document.getElementById('cp-avatarBox');
+        if(box) box.innerHTML = '<div class="cp-avatar-placeholder">👤</div>';
+      };
+      test.src = c.avatarUrl;
+    }
+
+    desc.textContent = c.description || '(no description yet)';
+    refs.textContent = c.references || '(no references yet)';
+  }
+
+  /* ---------- Inline live editing of Description/Info and References ---------- */
+  const inlineEditing = { description: false, references: false };
+
+  function toggleInlineEdit(field){
+    const c = characters.find(ch=>ch.id===currentCharId);
+    if(!c) return;
+
+    const contentEl = document.getElementById(field==='description' ? 'cp-description' : 'cp-references');
+    const btn = document.getElementById(field==='description' ? 'cp-descEditBtn' : 'cp-refsEditBtn');
+
+    if(inlineEditing[field]){
+      // currently editing -> save and switch back to display mode
+      const textarea = contentEl.querySelector('textarea');
+      const newVal = textarea ? textarea.value : c[field];
+      if(newVal !== c[field]) changeLog.edited.push(c.name);
+      c[field] = newVal;
+      inlineEditing[field] = false;
+      btn.textContent = '✏️';
+      renderAll();
+    } else {
+      inlineEditing[field] = true;
+      btn.textContent = '💾';
+      contentEl.innerHTML = `<textarea class="cp-inline-edit-textarea">${escapeHtml(c[field] || '')}</textarea>`;
+      contentEl.querySelector('textarea').focus();
+    }
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  function renderAll(){
+    renderWorldTabs();
+    renderRoster();
+    renderBanner();
+    renderCharManagerList();
+  }
+
+  /* ---------- Add / Edit Character modal ---------- */
+  /* Centers a modal window as absolute px left/top (instead of the default
+     CSS transform-centering) so OS.startDrag's offsetLeft/offsetTop-based
+     math works correctly the moment dragging starts. */
+  function centerModalWindow(el){
+    el.classList.remove('hidden'); // the overlay showing isn't enough — the window itself must drop 'hidden' too
+    el.style.transform = 'none';
+    const w = el.offsetWidth, h = el.offsetHeight;
+    const left = Math.max(8, (window.innerWidth - w) / 2);
+    const top = Math.max(8, (window.innerHeight - h) / 2);
+    el.style.left = left + 'px';
+    el.style.top = top + 'px';
+  }
+
+  function refreshWorldList(){
+    const datalist = document.getElementById('cp-worldList');
+    datalist.innerHTML = getWorlds().map(w=>`<option value="${escapeHtml(w)}">`).join('');
+  }
+
+  /* Pass a character id to edit that character instead of creating a new one. */
+  function openAddModal(charId){
+    editingCharId = charId || null;
+    const editing = characters.find(c=>c.id===editingCharId);
+
+    document.getElementById('cp-inputName').value = editing ? editing.name : '';
+    document.getElementById('cp-inputRole').value = editing ? editing.role : '';
+    document.getElementById('cp-inputWorld').value = editing ? editing.world : (currentWorld || '');
+    document.getElementById('cp-inputDesc').value = editing ? editing.description : '';
+    document.getElementById('cp-inputRefs').value = editing ? editing.references : '';
+    document.getElementById('cp-inputAvatar').value = editing ? editing.avatarUrl : '';
+    document.getElementById('cp-inputColor').value = editing ? (editing.themeColor || '#2ecc71') : '#2ecc71';
+    document.getElementById('cp-inputPortalLink').value = editing ? (editing.portalLink || '') : '';
+    document.getElementById('cp-addError').textContent = '';
+
+    pendingAvatarZoom = editing && editing.avatarZoom ? editing.avatarZoom : 100;
+    pendingAvatarPosX = editing && editing.avatarPosX != null ? editing.avatarPosX : 50;
+    pendingAvatarPosY = editing && editing.avatarPosY != null ? editing.avatarPosY : 50;
+
+    document.getElementById('cp-addModalIcon').textContent = editing ? '✏️' : '➕';
+    document.getElementById('cp-addModalTitle').textContent = editing ? 'Edit Character' : 'Add New Character';
+    document.getElementById('cp-saveCharBtn').textContent = editing ? '💾 Save Changes' : '💾 Save Character';
+
+    refreshWorldList();
+
+    const overlay = document.getElementById('cp-addOverlay');
+    overlay.classList.add('show');
+    centerModalWindow(document.getElementById('win-addcharacter'));
+  }
+  function closeAddModal(){
+    document.getElementById('cp-addOverlay').classList.remove('show');
+    editingCharId = null;
+  }
+
+  function saveCharacter(){
+    const name = document.getElementById('cp-inputName').value.trim();
+    if(!name){
+      document.getElementById('cp-addError').textContent = 'Character name is required.';
+      return;
+    }
+    let world = document.getElementById('cp-inputWorld').value.trim() || 'General';
+    world = createWorld(world) || world; // registers it if it's a brand-new world
+
+    const fields = {
+      name,
+      role: document.getElementById('cp-inputRole').value.trim(),
+      world,
+      description: document.getElementById('cp-inputDesc').value,
+      references: document.getElementById('cp-inputRefs').value,
+      avatarUrl: document.getElementById('cp-inputAvatar').value.trim(),
+      themeColor: document.getElementById('cp-inputColor').value,
+      portalLink: document.getElementById('cp-inputPortalLink').value.trim(),
+      avatarZoom: pendingAvatarZoom,
+      avatarPosX: pendingAvatarPosX,
+      avatarPosY: pendingAvatarPosY
+    };
+
+    const editing = characters.find(c=>c.id===editingCharId);
+    if(editing){
+      Object.assign(editing, fields); // keep id and dateAdded as-is
+      currentWorld = world;
+      currentCharId = editing.id;
+      changeLog.edited.push(editing.name);
+    } else {
+      const newChar = Object.assign({
+        id: 'c' + Date.now() + Math.random().toString(36).slice(2,7),
+        dateAdded: new Date().toISOString().slice(0,10),
+        isUserAdded: true // added by the user this session -> deletable without admin
+      }, fields);
+      characters.push(newChar);
+      currentWorld = world;
+      currentCharId = newChar.id;
+      changeLog.added.push(newChar.name);
+    }
+
+    closeAddModal();
+    renderAll();
+  }
+
+  /* ---------- Adjust Avatar View (zoom/pan) modal ---------- */
+  function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
+  function pointerPosGeneric(e){
+    if(e.touches && e.touches.length) return {x:e.touches[0].clientX, y:e.touches[0].clientY};
+    if(e.changedTouches && e.changedTouches.length) return {x:e.changedTouches[0].clientX, y:e.changedTouches[0].clientY};
+    return {x:e.clientX, y:e.clientY};
+  }
+
+  function updateCropPreview(){
+    const img = document.getElementById('cp-cropImage');
+    img.style.backgroundSize = cropZoom + '%';
+    img.style.backgroundPosition = cropPosX + '% ' + cropPosY + '%';
+    document.getElementById('cp-cropZoomLabel').textContent = cropZoom + '%';
+  }
+
+  function openAvatarCropModal(){
+    const url = document.getElementById('cp-inputAvatar').value.trim();
+    const hint = document.getElementById('cp-cropHint');
+    const img = document.getElementById('cp-cropImage');
+
+    if(!url){
+      hint.textContent = 'Enter an avatar image URL above first, then come back here.';
+      img.style.backgroundImage = 'none';
+    } else {
+      hint.textContent = 'Drag the image to reposition it, use the slider to zoom.';
+      img.style.backgroundImage = `url("${url}")`;
+    }
+
+    cropZoom = pendingAvatarZoom;
+    cropPosX = pendingAvatarPosX;
+    cropPosY = pendingAvatarPosY;
+    document.getElementById('cp-cropZoom').value = cropZoom;
+    updateCropPreview();
+
+    const overlay = document.getElementById('cp-avatarCropOverlay');
+    overlay.classList.add('show');
+    centerModalWindow(document.getElementById('win-avatarcrop'));
+  }
+  function closeAvatarCropModal(){
+    document.getElementById('cp-avatarCropOverlay').classList.remove('show');
+  }
+  function saveAvatarCrop(){
+    pendingAvatarZoom = cropZoom;
+    pendingAvatarPosX = cropPosX;
+    pendingAvatarPosY = cropPosY;
+    closeAvatarCropModal();
+  }
+
+  function startCropDrag(e){
+    if(!document.getElementById('cp-cropImage').style.backgroundImage || document.getElementById('cp-cropImage').style.backgroundImage === 'none') return;
+    e.preventDefault();
+    cropDragging = true;
+    const p = pointerPosGeneric(e);
+    cropDragStartX = p.x; cropDragStartY = p.y;
+    cropStartPosX = cropPosX; cropStartPosY = cropPosY;
+    document.addEventListener('mousemove', onCropDrag);
+    document.addEventListener('mouseup', endCropDrag);
+    document.addEventListener('touchmove', onCropDrag, {passive:false});
+    document.addEventListener('touchend', endCropDrag);
+  }
+  function onCropDrag(e){
+    if(!cropDragging) return;
+    if(e.cancelable) e.preventDefault();
+    const p = pointerPosGeneric(e);
+    const viewport = document.getElementById('cp-cropViewport');
+    const size = viewport.clientWidth || 220;
+    const dx = p.x - cropDragStartX;
+    const dy = p.y - cropDragStartY;
+    // dragging the image right/down should reveal more of its left/top side,
+    // which means the background-position percentage moves the other way
+    cropPosX = clamp(cropStartPosX - (dx / size) * 100, 0, 100);
+    cropPosY = clamp(cropStartPosY - (dy / size) * 100, 0, 100);
+    updateCropPreview();
+  }
+  function endCropDrag(){
+    cropDragging = false;
+    document.removeEventListener('mousemove', onCropDrag);
+    document.removeEventListener('mouseup', endCropDrag);
+    document.removeEventListener('touchmove', onCropDrag);
+    document.removeEventListener('touchend', endCropDrag);
+  }
+
+  const cropViewportEl = document.getElementById('cp-cropViewport');
+  if(cropViewportEl){
+    cropViewportEl.addEventListener('mousedown', startCropDrag);
+    cropViewportEl.addEventListener('touchstart', startCropDrag, {passive:false});
+  }
+  const cropZoomSliderEl = document.getElementById('cp-cropZoom');
+  if(cropZoomSliderEl){
+    cropZoomSliderEl.addEventListener('input', function(){
+      cropZoom = +this.value;
+      updateCropPreview();
+    });
+  }
+
+
+  function deleteCurrentCharacter(){
+    deleteCharacter(currentCharId);
+  }
+
+  function deleteCharacter(id){
+    const c = characters.find(ch=>ch.id===id);
+    if(!c) return;
+    if(!canDeleteCharacter(c)){
+      alert('🔒 This character isn\'t deletable by default.\nType "admin" in the roster search box and press Enter to unlock, or delete characters you added yourself freely.');
+      return;
+    }
+    if(!confirm(`Remove "${c.name}" from the cast? This can't be undone.`)) return;
+    characters = characters.filter(ch=>ch.id!==id);
+    changeLog.deleted.push(c.name);
+    if(currentCharId === id){
+      const remaining = charsInWorld(currentWorld);
+      currentCharId = remaining.length ? remaining[0].id : null;
+    }
+    renderAll();
+  }
+
+  /* ---------- Character Manager (list view for the current world) ---------- */
+  function openCharManager(){
+    OS.open('charmanager');
+    renderCharManagerList();
+  }
+
+  function deleteCurrentWorld(){
+    if(!currentWorld) return;
+    if(!canDeleteWorld(currentWorld)){
+      alert('🔒 This world isn\'t deletable by default.\nType "admin" in the roster search box and press Enter to unlock, or delete worlds you created yourself freely.');
+      return;
+    }
+    const inWorld = charsInWorld(currentWorld);
+    const msg = inWorld.length
+      ? `Delete the world "${currentWorld}"? This will also permanently delete its ${inWorld.length} character${inWorld.length===1?'':'s'}.`
+      : `Delete the world "${currentWorld}"?`;
+    if(!confirm(msg)) return;
+
+    changeLog.worldsDeleted.push(currentWorld);
+    characters = characters.filter(c => c.world !== currentWorld);
+    worlds = worlds.filter(w => w !== currentWorld);
+    userAddedWorlds.delete(currentWorld);
+
+    const remainingWorlds = getWorlds();
+    currentWorld = remainingWorlds.length ? remainingWorlds[0] : null;
+    const remainingChars = currentWorld ? charsInWorld(currentWorld) : [];
+    currentCharId = remainingChars.length ? remainingChars[0].id : null;
+
+    renderAll();
+  }
+
+  function openRenameWorldModal(){
+    if(!currentWorld) return;
+    document.getElementById('cp-renameWorldInput').value = currentWorld;
+    document.getElementById('cp-renameWorldError').textContent = '';
+
+    const overlay = document.getElementById('cp-renameWorldOverlay');
+    overlay.classList.add('show');
+    centerModalWindow(document.getElementById('win-renameworld'));
+  }
+  function closeRenameWorldModal(){
+    document.getElementById('cp-renameWorldOverlay').classList.remove('show');
+  }
+  function saveRenameWorld(){
+    const newName = document.getElementById('cp-renameWorldInput').value.trim();
+    if(!newName){
+      document.getElementById('cp-renameWorldError').textContent = 'World name is required.';
+      return;
+    }
+    if(newName === currentWorld){
+      closeRenameWorldModal();
+      return;
+    }
+
+    // move every character in the old world over to the new name (merging
+    // into an existing world of that name if one already exists)
+    characters.forEach(c=>{ if(c.world === currentWorld) c.world = newName; });
+    worlds = worlds.filter(w => w !== currentWorld);
+    if(!worlds.includes(newName)) worlds.push(newName);
+    if(userAddedWorlds.has(currentWorld)){
+      userAddedWorlds.delete(currentWorld);
+      userAddedWorlds.add(newName);
+    }
+
+    currentWorld = newName;
+
+    closeRenameWorldModal();
+    renderAll();
+  }
+
+  function moveCharacterOrder(id, direction){
+    // Pull out just this world's characters (in their current relative order),
+    // reorder that small list with plain, always-correct array moves, then
+    // drop the result back into the exact same global slots — this avoids
+    // fragile index math when other worlds' characters are interleaved
+    // between them in the master array.
+    const slots = [];
+    characters.forEach((c,i)=>{ if(c.world===currentWorld) slots.push(i); });
+    const worldChars = slots.map(i=>characters[i]);
+    const posInWorld = worldChars.findIndex(c=>c.id===id);
+    if(posInWorld === -1) return;
+
+    let targetPos;
+    if(direction==='up') targetPos = posInWorld - 1;
+    else if(direction==='down') targetPos = posInWorld + 1;
+    else if(direction==='top') targetPos = 0;
+    else if(direction==='bottom') targetPos = worldChars.length - 1;
+    if(targetPos < 0 || targetPos >= worldChars.length || targetPos === posInWorld) return;
+
+    const [moved] = worldChars.splice(posInWorld, 1);
+    worldChars.splice(targetPos, 0, moved);
+    slots.forEach((slotIdx, k)=>{ characters[slotIdx] = worldChars[k]; });
+
+    renderAll();
+  }
+
+  function renderCharManagerList(){
+    const label = document.getElementById('cm-worldLabel');
+    const countEl = document.getElementById('cm-count');
+    const body = document.getElementById('cm-tableBody');
+    if(!label || !countEl || !body) return; // window markup not present yet during early init
+
+    const deleteWorldBtn = document.querySelector('#win-charmanager .cm-deleteWorldBtn');
+    if(deleteWorldBtn) deleteWorldBtn.style.display = canDeleteWorld(currentWorld) ? '' : 'none';
+
+    label.textContent = currentWorld || '—';
+    const list = charsInWorld(currentWorld);
+    countEl.textContent = `${list.length} Character${list.length===1?'':'s'}`;
+    body.innerHTML = '';
+
+    if(!list.length){
+      body.innerHTML = '<div class="cm-empty">No characters in this world yet. Click "➕ Add Character" to add one.</div>';
+      return;
+    }
+
+    list.forEach((c,i)=>{
+      const row = document.createElement('div');
+      row.className = 'cm-row';
+      row.innerHTML = `
+        <div class="cm-col-order">
+          <button class="btn95 cm-order-btn" title="Move up" ${i===0?'disabled':''}>▲</button>
+          <button class="btn95 cm-order-btn" title="Move down" ${i===list.length-1?'disabled':''}>▼</button>
+        </div>
+        <div class="cm-col-name">
+          <span class="cm-swatch" style="background:${c.themeColor||'#ccc'}"></span>
+          ${escapeHtml(c.name)}
+        </div>
+        <div class="cm-col-role">
+          <div class="cm-role-title">${escapeHtml(c.role||'')}</div>
+          <div class="cm-role-desc">${escapeHtml(c.description||'')}</div>
+        </div>
+        <div class="cm-col-actions">
+          <button class="btn95 cm-action-btn cm-edit-btn">✏️ Edit</button>
+          ${canDeleteCharacter(c) ? '<button class="btn95 cm-action-btn cm-del-btn">🗑 Del</button>' : ''}
+        </div>
+      `;
+      row.querySelectorAll('.cm-order-btn')[0].onclick = ()=> moveCharacterOrder(c.id, 'up');
+      row.querySelectorAll('.cm-order-btn')[1].onclick = ()=> moveCharacterOrder(c.id, 'down');
+      row.querySelector('.cm-edit-btn').onclick = ()=> openAddModal(c.id);
+      const delBtn = row.querySelector('.cm-del-btn');
+      if(delBtn) delBtn.onclick = ()=> deleteCharacter(c.id);
+      body.appendChild(row);
+    });
+  }
+
+  /* ---------- Create New World modal ---------- */
+  function openCreateWorldModal(){
+    document.getElementById('cp-newWorldName').value = '';
+    document.getElementById('cp-worldError').textContent = '';
+
+    const overlay = document.getElementById('cp-worldOverlay');
+    overlay.classList.add('show');
+    centerModalWindow(document.getElementById('win-createworld'));
+  }
+  function closeCreateWorldModal(){
+    document.getElementById('cp-worldOverlay').classList.remove('show');
+  }
+  function saveNewWorld(){
+    const name = document.getElementById('cp-newWorldName').value.trim();
+    if(!name){
+      document.getElementById('cp-worldError').textContent = 'World name is required.';
+      return;
+    }
+    createWorld(name);
+    refreshWorldList();
+
+    // if the Add Character form is open behind this popup, drop the new
+    // world straight into its World field so it's ready to use immediately
+    const worldInput = document.getElementById('cp-inputWorld');
+    if(worldInput) worldInput.value = name;
+
+    closeCreateWorldModal();
+    renderWorldTabs(); // in case the main window is showing an empty-world message
+  }
+
+  /* ---------- Character Roster Re-Organizer ---------- */
+  function openReorganizer(){
+    roItems = charsInWorld(currentWorld).slice();
+    roOriginal = roItems.slice();
+    roDragId = null;
+    document.getElementById('ro-filter').value = '';
+    OS.open('reorganizer');
+    renderReorganizerList();
+  }
+  function closeReorganizer(){
+    OS.close('reorganizer');
+    roItems = [];
+    roOriginal = [];
+    roDragId = null;
+  }
+
+  function renderReorganizerList(){
+    const list = document.getElementById('ro-list');
+    if(!list) return;
+    const filterText = (document.getElementById('ro-filter').value || '').toLowerCase().trim();
+
+    list.innerHTML = '';
+    if(!roItems.length){
+      list.innerHTML = '<div class="ro-empty">No characters in this world yet.</div>';
+      return;
+    }
+
+    let anyVisible = false;
+    roItems.forEach((c,i)=>{
+      const haystack = `${c.name} ${c.role} ${c.description}`.toLowerCase();
+      if(filterText && !haystack.includes(filterText)) return;
+      anyVisible = true;
+
+      const row = document.createElement('div');
+      row.className = 'ro-row';
+      row.draggable = true;
+      row.dataset.id = c.id;
+      row.innerHTML = `
+        <span class="ro-handle">⠿</span>
+        <span class="ro-order-num">#${i+1}</span>
+        <span class="ro-swatch" style="background:${c.themeColor||'#ccc'}"></span>
+        <span class="ro-name">${escapeHtml(c.name)}</span>
+        <span class="ro-role">${escapeHtml(c.role||'')}</span>
+        <span class="ro-order-btns">
+          <button class="btn95" title="Move to top">⬆Top</button>
+          <button class="btn95" title="Move up">▲</button>
+          <button class="btn95" title="Move down">▼</button>
+          <button class="btn95" title="Move to bottom">⬇Bot</button>
+        </span>
+      `;
+      const btns = row.querySelectorAll('.ro-order-btns button');
+      btns[0].onclick = ()=> moveReorganizerRow(c.id, 'top');
+      btns[1].onclick = ()=> moveReorganizerRow(c.id, 'up');
+      btns[2].onclick = ()=> moveReorganizerRow(c.id, 'down');
+      btns[3].onclick = ()=> moveReorganizerRow(c.id, 'bottom');
+
+      row.addEventListener('dragstart', e=>{
+        roDragId = c.id;
+        row.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      row.addEventListener('dragend', ()=>{
+        row.classList.remove('dragging');
+        list.querySelectorAll('.ro-row').forEach(r=>r.classList.remove('drag-over'));
+      });
+      row.addEventListener('dragover', e=>{
+        e.preventDefault();
+        if(roDragId !== null && roDragId !== c.id) row.classList.add('drag-over');
+      });
+      row.addEventListener('dragleave', ()=> row.classList.remove('drag-over'));
+      row.addEventListener('drop', e=>{
+        e.preventDefault();
+        row.classList.remove('drag-over');
+        if(roDragId === null || roDragId === c.id) return;
+        const fromIdx = roItems.findIndex(x=>x.id===roDragId);
+        const toIdx = roItems.findIndex(x=>x.id===c.id);
+        if(fromIdx===-1 || toIdx===-1) return;
+        const [moved] = roItems.splice(fromIdx, 1);
+        roItems.splice(toIdx, 0, moved);
+        roDragId = null;
+        renderReorganizerList();
+      });
+
+      list.appendChild(row);
+    });
+
+    if(!anyVisible){
+      list.innerHTML = '<div class="ro-empty">No characters match that search.</div>';
+    }
+  }
+
+  function moveReorganizerRow(id, direction){
+    const idx = roItems.findIndex(c=>c.id===id);
+    if(idx===-1) return;
+    let target;
+    if(direction==='up') target = idx - 1;
+    else if(direction==='down') target = idx + 1;
+    else if(direction==='top') target = 0;
+    else if(direction==='bottom') target = roItems.length - 1;
+    if(target < 0 || target >= roItems.length || target === idx) return;
+    const [moved] = roItems.splice(idx, 1);
+    roItems.splice(target, 0, moved);
+    renderReorganizerList();
+  }
+
+  function sortReorganizer(direction){
+    roItems.sort((a,b)=>{
+      const cmp = a.name.localeCompare(b.name, undefined, {sensitivity:'base'});
+      return direction === 'za' ? -cmp : cmp;
+    });
+    renderReorganizerList();
+  }
+
+  function resetReorganizerOrder(){
+    roItems = roOriginal.slice();
+    renderReorganizerList();
+  }
+
+  function saveReorganizerOrder(){
+    characters = characters.filter(c => c.world !== currentWorld).concat(roItems);
+    closeReorganizer();
+    renderAll();
+  }
+
+  document.getElementById('ro-filter') && document.getElementById('ro-filter').addEventListener('input', renderReorganizerList);
+
+  /* ---------- Export JSON modal ---------- */
+  function openExport(){
+    const data = { worlds: getWorlds(), characters };
+    document.getElementById('cp-exportText').value = JSON.stringify(data, null, 2);
+    document.getElementById('cp-exportOverlay').classList.add('show');
+    centerModalWindow(document.getElementById('win-export'));
+  }
+  function closeExport(){
+    document.getElementById('cp-exportOverlay').classList.remove('show');
+  }
+  function copyExport(btn){
+    const text = document.getElementById('cp-exportText').value;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).catch(()=>fallbackCopyExport());
+    } else {
+      fallbackCopyExport();
+    }
+    const original = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    setTimeout(()=>{ btn.textContent = original; }, 1200);
+  }
+  function fallbackCopyExport(){
+    const ta = document.getElementById('cp-exportText');
+    ta.select();
+    document.execCommand('copy');
+  }
+  function downloadExport(){
+    const text = document.getElementById('cp-exportText').value;
+    const blob = new Blob([text], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'character-portal-data.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  /* Downloads a full copy of this entire desktop page, with the current
+     worlds/characters baked in as the new starting data — so reopening the
+     downloaded file picks up right where this session left off, instead of
+     resetting back to the original seed character. */
+  function buildChangeSummary(){
+    const uniq = arr => [...new Set(arr)];
+    const parts = [];
+    if(changeLog.added.length) parts.push(`${uniq(changeLog.added).join(', ')} added`);
+    if(changeLog.edited.length) parts.push(`${uniq(changeLog.edited).join(', ')} edited`);
+    if(changeLog.deleted.length) parts.push(`${uniq(changeLog.deleted).join(', ')} deleted`);
+    if(changeLog.worldsAdded.length){
+      const w = uniq(changeLog.worldsAdded);
+      parts.push(`${w.join(', ')} world${w.length>1?'s':''} added`);
+    }
+    if(changeLog.worldsDeleted.length){
+      const w = uniq(changeLog.worldsDeleted);
+      parts.push(`${w.join(', ')} world${w.length>1?'s':''} deleted`);
+    }
+    return parts.length ? parts.join(', ') : 'no changes';
+  }
+
+  function logNoteUpdate(){
+    const stamp = new Date().toLocaleString();
+    const noteLine = `- Last Character Portal update (${stamp}): ${buildChangeSummary()}`;
+    const notesArea = document.getElementById('notesArea');
+    if(notesArea){
+      // drop any previous "Last Character Portal update" line, then add the
+      // fresh one at the bottom, separated by a blank line
+      const cleaned = notesArea.value.replace(/\n?- Last Character Portal update.*$/gm, '').replace(/\s+$/,'');
+      notesArea.value = cleaned + '\n\n' + noteLine + '\n';
+    }
+    // this update has now been recorded — start tracking the next batch of changes fresh
+    changeLog = { added: [], edited: [], deleted: [], worldsAdded: [], worldsDeleted: [] };
+  }
+
+  function downloadFullHtml(){
+    // Record what changed since the last export into the Notes app before we
+    // snapshot the page, so the exported copy carries the note too.
+    logNoteUpdate();
+
+    // Work on a clone so we don't disturb the currently running desktop —
+    // reset every window/overlay/taskbar entry back to a fresh "nothing open"
+    // state in that clone, so the downloaded file boots to the default
+    // desktop instead of reopening whatever happened to be open right now.
+    const docClone = document.documentElement.cloneNode(true);
+
+    docClone.querySelectorAll('.window').forEach(win=>{
+      win.classList.add('hidden');
+      win.classList.remove('inactive');
+      win.style.zIndex = '';
+    });
+    docClone.querySelectorAll('.cp-modal-overlay').forEach(o=> o.classList.remove('show'));
+    const taskItems = docClone.querySelector('#taskItems');
+    if(taskItems) taskItems.innerHTML = '';
+    const startMenu = docClone.querySelector('#startMenu');
+    if(startMenu) startMenu.classList.add('hidden');
+    const startBtn = docClone.querySelector('#startBtn');
+    if(startBtn) startBtn.classList.remove('pressed');
+
+    // cloneNode does NOT carry over a textarea's live typed value (only its
+    // original static text), so the Notes app content has to be copied over
+    // by hand or the exported file would boot with stale/default notes.
+    const liveNotes = document.getElementById('notesArea');
+    const clonedNotes = docClone.querySelector('#notesArea');
+    if(liveNotes && clonedNotes) clonedNotes.textContent = liveNotes.value;
+
+    // Reset delete permissions in the exported copy: admin mode locks again,
+    // and any "delete freely" rights on characters/worlds the user added in
+    // this session are dropped — the download starts fully locked down.
+    const cloneBody = docClone.querySelector('body');
+    if(cloneBody) cloneBody.classList.remove('cp-admin');
+
+    let html = '<!DOCTYPE html>\n' + docClone.outerHTML;
+
+    const charactersForExport = characters.map(c=>{
+      const copy = Object.assign({}, c);
+      delete copy.isUserAdded;
+      return copy;
+    });
+
+    const worldsSrc = 'let worlds = ' + JSON.stringify(getWorlds()) + ';';
+    const charactersSrc = 'let characters = ' + JSON.stringify(charactersForExport, null, 2) + ';';
+
+    html = html.replace(/let worlds = \[[^\]]*\];/, worldsSrc);
+    html = html.replace(/let characters = \[[\s\S]*?\n\s*\];/, charactersSrc);
+
+    const blob = new Blob([html], {type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'fake-desktop-backup.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  document.addEventListener('keydown', e=>{
+    if(e.key !== 'Escape') return;
+    closeCreateWorldModal();
+    closeRenameWorldModal();
+    closeAvatarCropModal();
+    closeAddModal();
+    closeExport();
+  });
+
+  renderAll();
+
+  return {
+    openAddModal, closeAddModal, saveCharacter, deleteCurrentCharacter,
+    openCreateWorldModal, closeCreateWorldModal, saveNewWorld,
+    openCharManager, deleteCurrentWorld, toggleInlineEdit,
+    openAvatarCropModal, closeAvatarCropModal, saveAvatarCrop,
+    openRenameWorldModal, closeRenameWorldModal, saveRenameWorld,
+    openReorganizer, closeReorganizer, sortReorganizer, resetReorganizerOrder, saveReorganizerOrder,
+    openExport, closeExport, copyExport, downloadExport, downloadFullHtml,
+    filterRoster, handleRosterSearchKey
+  };
+})();
+
+/* =====================================================
+   PaintApp — simple canvas painter
+===================================================== */
 const PaintApp = (function(){
   const canvas = document.getElementById('paintCanvas');
   const ctx = canvas.getContext('2d');
@@ -2709,5 +4977,6 @@ VisitorTracker.init();
 })();
 </script>
 
-</body>
-</html>
+
+
+</body></html>
