@@ -1066,7 +1066,7 @@ NOTES
 - reminder: write something about visitor(s)
 - can admin powers destroy worlds?
 
-- Last Character Portal update (9/9/2026, 11:25:06 PM): Victor edited
+- Last Character Portal update (9/10/2026, 1:52:20 AM): Victor edited
 </textarea>
     </div>
     <div class="statusbar">Ln 1, Col 1</div>
@@ -1241,7 +1241,7 @@ NOTES
   </div>
 
   <!-- ============ WINDOW: Character Portal ============ -->
-  <div class="window raised hidden" id="win-charportal" data-default-width="640" data-default-height="640" style="left: 338px; top: 17px; width: 640px; height: 640px;">
+  <div class="window raised hidden" id="win-charportal" data-default-width="640" data-default-height="640" style="left: 329px; top: 33px; width: 640px; height: 640px;">
     <div class="titlebar" onmousedown="OS.startDrag(event,'charportal')" ontouchstart="OS.startDrag(event,'charportal')">
       <div class="ttitle"><span>🎭</span><span>Character Portal</span></div>
       <div class="tbtns">
@@ -1432,7 +1432,7 @@ Full character sheet https://s.mj.run/VKrP9HNFn-0</div>
 
   <!-- ============ MODAL: Export JSON ============ -->
   <div class="cp-modal-overlay" id="cp-exportOverlay" onclick="CharPortal.closeExport()">
-    <div class="window raised cp-modal-window hidden" id="win-export" onclick="event.stopPropagation()" style="transform: none; left: 570px; top: 278.5px;">
+    <div class="window raised cp-modal-window hidden" id="win-export" onclick="event.stopPropagation()" style="transform: none; left: 570px; top: 295.5px;">
       <div class="titlebar" onmousedown="OS.startDrag(event,'export')" ontouchstart="OS.startDrag(event,'export')">
         <div class="ttitle"><span>📤</span><span>Export Character Data (JSON)</span></div>
         <div class="tbtns"><div class="tbtn" onclick="CharPortal.closeExport()">✕</div></div>
@@ -1985,7 +1985,7 @@ Full character sheet https://s.mj.run/VKrP9HNFn-0</div>
   <div id="startBtn" class="btn95" onclick="OS.toggleStart(event)"><span class="g">🪟</span>Start</div>
   <div id="taskDivider"></div>
   <div id="taskItems"></div>
-  <div id="clock">11:25 PM</div>
+  <div id="clock">1:52 AM</div>
 </div>
 
 <div id="startMenu" class="hidden raised">
@@ -4965,10 +4965,15 @@ VisitorTracker.init();
 
   notesArea.addEventListener('keyup', ()=>{
     const val = notesArea.value;
-    if(!val.toLowerCase().trimEnd().endsWith(TRIGGER)) return;
+    const cursorPos = notesArea.selectionStart;
+    // look at just the current line up to the cursor, not the whole document —
+    // that way this still works even if other text (like an export note) sits below
+    const lineStart = val.lastIndexOf('\n', cursorPos - 1) + 1;
+    const currentLine = val.slice(lineStart, cursorPos);
+    if(!currentLine.toLowerCase().trimEnd().endsWith(TRIGGER)) return;
 
-    const trimmed = val.replace(/\s+$/, '');
-    const withoutTrigger = trimmed.slice(0, trimmed.length - TRIGGER.length).replace(/\s+$/, '');
+    const trimmedLine = currentLine.replace(/\s+$/, '');
+    const withoutTrigger = trimmedLine.slice(0, trimmedLine.length - TRIGGER.length).replace(/\s+$/, '');
     const count = VisitorTracker.getCount();
     const reason = VisitorTracker.getReason();
 
@@ -4981,11 +4986,14 @@ VisitorTracker.init();
       message = `🌐 Couldn't reach the visitor counter right now — try again in a bit.`;
     }
 
-    notesArea.value = withoutTrigger + '\n\n' + message;
+    const before = val.slice(0, lineStart);
+    const after = val.slice(cursorPos);
+    notesArea.value = before + withoutTrigger + '\n\n' + message + after;
+    const newCursorPos = (before + withoutTrigger + '\n\n' + message).length;
+    notesArea.selectionStart = notesArea.selectionEnd = newCursorPos;
   });
 })();
 </script>
-
 
 
 
