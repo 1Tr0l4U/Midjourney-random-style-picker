@@ -4134,11 +4134,14 @@ const CharPortal = (function(){
       const zoom = c.avatarZoom || 100;
       const posX = c.avatarPosX != null ? c.avatarPosX : 50;
       const posY = c.avatarPosY != null ? c.avatarPosY : 50;
+      const forCharId = c.id; // so a slow load from a previous click can't clobber whoever is showing now
       test.onload = ()=>{
+        if(currentCharId !== forCharId) return; // selection moved on while this was loading — ignore it
         const box = document.getElementById('cp-avatarBox');
         if(box) box.innerHTML = `<div class="cp-avatar-img" style="background-image:url('${c.avatarUrl.replace(/'/g,"\\'")}'); background-size:${zoom}%; background-position:${posX}% ${posY}%;"></div>`;
       };
       test.onerror = ()=>{
+        if(currentCharId !== forCharId) return;
         const box = document.getElementById('cp-avatarBox');
         if(box) box.innerHTML = '<div class="cp-avatar-placeholder">👤</div>';
       };
