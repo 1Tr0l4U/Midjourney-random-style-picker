@@ -1440,6 +1440,7 @@ NOTES
       <div class="sref-card">
         <label class="sref-label">📂 Character Dataset</label>
         <div class="cg-status cg-status-warn" id="cg-dataStatus">Loading…</div>
+        <div class="cg-status" id="cg-comboCount"></div>
       </div>
 
       <div class="sref-card">
@@ -1455,7 +1456,7 @@ NOTES
           <label class="sref-label" style="margin-top:0">🎛 Customize Generation</label>
           <button class="btn95" onclick="CharGenApp.openFlowchart()">🗺️ View Flowchart</button>
         </div>
-        <div class="sref-small">Leave anything on "Random" to let the generator decide. Pick "Don't include in prompt" to still generate that trait for the character sheet, but leave it out of the Midjourney/DALL·E prompt text.</div>
+        <div class="sref-small">Leave anything on "Random" to let the generator decide. Pick "Don't include in prompt" to still generate that trait for the character sheet, but leave it out of the Midjourney prompt text.</div>
         <div class="cg-grid" style="margin-top:8px">
 
           <div class="cg-field">
@@ -1572,7 +1573,7 @@ NOTES
 
       <div class="sref-card">
         <label class="sref-label">🖼 Art Prompt Wrapper Text</label>
-        <div class="sref-small">Optional text pasted right before / after the generated Midjourney/DALL·E prompt.</div>
+        <div class="sref-small">Optional text pasted right before / after the generated Midjourney prompt.</div>
         <div class="cg-grid" style="margin-top:8px">
           <div class="cg-field">
             <label class="sref-label">Prefix (added before)</label>
@@ -8722,6 +8723,37 @@ const CharGenApp = (function(){
     return total;
   }
 
+  /* Rough estimate of how many distinct characters the dataset can produce:
+     the product of the option counts across the independent trait
+     dimensions the generator actually draws one value from per character. */
+  function estimateCombinations(d){
+    const dims = ['races','genders','classes','subclasses','eye_colors','eye_shapes','eye_designs',
+      'hair_colors','hair_textures','hair_lengths','hair_styles','facial_hair','skin_tones',
+      'body_types','ages','heights','weapons','colors','footwear','accessories'];
+    let total = 1;
+    dims.forEach(k => {
+      const v = d[k];
+      if(Array.isArray(v) && v.length) total *= v.length;
+    });
+    return total;
+  }
+
+  function formatBigNumber(n){
+    if(!isFinite(n) || n <= 0) return '0';
+    if(n < 1000) return String(Math.round(n));
+    const units = ['', 'thousand', 'million', 'billion', 'trillion', 'quadrillion',
+      'quintillion', 'sextillion', 'septillion', 'octillion', 'nonillion'];
+    let i = 0;
+    while(n >= 1000 && i < units.length - 1){ n /= 1000; i++; }
+    const digits = n < 10 ? 2 : n < 100 ? 1 : 0;
+    return n.toFixed(digits) + (units[i] ? ' ' + units[i] : '');
+  }
+
+  function setComboCount(msg){
+    const el = document.getElementById('cg-comboCount');
+    if(el) el.textContent = msg;
+  }
+
   function setStatus(msg, kind){
     const el = document.getElementById('cg-dataStatus');
     el.textContent = msg;
@@ -8872,6 +8904,7 @@ const CharGenApp = (function(){
 
   async function loadRemoteData(){
     setStatus('Loading…');
+    setComboCount('');
     DATA = null;
     setGenerateEnabled(false);
     try{
@@ -8891,6 +8924,7 @@ const CharGenApp = (function(){
       setGenerateEnabled(true);
       hideError();
       setStatus(`✅ Loaded dataset — ${countOptions(DATA)} discrete options across ${Object.keys(DATA).length} categories.`, 'ok');
+      setComboCount(`🔢 ${formatBigNumber(estimateCombinations(DATA))} unique combinations possible`);
     } catch(err){
       setStatus('⚠ Could not load the dataset from GitHub (' + err.message + '). Try Reload Data.', 'warn');
     }
