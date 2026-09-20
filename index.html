@@ -949,6 +949,38 @@ mark.cp-roster-highlight{
 #srefLightbox .lb-error{
   font-size:16px;font-weight:bold;padding:30px;color:#333;
 }
+
+/* lightbox for the character-generator internal flowchart (zoom + pan) */
+#cgFlowchartLightbox{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:none;align-items:center;justify-content:center;
+  z-index:100000;
+}
+#cgFlowchartLightbox.show{display:flex}
+#cgFlowchartLightbox .window{
+  width:min(92vw,900px);
+  height:min(88vh,700px);
+  display:flex;flex-direction:column;
+}
+.cg-fc-toolbar{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:6px 10px;background:var(--gray);border-bottom:1px solid #808080;
+}
+.cg-fc-viewport{
+  flex:1;min-height:0;position:relative;overflow:hidden;
+  background:#fff;cursor:grab;touch-action:none;
+}
+.cg-fc-viewport.dragging{cursor:grabbing}
+.cg-fc-viewport img{
+  position:absolute;top:0;left:0;
+  transform-origin:0 0;
+  display:none;
+  user-select:none;-webkit-user-drag:none;
+}
+.cg-fc-loading{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:#333;
+}
 /* ---------- Random Character Generator ---------- */
 .cg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px 14px}
 .cg-field{display:flex;flex-direction:column}
@@ -1394,16 +1426,20 @@ NOTES
         <div class="tbtn" onclick="OS.close('chargen')">✕</div>
       </div>
     </div>
-    <div class="menubar"><span>File</span><span>Edit</span><span>View</span><span>Help</span></div>
+    <div class="menubar">
+      <span class="menu-item" onclick="CharGenApp.toggleFileMenu(event)">
+        File
+        <div class="file-dropdown" id="cg-file-dropdown">
+          <div class="file-dropdown-item" onclick="CharGenApp.loadRemoteData()">🔄 Click to reload the data</div>
+        </div>
+      </span>
+      <span>Edit</span><span>View</span><span>Help</span>
+    </div>
     <div class="window-body">
 
       <div class="sref-card">
-        <label class="sref-label">📂 Character Dataset (required)</label>
-        <div class="sref-small">This app ships with no built-in data — upload a <code>character_data.json</code> file (same format as the notebook's dataset) to enable generation.</div>
-        <div class="cg-uploadRow" style="margin-top:8px">
-          <input type="file" id="cg-fileInput" accept="application/json,.json" class="field95" onchange="CharGenApp.handleUpload(event)">
-        </div>
-        <div class="cg-status cg-status-warn" id="cg-dataStatus">⚠ No dataset loaded yet. Upload a character_data.json file to begin.</div>
+        <label class="sref-label">📂 Character Dataset</label>
+        <div class="cg-status cg-status-warn" id="cg-dataStatus">Loading…</div>
       </div>
 
       <div class="sref-card">
@@ -1411,11 +1447,14 @@ NOTES
           <input type="checkbox" id="cg-truerandom" onchange="CharGenApp.toggleTrueRandom()">
           <span>🎲🎲 TRUE RANDOM</span>
         </label>
-        <div class="sref-small" style="margin-top:4px">When on, every dropdown below is locked and every trait — eye count, class count, outfit style, armor/headwear odds, hair, etc. — is picked with truly equal odds instead of the tuned probabilities (e.g. eyes are no longer more likely to come up as 2, classes no longer favor 1 over 2, outfit is a flat 50/50 full‑body vs modular).</div>
+        <div class="sref-small" style="margin-top:4px">All features are now picked truly at equal odds.</div>
       </div>
 
       <div class="sref-card" id="cg-customizeCard">
-        <label class="sref-label">🎛 Customize Generation</label>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+          <label class="sref-label" style="margin-top:0">🎛 Customize Generation</label>
+          <button class="btn95" onclick="CharGenApp.openFlowchart()">🗺️ View Flowchart</button>
+        </div>
         <div class="sref-small">Leave anything on "Random" to let the generator decide. Pick "Don't include in prompt" to still generate that trait for the character sheet, but leave it out of the Midjourney/DALL·E prompt text.</div>
         <div class="cg-grid" style="margin-top:8px">
 
@@ -1514,7 +1553,6 @@ NOTES
             <label class="sref-label">Facial Hair</label>
             <select id="cg-facialhair" class="field95">
               <option value="random" selected>🎲 Random</option>
-              <option value="none">None (clean-shaven)</option>
               <option value="exclude">🚫 Don't include in prompt</option>
             </select>
           </div>
@@ -3671,6 +3709,28 @@ Alternative prompt:  an anthropomorphic female ferret with white fur and deep re
     </div>
     <div class="lb-body" id="lbBody"></div>
     <div class="statusbar">Click outside the image, or ✕, to close</div>
+  </div>
+</div>
+
+<div id="cgFlowchartLightbox" onclick="CharGenApp.closeFlowchart(event)">
+  <div class="window raised" onclick="event.stopPropagation()">
+    <div class="titlebar">
+      <div class="ttitle"><span>🗺️</span><span>Character Generator — Internal Flowchart</span></div>
+      <div class="tbtns">
+        <div class="tbtn" onclick="CharGenApp.closeFlowchart()">✕</div>
+      </div>
+    </div>
+    <div class="cg-fc-toolbar">
+      <button class="btn95" onclick="CharGenApp.flowchartZoom(-0.25)">➖ Zoom out</button>
+      <span id="cg-fc-zoomLabel" class="sref-small" style="margin:0;font-weight:bold">100%</span>
+      <button class="btn95" onclick="CharGenApp.flowchartZoom(0.25)">➕ Zoom in</button>
+      <button class="btn95" onclick="CharGenApp.flowchartReset()">↺ Reset</button>
+    </div>
+    <div class="cg-fc-viewport" id="cg-fc-viewport">
+      <img id="cg-fc-img" alt="Character Generator internal flowchart" draggable="false">
+      <div class="cg-fc-loading" id="cg-fc-loading">Loading…</div>
+    </div>
+    <div class="statusbar">Scroll, or use the buttons, to zoom · drag to pan · click outside, or ✕, to close</div>
   </div>
 </div>
 
@@ -8081,9 +8141,10 @@ const PaintApp = (function(){
 ===================================================== */
 const CharGenApp = (function(){
 
-  // No dataset is bundled with the app — the person must upload their own
-  // character_data.json before generating anything.
+  // Dataset is fetched automatically from GitHub on load — same approach
+  // as the Random Style Picker.
   let DATA = null;
+  const DATA_URL = 'https://raw.githubusercontent.com/1Tr0l4U/Midjourney-random-style-picker/main/random_character_data.json';
   let lastPrompt = '';
   // TRUE RANDOM mode: when on, every "percentage of chance" in the generator
   // (roll(p) calls) becomes an even 50/50, and the few generators that use
@@ -8358,8 +8419,8 @@ const CharGenApp = (function(){
   function genWeapons(choice){
     let n;
     if(trueRandom){
-      // Equal odds of 1, 2, or 3 weapons instead of 1 being favored ~80%.
-      n = pick([1,2,3]);
+      // TRUE RANDOM always generates exactly 1 weapon.
+      n = 1;
     } else if(choice && choice !== 'random'){
       n = parseInt(choice, 10);
     } else {
@@ -8690,42 +8751,149 @@ const CharGenApp = (function(){
 
   function populateDynamicSelects(){
     populateSelectWithValues('cg-age', DATA.ages);
-    populateSelectWithValues('cg-skin', DATA.skin_tones);
     populateSelectWithValues('cg-build', DATA.body_types);
-    populateSelectWithValues('cg-facialhair', DATA.facial_hair);
   }
 
-  function handleUpload(evt){
-    const file = evt.target.files && evt.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = function(){
-      try{
-        const parsed = JSON.parse(reader.result);
-        const required = ['races','genders','classes','subclasses','eye_colors','eye_shapes','eye_designs',
-          'hair_colors','hair_textures','hair_lengths','hair_styles','facial_hair','skin_tones',
-          'body_types','ages','heights','weapons','colors','footwear','accessories'];
-        const missing = required.filter(k => !(k in parsed));
-        if(missing.length){
-          setStatus(`⚠ Uploaded file is missing required fields: ${missing.join(', ')}. Please fix the file and upload again.`, 'warn');
-          document.getElementById('cg-fileInput').value = '';
-          DATA = null;
-          setGenerateEnabled(false);
-          return;
-        }
-        DATA = parsed;
-        populateDynamicSelects();
-        setGenerateEnabled(true);
-        hideError();
-        setStatus(`✅ Loaded "${file.name}" — ${countOptions(DATA)} discrete options across ${Object.keys(DATA).length} categories.`, 'ok');
-      } catch(err){
-        setStatus('⚠ Could not parse that file as JSON. Please check the file and upload again.', 'warn');
-        document.getElementById('cg-fileInput').value = '';
-        DATA = null;
-        setGenerateEnabled(false);
-      }
+  /* ---------- internal flowchart viewer (zoom + pan lightbox) ---------- */
+  const FLOWCHART_URL = 'https://raw.githubusercontent.com/1Tr0l4U/Midjourney-random-style-picker/main/character_generator_internal_flowchart.png';
+  let fcScale = 1, fcTX = 0, fcTY = 0, fcLoaded = false, fcDrag = null;
+
+  function applyFlowchartTransform(){
+    const img = document.getElementById('cg-fc-img');
+    img.style.transform = `translate(${fcTX}px, ${fcTY}px) scale(${fcScale})`;
+    document.getElementById('cg-fc-zoomLabel').textContent = Math.round(fcScale * 100) + '%';
+  }
+
+  function flowchartReset(){
+    const vp = document.getElementById('cg-fc-viewport');
+    const img = document.getElementById('cg-fc-img');
+    fcScale = 1;
+    fcTX = img.naturalWidth ? Math.max(0, (vp.clientWidth - img.naturalWidth) / 2) : 0;
+    fcTY = img.naturalHeight ? Math.max(0, (vp.clientHeight - img.naturalHeight) / 2) : 0;
+    applyFlowchartTransform();
+  }
+
+  function flowchartZoomTo(newScale, clientX, clientY){
+    const vp = document.getElementById('cg-fc-viewport');
+    newScale = Math.min(8, Math.max(0.2, newScale));
+    const rect = vp.getBoundingClientRect();
+    const ax = (clientX != null) ? clientX - rect.left : vp.clientWidth / 2;
+    const ay = (clientY != null) ? clientY - rect.top : vp.clientHeight / 2;
+    const imgX = (ax - fcTX) / fcScale;
+    const imgY = (ay - fcTY) / fcScale;
+    fcScale = newScale;
+    fcTX = ax - imgX * fcScale;
+    fcTY = ay - imgY * fcScale;
+    applyFlowchartTransform();
+  }
+
+  function flowchartZoom(delta){
+    flowchartZoomTo(fcScale + delta);
+  }
+
+  function openFlowchart(){
+    const overlay = document.getElementById('cgFlowchartLightbox');
+    const img = document.getElementById('cg-fc-img');
+    const loading = document.getElementById('cg-fc-loading');
+    overlay.classList.add('show');
+    if(fcLoaded){
+      flowchartReset();
+      return;
+    }
+    loading.textContent = 'Loading…';
+    loading.style.display = 'flex';
+    img.style.display = 'none';
+    img.onload = ()=>{
+      fcLoaded = true;
+      loading.style.display = 'none';
+      img.style.display = 'block';
+      flowchartReset();
     };
-    reader.readAsText(file);
+    img.onerror = ()=>{
+      loading.textContent = '⚠ Could not load the flowchart image from GitHub.';
+    };
+    img.src = FLOWCHART_URL;
+  }
+
+  function closeFlowchart(e){
+    if(e) e.stopPropagation();
+    document.getElementById('cgFlowchartLightbox').classList.remove('show');
+  }
+
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape'){
+      const overlay = document.getElementById('cgFlowchartLightbox');
+      if(overlay && overlay.classList.contains('show')) closeFlowchart();
+    }
+  });
+
+  (function setupFlowchartPanZoom(){
+    const vp = document.getElementById('cg-fc-viewport');
+    if(!vp) return;
+    vp.addEventListener('wheel', e=>{
+      if(!fcLoaded) return;
+      e.preventDefault();
+      flowchartZoomTo(fcScale + (e.deltaY < 0 ? 0.2 : -0.2), e.clientX, e.clientY);
+    }, { passive:false });
+
+    vp.addEventListener('pointerdown', e=>{
+      if(!fcLoaded) return;
+      fcDrag = { x: e.clientX, y: e.clientY, tx: fcTX, ty: fcTY };
+      vp.classList.add('dragging');
+      vp.setPointerCapture(e.pointerId);
+    });
+    vp.addEventListener('pointermove', e=>{
+      if(!fcDrag) return;
+      fcTX = fcDrag.tx + (e.clientX - fcDrag.x);
+      fcTY = fcDrag.ty + (e.clientY - fcDrag.y);
+      applyFlowchartTransform();
+    });
+    function endDrag(){
+      fcDrag = null;
+      vp.classList.remove('dragging');
+    }
+    vp.addEventListener('pointerup', endDrag);
+    vp.addEventListener('pointercancel', endDrag);
+
+    vp.addEventListener('dblclick', e=>{
+      if(!fcLoaded) return;
+      flowchartZoomTo(fcScale + 0.75, e.clientX, e.clientY);
+    });
+  })();
+
+  function toggleFileMenu(e){
+    e.stopPropagation();
+    document.getElementById('cg-file-dropdown').classList.toggle('show');
+  }
+  document.addEventListener('click', ()=>{
+    const dd = document.getElementById('cg-file-dropdown');
+    if(dd) dd.classList.remove('show');
+  });
+
+  async function loadRemoteData(){
+    setStatus('Loading…');
+    DATA = null;
+    setGenerateEnabled(false);
+    try{
+      const res = await fetch(DATA_URL, { cache: 'no-store' });
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const parsed = await res.json();
+      const required = ['races','genders','classes','subclasses','eye_colors','eye_shapes','eye_designs',
+        'hair_colors','hair_textures','hair_lengths','hair_styles','facial_hair','skin_tones',
+        'body_types','ages','heights','weapons','colors','footwear','accessories'];
+      const missing = required.filter(k => !(k in parsed));
+      if(missing.length){
+        setStatus(`⚠ Remote dataset is missing required fields: ${missing.join(', ')}.`, 'warn');
+        return;
+      }
+      DATA = parsed;
+      populateDynamicSelects();
+      setGenerateEnabled(true);
+      hideError();
+      setStatus(`✅ Loaded dataset — ${countOptions(DATA)} discrete options across ${Object.keys(DATA).length} categories.`, 'ok');
+    } catch(err){
+      setStatus('⚠ Could not load the dataset from GitHub (' + err.message + '). Try Reload Data.', 'warn');
+    }
   }
 
   function toggleTrueRandom(){
@@ -8781,7 +8949,10 @@ const CharGenApp = (function(){
     document.addEventListener('pointercancel', ()=>{ armed = false; });
   })();
 
-  return { generate, copyPrompt, handleUpload, toggleTrueRandom };
+  loadRemoteData();
+
+  return { generate, copyPrompt, loadRemoteData, toggleFileMenu, toggleTrueRandom,
+    openFlowchart, closeFlowchart, flowchartZoom, flowchartReset };
 })();
 
 </script>
