@@ -103,6 +103,9 @@ body{
   border-bottom:2px solid var(--gray-light);
   padding:5px 9px 3px 11px;
 }
+.btn95:disabled{
+  color:#808080;cursor:not-allowed;
+}
 input.field95, textarea.field95, select.field95{
   border-top:2px solid var(--gray-darker);
   border-left:2px solid var(--gray-darker);
@@ -946,6 +949,49 @@ mark.cp-roster-highlight{
 #srefLightbox .lb-error{
   font-size:16px;font-weight:bold;padding:30px;color:#333;
 }
+/* ---------- Random Character Generator ---------- */
+.cg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px 14px}
+.cg-field{display:flex;flex-direction:column}
+.cg-field .sref-label{margin-top:0}
+.cg-uploadRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cg-uploadRow input[type="file"]{flex:1;min-width:160px}
+.cg-status{font-size:11px;color:#1b4a8a;margin-top:6px}
+.cg-status.cg-status-warn{color:#a01818}
+.cg-status.cg-status-ok{color:#1a7a1a}
+.cg-sheet{
+  background:#fff;padding:10px 12px;margin-top:8px;
+  border-top:2px solid var(--gray-darker);border-left:2px solid var(--gray-darker);
+  border-right:2px solid var(--gray-light);border-bottom:2px solid var(--gray-light);
+  font-family:"Courier New",monospace;font-size:11.5px;line-height:1.55;
+  white-space:pre-wrap;word-break:break-word;max-height:340px;overflow:auto;
+  user-select:text;cursor:text;
+}
+.cg-sheet, .cg-sheet *{user-select:text}
+.cg-sheet::selection, .cg-sheet *::selection{background:#000080;color:#fff}
+.cg-sheet .cg-h{color:#000080;font-weight:bold}
+.cg-sheet .cg-rule{color:#808080}
+.cg-promptbox{
+  margin-top:8px;padding:8px;background:#fff;
+  border-top:2px solid var(--gray-darker);border-left:2px solid var(--gray-darker);
+  border-right:2px solid var(--gray-light);border-bottom:2px solid var(--gray-light);
+  display:flex;flex-direction:column;gap:8px;font-size:11px;
+}
+.cg-promptbox textarea{width:100%;min-height:90px;resize:vertical;border:none;font-family:inherit;font-size:11px;user-select:text}
+.cg-promptbox.copied{background:#d4f7d4}
+.cg-promptbox .btn95{align-self:flex-end}
+.cg-genBtn{width:100%;padding:12px;font-weight:bold;font-size:13px}
+.cg-resetlink{font-size:11px;color:#1b4a8a;cursor:pointer;text-decoration:underline;background:none;border:none;padding:0}
+.cg-error{
+  margin:4px 0 10px;padding:8px 10px;background:#fff3f3;color:#a01818;
+  border:1px solid #a01818;font-size:11px;display:none;
+}
+.cg-diag{font-size:10px;color:#888;margin:-4px 0 8px;text-align:right}
+#cg-customizeCard.cg-locked{opacity:.45;position:relative}
+#cg-customizeCard.cg-locked::after{
+  content:"🔒 Locked — TRUE RANDOM is on";
+  position:absolute;top:6px;right:10px;font-size:11px;font-weight:bold;color:#a01818;
+}
+#cg-customizeCard.cg-locked select{pointer-events:none;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -990,6 +1036,11 @@ mark.cp-roster-highlight{
   <div class="icon" style="left:18px; top:718px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('bin')">
     <div class="glyph">🗑️</div>
     <div class="label">Recycle Bin</div>
+  </div>
+
+  <div class="icon" style="left:118px; top:18px" onmousedown="OS.startIconDrag(event,this)" ontouchstart="OS.startIconDrag(event,this)" ondblclick="OS.open('chargen')">
+    <div class="glyph">🎲</div>
+    <div class="label">Random Character<br>Generator</div>
   </div>
 
   <!-- ============ WINDOW: Random Style Picker ============ -->
@@ -1157,7 +1208,6 @@ NOTES
 - This is your desktop. Double-click icons to open them.
 - Drag windows by their title bar.
 - Add your own programs / icons here later!
-- reminder: write something about visitor(s)
 - can admin powers destroy worlds?
 
 - Last Character Portal update (9/16/2026, 11:22:09 PM): no changes
@@ -1332,6 +1382,195 @@ NOTES
     </div>
     <div class="statusbar">Ready</div>
     <div class="resize-handle" onmousedown="OS.startResize(event,'camerashots')" ontouchstart="OS.startResize(event,'camerashots')"></div>
+  </div>
+
+  <!-- ============ WINDOW: Random Character Generator ============ -->
+  <div class="window raised hidden" id="win-chargen" data-default-width="640" data-default-height="700" style="left:200px; top:40px; width:640px; height:700px;">
+    <div class="titlebar" onmousedown="OS.startDrag(event,'chargen')" ontouchstart="OS.startDrag(event,'chargen')">
+      <div class="ttitle"><span>🎲</span><span>Random Character Generator</span></div>
+      <div class="tbtns">
+        <div class="tbtn" onclick="OS.minimize('chargen')">_</div>
+        <div class="tbtn" onclick="OS.toggleMax('chargen')">□</div>
+        <div class="tbtn" onclick="OS.close('chargen')">✕</div>
+      </div>
+    </div>
+    <div class="menubar"><span>File</span><span>Edit</span><span>View</span><span>Help</span></div>
+    <div class="window-body">
+
+      <div class="sref-card">
+        <label class="sref-label">📂 Character Dataset (required)</label>
+        <div class="sref-small">This app ships with no built-in data — upload a <code>character_data.json</code> file (same format as the notebook's dataset) to enable generation.</div>
+        <div class="cg-uploadRow" style="margin-top:8px">
+          <input type="file" id="cg-fileInput" accept="application/json,.json" class="field95" onchange="CharGenApp.handleUpload(event)">
+        </div>
+        <div class="cg-status cg-status-warn" id="cg-dataStatus">⚠ No dataset loaded yet. Upload a character_data.json file to begin.</div>
+      </div>
+
+      <div class="sref-card">
+        <label class="sref-toggle-row" style="font-weight:bold;font-size:12px">
+          <input type="checkbox" id="cg-truerandom" onchange="CharGenApp.toggleTrueRandom()">
+          <span>🎲🎲 TRUE RANDOM</span>
+        </label>
+        <div class="sref-small" style="margin-top:4px">When on, every dropdown below is locked and every trait — eye count, class count, outfit style, armor/headwear odds, hair, etc. — is picked with truly equal odds instead of the tuned probabilities (e.g. eyes are no longer more likely to come up as 2, classes no longer favor 1 over 2, outfit is a flat 50/50 full‑body vs modular).</div>
+      </div>
+
+      <div class="sref-card" id="cg-customizeCard">
+        <label class="sref-label">🎛 Customize Generation</label>
+        <div class="sref-small">Leave anything on "Random" to let the generator decide. Pick "Don't include in prompt" to still generate that trait for the character sheet, but leave it out of the Midjourney/DALL·E prompt text.</div>
+        <div class="cg-grid" style="margin-top:8px">
+
+          <div class="cg-field">
+            <label class="sref-label">Gender</label>
+            <select id="cg-gender" class="field95">
+              <option value="random" selected>🎲 Random</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+              <option value="androgynous">Androgynous / Other</option>
+              <option value="exclude">🚫 Don't include in prompt</option>
+            </select>
+          </div>
+
+          <div class="cg-field">
+            <label class="sref-label">Number of Eyes</label>
+            <select id="cg-eyes" class="field95">
+              <option value="random" selected>🎲 Random</option>
+              <option value="1">1 (cyclopean)</option>
+              <option value="2">2 (standard)</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="6">6</option>
+              <option value="8">8</option>
+              <option value="many">Many (5–8)</option>
+              <option value="exclude">🚫 Don't include in prompt</option>
+            </select>
+          </div>
+
+          <div class="cg-field">
+            <label class="sref-label">Class(es)</label>
+            <select id="cg-class" class="field95">
+              <option value="random" selected>🎲 Random</option>
+              <option value="1">1 class</option>
+              <option value="2">2 classes (multiclass/hybrid)</option>
+              <option value="exclude">🚫 Don't include in prompt</option>
+            </select>
+          </div>
+
+          <div class="cg-field">
+            <label class="sref-label">Race(s)</label>
+            <select id="cg-race" class="field95">
+              <option value="random" selected>🎲 Random</option>
+              <option value="1">1 race</option>
+              <option value="2">2 races (hybrid)</option>
+              <option value="exclude">🚫 Don't include in prompt</option>
+            </select>
+          </div>
+
+          <div class="cg-field">
+            <label class="sref-label">Hair Color(s)</label>
+            <select id="cg-hair" class="field95">
+              <option value="random" selected>🎲 Random</option>
+              <option value="1">1 color</option>
+              <option value="2">2 colors (two-tone)</option>
+              <option value="exclude">🚫 Don't include in prompt</option>
+            </select>
+          </div>
+
+          <div class="cg-field">
+            <label class="sref-label">Weapon(s)</label>
+            <select id="cg-weapons" class="field95">
+              <option value="random">🎲 Random</option>
+              <option value="1" selected>1 weapon</option>
+              <option value="2">2 weapons</option>
+              <option value="3">3 weapons</option>
+              <option value="exclude">🚫 Don't include in prompt</option>
+            </select>
+          </div>
+
+          <div class="cg-field">
+            <label class="sref-label">Age</label>
+            <select id="cg-age" class="field95">
+              <option value="random" selected>🎲 Random</option>
+              <option value="exclude">🚫 Don't include in prompt</option>
+            </select>
+          </div>
+
+          <div class="cg-field">
+            <label class="sref-label">Skin Tone</label>
+            <select id="cg-skin" class="field95">
+              <option value="random" selected>🎲 Random</option>
+              <option value="exclude">🚫 Don't include in prompt</option>
+            </select>
+          </div>
+
+          <div class="cg-field">
+            <label class="sref-label">Body Build</label>
+            <select id="cg-build" class="field95">
+              <option value="random" selected>🎲 Random</option>
+              <option value="exclude">🚫 Don't include in prompt</option>
+            </select>
+          </div>
+
+          <div class="cg-field">
+            <label class="sref-label">Facial Hair</label>
+            <select id="cg-facialhair" class="field95">
+              <option value="random" selected>🎲 Random</option>
+              <option value="none">None (clean-shaven)</option>
+              <option value="exclude">🚫 Don't include in prompt</option>
+            </select>
+          </div>
+
+          <div class="cg-field">
+            <label class="sref-label">Outfit</label>
+            <select id="cg-outfit" class="field95">
+              <option value="random" selected>🎲 Random</option>
+              <option value="full_body">Full body (one-piece)</option>
+              <option value="modular">Modular (separate top/bottom)</option>
+              <option value="exclude">🚫 Don't include in prompt</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="sref-card">
+        <label class="sref-label">🖼 Art Prompt Wrapper Text</label>
+        <div class="sref-small">Optional text pasted right before / after the generated Midjourney/DALL·E prompt.</div>
+        <div class="cg-grid" style="margin-top:8px">
+          <div class="cg-field">
+            <label class="sref-label">Prefix (added before)</label>
+            <textarea id="cg-prefix" class="field95" placeholder="e.g. /imagine prompt:"></textarea>
+          </div>
+          <div class="cg-field">
+            <label class="sref-label">Suffix (added after)</label>
+            <textarea id="cg-suffix" class="field95" placeholder="e.g. --ar 2:3 --v 6"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin:4px 0 10px">
+        <button class="btn95 cg-genBtn" id="cg-genBtnEl" onclick="CharGenApp.generate()" disabled>🎲 Generate Character</button>
+      </div>
+
+      <div class="cg-diag" id="cg-diag"></div>
+
+      <div class="cg-error" id="cg-errorBanner"></div>
+
+      <div class="sref-card" id="cg-promptCard" style="display:none">
+        <label class="sref-label">🎨 Midjourney / DALL·E Prompt</label>
+        <div class="cg-promptbox" id="cg-promptBox">
+          <textarea id="cg-promptText" readonly></textarea>
+          <button class="btn95" onclick="CharGenApp.copyPrompt(this)">📋 Copy Prompt</button>
+        </div>
+      </div>
+
+      <div class="sref-card" id="cg-sheetCard" style="display:none">
+        <label class="sref-label">⚔ Character Sheet</label>
+        <div class="cg-sheet" id="cg-sheet"></div>
+      </div>
+
+    </div>
+    <div class="statusbar" id="cg-statusbar">Ready</div>
+    <div class="resize-handle" onmousedown="OS.startResize(event,'chargen')" ontouchstart="OS.startResize(event,'chargen')"></div>
   </div>
 
   <!-- ============ WINDOW: Character Portal ============ -->
@@ -3409,6 +3648,7 @@ Alternative prompt:  an anthropomorphic female ferret with white fur and deep re
     <div class="startitem" onclick="OS.open('perfectpixel');OS.closeStart()"><span class="g">🧩</span>PerfectPixel</div>
     <div class="startitem" onclick="OS.open('camerashots');OS.closeStart()"><span class="g">🎥</span>Random Camera Shot</div>
     <div class="startitem" onclick="OS.open('charportal');OS.closeStart()"><span class="g">🎭</span>Character Portal</div>
+    <div class="startitem" onclick="OS.open('chargen');OS.closeStart()"><span class="g">🎲</span>Random Character Generator</div>
     <div class="startsep"></div>
     <div class="startitem" style="opacity:.6"><span class="g">➕</span>Add Programs...</div>
     <div class="startsep"></div>
@@ -3658,6 +3898,35 @@ const OS = (function(){
     document.removeEventListener('touchmove', onIconDrag);
     document.removeEventListener('touchend', endIconDrag);
   }
+
+  /* ---------- stuck-drag failsafe ----------
+     startDrag/startResize/startIconDrag each attach a document-level
+     mousemove+mouseup pair and only detach it on that element's own mouseup.
+     If the mouseup never reaches the document — releasing the mouse button
+     outside the browser window, or the tab losing focus mid-drag (e.g.
+     alt-tabbing to another app) — the listener is never removed. The window
+     (or icon) then keeps silently jumping to wherever the mouse last was
+     relative to a now-stale start position on every subsequent mouse move,
+     which can throw a click meant for a button off its target entirely with
+     no visible sign why. The next unrelated mouseup anywhere (clicking
+     something else) happens to clean it up, which is why it "fixes itself".
+     This failsafe force-clears all drag state whenever the window loses
+     focus, the pointer leaves the page, or the tab is hidden, so a click
+     right after switching apps is never silently swallowed by a ghost drag. */
+  function forceEndAllDrags(){
+    endDrag();
+    endResize();
+    endIconDrag();
+  }
+  window.addEventListener('blur', forceEndAllDrags);
+  document.addEventListener('mouseleave', forceEndAllDrags);
+  document.addEventListener('visibilitychange', ()=>{ if(document.hidden) forceEndAllDrags(); });
+  // Extra safety net: ANY mouseup/touchend anywhere always clears stale drag
+  // state too, even if it somehow slipped past the above (belt and braces —
+  // calling these when nothing is dragging is a harmless no-op).
+  document.addEventListener('mouseup', forceEndAllDrags, true);
+  document.addEventListener('touchend', forceEndAllDrags, true);
+
   function getIconGridPos(el){
     const col = Math.round((el.offsetLeft - ICON_GRID_ORIGIN_X) / ICON_GRID_CELL_W);
     const row = Math.round((el.offsetTop - ICON_GRID_ORIGIN_Y) / ICON_GRID_CELL_H);
@@ -7776,82 +8045,25 @@ const PaintApp = (function(){
 })();
 
 /* =====================================================
-   Quiet little visitor counter, tucked away in Notes.
-   Uses a free, no-auth hit-counter API (Abacus, by Jason Cameron) so the
-   number is
-   shared across everyone who opens the page, not just this browser.
-   Only counts a given browser once (via a localStorage flag) so refreshing
-   or reopening the page doesn't inflate the number.
+   FocusRecovery — works around a browser/OS quirk where switching to
+   another app and back can cause the next click (sometimes several) to be
+   consumed just to restore window focus, instead of being delivered to the
+   page as a real click. Proactively re-grabbing focus the instant the tab
+   becomes visible/focused again means the user's next click is never
+   "wasted" on refocusing — it just works immediately.
 ===================================================== */
-const VisitorTracker = (function(){
-  const NAMESPACE = 'midjourney-random-style-picker-1tr0l4u';
-  const KEY = 'unique-visitors';
-  let count = null;
-  let reason = null; // 'local' | 'network' | null
-
-  async function init(){
-    if(location.protocol === 'file:'){
-      // browsers block fetch() to external APIs when the page is opened
-      // directly from disk — this only works once it's actually hosted
-      reason = 'local';
-      return;
-    }
-    try{
-      const alreadyCounted = localStorage.getItem('rsp_counted');
-      const url = alreadyCounted
-        ? `https://abacus.jasoncameron.dev/get/${NAMESPACE}/${KEY}`
-        : `https://abacus.jasoncameron.dev/hit/${NAMESPACE}/${KEY}`;
-      const res = await fetch(url);
-      const json = await res.json();
-      count = json.value;
-      if(!alreadyCounted) localStorage.setItem('rsp_counted', '1');
-    } catch(err){
-      reason = 'network'; // fails quietly — the secret just explains it couldn't connect
-    }
-  }
-
-  function getCount(){ return count; }
-  function getReason(){ return reason; }
-
-  return { init, getCount, getReason };
-})();
-VisitorTracker.init();
-
-/* Type the word "visitors" at the end of a line in Notes.txt to reveal it. */
 (function(){
-  const notesArea = document.getElementById('notesArea');
-  const TRIGGER = 'visitors';
-
-  notesArea.addEventListener('keyup', ()=>{
-    const val = notesArea.value;
-    const cursorPos = notesArea.selectionStart;
-    // look at just the current line up to the cursor, not the whole document —
-    // that way this still works even if other text (like an export note) sits below
-    const lineStart = val.lastIndexOf('\n', cursorPos - 1) + 1;
-    const currentLine = val.slice(lineStart, cursorPos);
-    if(!currentLine.toLowerCase().trimEnd().endsWith(TRIGGER)) return;
-
-    const trimmedLine = currentLine.replace(/\s+$/, '');
-    const withoutTrigger = trimmedLine.slice(0, trimmedLine.length - TRIGGER.length).replace(/\s+$/, '');
-    const count = VisitorTracker.getCount();
-    const reason = VisitorTracker.getReason();
-
-    let message;
-    if(count !== null){
-      message = `🌐 ${count} unique people have opened this app so far. You're one of them.`;
-    } else if(reason === 'local'){
-      message = `🌐 This only works once the page is actually hosted online (e.g. GitHub Pages) — opening the file locally can't reach the counter.`;
-    } else {
-      message = `🌐 Couldn't reach the visitor counter right now — try again in a bit.`;
-    }
-
-    const before = val.slice(0, lineStart);
-    const after = val.slice(cursorPos);
-    notesArea.value = before + withoutTrigger + '\n\n' + message + after;
-    const newCursorPos = (before + withoutTrigger + '\n\n' + message).length;
-    notesArea.selectionStart = notesArea.selectionEnd = newCursorPos;
+  function reclaimFocus(){
+    try{ window.focus(); }catch(e){}
+    try{ document.body && document.body.focus({ preventScroll:true }); }catch(e){}
+  }
+  document.addEventListener('visibilitychange', ()=>{
+    if(!document.hidden) reclaimFocus();
   });
+  window.addEventListener('focus', reclaimFocus);
+  window.addEventListener('pageshow', reclaimFocus);
 })();
+
 </script>
 
 
@@ -7860,4 +8072,717 @@ VisitorTracker.init();
 
 
 
+
+<script>
+
+/* =====================================================
+   CharGenApp — Random Character Generator
+   Ported from the user's Jupyter notebook (Ultimate_random_character_new_update.ipynb)
+===================================================== */
+const CharGenApp = (function(){
+
+  // No dataset is bundled with the app — the person must upload their own
+  // character_data.json before generating anything.
+  let DATA = null;
+  let lastPrompt = '';
+  // TRUE RANDOM mode: when on, every "percentage of chance" in the generator
+  // (roll(p) calls) becomes an even 50/50, and the few generators that use
+  // raw hand-tuned probability bands (eyes, class count, weapon count)
+  // switch to picking uniformly among their possible outcomes instead.
+  let trueRandom = false;
+
+  /* ---------- basic RNG helpers (mirrors python's random module usage) ---------- */
+  function pick(seq){
+    if(!Array.isArray(seq) || seq.length === 0) return 'unknown';
+    return seq[Math.floor(Math.random()*seq.length)];
+  }
+  function roll(p){ return Math.random() < (trueRandom ? 0.5 : p); }
+  function pickNUnique(seq, n){
+    if(!Array.isArray(seq) || seq.length === 0) return [];
+    const pool = seq.slice();
+    const out = [];
+    n = Math.min(n, pool.length);
+    for(let i=0;i<n;i++){
+      const idx = Math.floor(Math.random()*pool.length);
+      out.push(pool.splice(idx,1)[0]);
+    }
+    return out;
+  }
+
+  function esc(s){
+    const d = document.createElement('div');
+    d.textContent = String(s);
+    return d.innerHTML;
+  }
+
+  /* ---------- eye filtering (mirrors _filter_by_eye_count) ---------- */
+  function filterByEyeCount(pool, n){
+    const eyeLocks = DATA.eye_count_locks || {};
+    const alwaysExclude = new Set(DATA.eye_traits_always_exclude || []);
+    const out = [];
+    for(const item of pool){
+      if(alwaysExclude.has(item)) continue;
+      const req = eyeLocks[item];
+      if(req === undefined){
+        out.push(item);
+      } else if(req === 'many'){
+        if(n >= 5) out.push(item);
+      } else if(req === n){
+        out.push(item);
+      }
+    }
+    return out.length ? out : pool.filter(i=>!alwaysExclude.has(i));
+  }
+
+  /* ---------- gender bucketing for the Female/Male/Androgynous dropdown ---------- */
+  function bucketGender(g){
+    const l = g.toLowerCase();
+    if(l.includes('female') || l.includes('woman') || l.includes('feminine')) return 'female';
+    if(l.includes('male') || l.includes('man') || l.includes('masculine')) return 'male';
+    return 'androgynous';
+  }
+
+  function genGender(choice){
+    const pool = DATA.genders || ['Male','Female'];
+    if(choice === 'random' || !choice) return pick(pool);
+    const bucket = pool.filter(g => bucketGender(g) === choice);
+    return bucket.length ? pick(bucket) : pick(pool);
+  }
+
+  /* ---------- race ---------- */
+  function pickOneRace(){
+    const core = DATA.core_races || [];
+    if(core.length && roll(0.60)) return pick(core);
+    return pick(DATA.races);
+  }
+
+  function genRace(choice){
+    if(choice === '2'){
+      let r1 = pickOneRace();
+      let r2 = pickOneRace();
+      let guard = 0;
+      while(r2 === r1 && guard < 10){ r2 = pickOneRace(); guard++; }
+      return `${r1} / ${r2} hybrid`;
+    }
+    return pickOneRace(); // 'random' and '1' behave the same as the original single-race logic
+  }
+
+  /* ---------- class + build ---------- */
+  function subclassOf(c){
+    const subs = DATA.subclasses && DATA.subclasses[c];
+    return pick(subs);
+  }
+  function classText(c1, c2){
+    return `${c1 || 'unknown'} (${subclassOf(c1)}) / ${c2 || 'unknown'} (${subclassOf(c2)})`;
+  }
+
+  function genClassAndBuild(choice){
+    if(trueRandom){
+      // Equal odds: 50/50 between 1 class and 2 classes, and 50/50 between
+      // a plain dual-class and a named hybrid archetype when it's 2.
+      if(roll(0.5)){
+        const c = pick(DATA.classes);
+        return { display: `${c} (${subclassOf(c)})`, classes: [c] };
+      }
+      if(roll(0.5)){
+        const archetype = pick(DATA.hybrid_archetypes);
+        const [c1,c2] = pickNUnique(DATA.classes, 2);
+        return { display: `${archetype} — ${classText(c1,c2)} hybrid`, classes: [c1,c2] };
+      }
+      const [c1,c2] = pickNUnique(DATA.classes, 2);
+      return { display: classText(c1,c2), classes: [c1,c2] };
+    }
+    if(choice === '1'){
+      const c = pick(DATA.classes);
+      const s = subclassOf(c);
+      return { display: `${c} (${s})`, classes: [c] };
+    }
+    if(choice === '2'){
+      if(roll(0.143)){
+        const archetype = pick(DATA.hybrid_archetypes);
+        const [c1,c2] = pickNUnique(DATA.classes, 2);
+        return { display: `${archetype} — ${classText(c1,c2)} hybrid`, classes: [c1,c2] };
+      }
+      const [c1,c2] = pickNUnique(DATA.classes, 2);
+      return { display: classText(c1,c2), classes: [c1,c2] };
+    }
+    // random — capped at 1 or 2 classes (no triple-class results)
+    const r = Math.random();
+    if(r < 0.05){
+      const archetype = pick(DATA.hybrid_archetypes);
+      const [c1,c2] = pickNUnique(DATA.classes, 2);
+      return { display: `${archetype} — ${classText(c1,c2)} hybrid`, classes: [c1,c2] };
+    } else if(r < 0.35){
+      const [c1,c2] = pickNUnique(DATA.classes, 2);
+      return { display: classText(c1,c2), classes: [c1,c2] };
+    } else {
+      const c = pick(DATA.classes);
+      const s = subclassOf(c);
+      return { display: `${c} (${s})`, classes: [c] };
+    }
+  }
+
+  /* ---------- eyes ---------- */
+  function genEyes(choice){
+    let n;
+    if(trueRandom){
+      // Every possible eye count is equally likely, instead of 2 being
+      // heavily favored.
+      n = pick([1,2,3,4,5,6,7,8]);
+    } else if(choice && choice !== 'random'){
+      if(choice === 'many') n = pick([5,6,7,8]);
+      else n = parseInt(choice, 10);
+    } else {
+      const r = Math.random();
+      if(r < 0.76) n = 2;
+      else if(r < 0.88) n = 1;
+      else if(r < 0.96) n = 3;
+      else if(r < 0.985) n = 4;
+      else n = pick([5,6,7,8]);
+    }
+
+    const color = pick(DATA.eye_colors);
+    const shape = pick(filterByEyeCount(DATA.eye_shapes, n));
+    const design = pick(filterByEyeCount(DATA.eye_designs, n));
+
+    let summary;
+    if(n === 1) summary = `1 large cyclopean ${color} eye (${shape}, ${design})`;
+    else if(n === 2) summary = `a pair of ${color} eyes (${shape}, ${design})`;
+    else summary = `${n} ${color} eyes arranged across the face (${shape}, ${design})`;
+
+    return { count:n, color, shape, design, summary };
+  }
+
+  /* ---------- hair ---------- */
+  function genHair(choice){
+    const texture = pick(DATA.hair_textures);
+    const length = pick(DATA.hair_lengths);
+    const style = pick(DATA.hair_styles);
+    let colorLabel;
+    if(choice === '2'){
+      let c1 = pick(DATA.hair_colors);
+      let c2 = pick(DATA.hair_colors);
+      let guard = 0;
+      while(c2 === c1 && guard < 10){ c2 = pick(DATA.hair_colors); guard++; }
+      colorLabel = `${c1} and ${c2}`;
+    } else {
+      colorLabel = pick(DATA.hair_colors);
+    }
+    const wornStyle = style[0] === style[0].toUpperCase() ? style.toLowerCase() : style;
+    const summary = `${length}, ${texture} ${colorLabel} hair, worn ${wornStyle}`;
+    return { summary, color: colorLabel, texture, length, style };
+  }
+
+  /* ---------- facial hair ---------- */
+  function genFacialHair(gender, choice){
+    if(choice && choice !== 'random'){
+      return choice.toLowerCase().startsWith('none') ? 'clean-shaven' : choice;
+    }
+    const g = gender.toLowerCase();
+    if(['female','woman','feminine'].some(k => g.includes(k))) return 'none';
+    const chance = ['male','man','masculine'].some(k => g.includes(k)) ? 0.65 : 0.30;
+    if(roll(chance)){
+      const style = pick(DATA.facial_hair);
+      return style.toLowerCase().startsWith('none') ? 'clean-shaven' : style;
+    }
+    return 'clean-shaven';
+  }
+
+  function genSkin(choice){
+    if(choice && choice !== 'random') return choice;
+    return pick(DATA.skin_tones);
+  }
+
+  function genBody(ageChoice, buildChoice){
+    return {
+      build: (buildChoice && buildChoice !== 'random') ? buildChoice : pick(DATA.body_types),
+      age: (ageChoice && ageChoice !== 'random') ? ageChoice : pick(DATA.ages),
+      height: pick(DATA.heights),
+      distinguishing_feature: roll(0.55) ? pick(DATA.distinguishing_features) : null
+    };
+  }
+
+  /* ---------- outfit ---------- */
+  function applyModifiers(baseItem, chance){
+    chance = chance === undefined ? 0.5 : chance;
+    const parts = [];
+    if(roll(chance) && DATA.conditions) parts.push(pick(DATA.conditions));
+    if(roll(chance) && DATA.styles) parts.push(pick(DATA.styles));
+    if(roll(chance*0.6) && DATA.cultural_motifs) parts.push(pick(DATA.cultural_motifs) + '-style');
+    if(roll(chance*0.7) && DATA.materials) parts.push(pick(DATA.materials));
+    parts.push(baseItem);
+    return parts.join(' ');
+  }
+
+  function genOutfit(modeChoice){
+    const outfit = {};
+    const useFullBody = (modeChoice === 'full_body') ? true
+      : (modeChoice === 'modular') ? false
+      : roll(0.30);
+    if(useFullBody){
+      outfit.mode = 'full_body';
+      outfit.full_body = pick(DATA.fullbody);
+      outfit.outerwear = roll(0.35) ? pick(DATA.outerwear) : null;
+    } else {
+      outfit.mode = 'modular';
+      outfit.top = pick(DATA.tops);
+      outfit.bottom = pick(DATA.bottoms);
+      outfit.outerwear = roll(0.55) ? pick(DATA.outerwear) : null;
+    }
+    outfit.footwear = pick(DATA.footwear);
+    outfit.armor = roll(0.45) ? applyModifiers(pick(DATA.armor), 0.35) : null;
+    outfit.headwear = roll(0.35) ? pick(DATA.headwear) : null;
+    outfit.accessories = pickNUnique(DATA.accessories, Math.floor(Math.random()*3)+1);
+    outfit.primary_color = pick(DATA.colors);
+    outfit.secondary_color = pick(DATA.colors);
+    return outfit;
+  }
+
+  function outfitLine(o){
+    const bits = [];
+    if(o.mode === 'full_body'){
+      bits.push(`${o.primary_color} ${o.full_body}`);
+    } else {
+      bits.push(`${o.primary_color} ${o.top}`);
+      bits.push(`${o.secondary_color} ${o.bottom}`);
+    }
+    if(o.outerwear) bits.push(o.outerwear);
+    if(o.armor) bits.push(o.armor);
+    bits.push(o.footwear);
+    if(o.headwear) bits.push(o.headwear);
+    bits.push('accessorized with ' + o.accessories.join(', '));
+    return bits.join('; ');
+  }
+
+  /* ---------- weapons ---------- */
+  function genWeapons(choice){
+    let n;
+    if(trueRandom){
+      // Equal odds of 1, 2, or 3 weapons instead of 1 being favored ~80%.
+      n = pick([1,2,3]);
+    } else if(choice && choice !== 'random'){
+      n = parseInt(choice, 10);
+    } else {
+      const r = Math.random();
+      n = r > 0.97 ? 3 : (r > 0.80 ? 2 : 1);
+    }
+    return pickNUnique(DATA.weapons, n).map(w => applyModifiers(w, 0.45));
+  }
+
+  /* ---------- personality ---------- */
+  function genPersonality(){
+    return {
+      trait: pick(DATA.personality_traits),
+      ideal: pick(DATA.ideals),
+      bond: pick(DATA.bonds),
+      flaw: pick(DATA.flaws),
+      background: pick(DATA.backgrounds),
+      alignment: pick(DATA.alignments)
+    };
+  }
+
+  /* ---------- full character generation ---------- */
+  function generateCharacter(opts){
+    const gender = genGender(opts.gender);
+    const clsResult = genClassAndBuild(opts.classCount);
+
+    return {
+      race: genRace(opts.raceCount),
+      gender,
+      character_class: clsResult.display,
+      component_classes: clsResult.classes,
+      eyes: genEyes(opts.eyeCount),
+      hair: genHair(opts.hairCount),
+      facial_hair: genFacialHair(gender, opts.facialHair),
+      skin: genSkin(opts.skin),
+      body: genBody(opts.age, opts.build),
+      outfit: genOutfit(opts.outfitMode),
+      weapons: genWeapons(opts.weaponCount),
+      personality: genPersonality()
+    };
+  }
+
+  /* ---------- rendering: character sheet ---------- */
+  function renderSheet(c){
+    const b = c.body;
+    const feat = b.distinguishing_feature ? `, notable feature: ${b.distinguishing_feature}` : '';
+    const lines = [];
+    const rule = '─'.repeat(60);
+
+    lines.push(`<span class="cg-h">⚔ RANDOM CHARACTER SHEET ⚔</span>`);
+    lines.push(`<span class="cg-rule">${rule}</span>`);
+    lines.push(`<b>Race</b>        : ${esc(c.race)}`);
+    lines.push(`<b>Gender</b>      : ${esc(c.gender)}`);
+    lines.push(`<b>Class</b>       : ${esc(c.character_class)}`);
+    lines.push(`<span class="cg-rule">${rule}</span>`);
+    lines.push(`<b>Eyes</b>        : ${esc(c.eyes.summary)}`);
+    lines.push(`<b>Hair</b>        : ${esc(c.hair.summary)}`);
+    lines.push(`<b>Facial Hair</b> : ${esc(c.facial_hair)}`);
+    lines.push(`<b>Skin</b>        : ${esc(c.skin)}`);
+    lines.push(`<b>Build</b>       : ${esc(b.build)}, ${esc(b.age)}, ${esc(b.height)}${esc(feat)}`);
+    lines.push(`<span class="cg-rule">${rule}</span>`);
+    lines.push(`<b>Outfit</b>      : ${esc(outfitLine(c.outfit))}`);
+    lines.push(`<b>Weapon(s)</b>   : ${esc(c.weapons.join(', '))}`);
+    lines.push(`<span class="cg-rule">${rule}</span>`);
+    const p = c.personality;
+    lines.push(`<b>Background</b>  : ${esc(p.background)}   |   <b>Alignment</b>: ${esc(p.alignment)}`);
+    lines.push(`<b>Personality</b> : ${esc(p.trait)}`);
+    lines.push(`<b>Ideal</b>       : ${esc(p.ideal)}`);
+    lines.push(`<b>Bond</b>        : ${esc(p.bond)}`);
+    lines.push(`<b>Flaw</b>        : ${esc(p.flaw)}`);
+
+    return lines.join('\n');
+  }
+
+  /* ---------- rendering: art prompt (mirrors generate_art_prompt) ---------- */
+  function generateArtPrompt(c, ex){
+    ex = ex || {};
+    const o = c.outfit;
+    const outfitDesc = outfitLine(o).replace('accessorized with', 'wearing');
+
+    const subjectBits = [];
+    if(!ex.age) subjectBits.push(c.body.age);
+    if(!ex.gender) subjectBits.push(c.gender);
+    const subject = subjectBits.length ? `a ${subjectBits.join(' ')}` : 'a character';
+
+    const introBits = [];
+    if(!ex.race) introBits.push(`race: ${c.race}`);
+    if(!ex.class){
+      introBits.push(`class: ${c.character_class}`);
+      if(c.component_classes && c.component_classes.length === 2){
+        introBits.push(`multiclass: ${c.component_classes[0]} and ${c.component_classes[1]}`);
+      }
+    }
+    const intro = `full body character portrait of ${subject}` + (introBits.length ? ', ' + introBits.join(', ') : '');
+
+    const parts = [
+      intro,
+      !ex.eyes ? c.eyes.summary : '',
+      !ex.hair ? c.hair.summary : '',
+      (!ex.facialHair && c.facial_hair !== 'clean-shaven' && c.facial_hair !== 'none') ? c.facial_hair : '',
+      !ex.skin ? `${c.skin.toLowerCase()} skin` : '',
+      !ex.build ? `${c.body.build} build` : '',
+      !ex.outfit ? outfitDesc : '',
+      !ex.weapons ? `wielding ${c.weapons.join(', ')}` : ''
+    ];
+    return parts.filter(p => p).join(', ');
+  }
+
+  /* ---------- UI wiring ---------- */
+  function val(id){ return document.getElementById(id).value; }
+
+  function buildCharacterAndPrompt(){
+    if(!DATA){
+      throw new Error('NO_DATA_LOADED');
+    }
+
+    // TRUE RANDOM ignores every dropdown entirely (they're locked in the UI
+    // anyway) — nothing is excluded from the prompt, every trait is rolled
+    // with equal odds.
+    if(trueRandom){
+      const opts = {
+        gender: 'random', eyeCount: 'random', classCount: 'random', raceCount: 'random',
+        hairCount: 'random', weaponCount: 'random', age: 'random', skin: 'random',
+        build: 'random', facialHair: 'random', outfitMode: 'random'
+      };
+      const noExclusions = {
+        gender:false, eyes:false, class:false, race:false, hair:false,
+        weapons:false, age:false, skin:false, build:false, facialHair:false, outfit:false
+      };
+      const c = generateCharacter(opts);
+      const prefix = document.getElementById('cg-prefix').value.trim();
+      const suffix = document.getElementById('cg-suffix').value.trim();
+      const artPrompt = generateArtPrompt(c, noExclusions);
+      const prompt = [prefix, artPrompt, suffix].filter(p => p).join(' ');
+      return { c, prompt };
+    }
+
+    const genderVal = val('cg-gender');
+    const eyeVal = val('cg-eyes');
+    const classVal = val('cg-class');
+    const raceVal = val('cg-race');
+    const hairVal = val('cg-hair');
+    const weaponVal = val('cg-weapons');
+    const ageVal = val('cg-age');
+    const skinVal = val('cg-skin');
+    const buildVal = val('cg-build');
+    const facialHairVal = val('cg-facialhair');
+    const outfitVal = val('cg-outfit');
+
+    // "exclude" means: still generate this trait normally for the character
+    // sheet, just leave it out of the Midjourney/DALL·E prompt text.
+    const asGenParam = v => v === 'exclude' ? 'random' : v;
+    const opts = {
+      gender: asGenParam(genderVal),
+      eyeCount: asGenParam(eyeVal),
+      classCount: asGenParam(classVal),
+      raceCount: asGenParam(raceVal),
+      hairCount: asGenParam(hairVal),
+      weaponCount: asGenParam(weaponVal),
+      age: asGenParam(ageVal),
+      skin: asGenParam(skinVal),
+      build: asGenParam(buildVal),
+      facialHair: asGenParam(facialHairVal),
+      outfitMode: asGenParam(outfitVal)
+    };
+    const exclude = {
+      gender: genderVal === 'exclude',
+      eyes: eyeVal === 'exclude',
+      class: classVal === 'exclude',
+      race: raceVal === 'exclude',
+      hair: hairVal === 'exclude',
+      weapons: weaponVal === 'exclude',
+      age: ageVal === 'exclude',
+      skin: skinVal === 'exclude',
+      build: buildVal === 'exclude',
+      facialHair: facialHairVal === 'exclude',
+      outfit: outfitVal === 'exclude'
+    };
+
+    const c = generateCharacter(opts);
+    const prefix = document.getElementById('cg-prefix').value.trim();
+    const suffix = document.getElementById('cg-suffix').value.trim();
+    const artPrompt = generateArtPrompt(c, exclude);
+    const prompt = [prefix, artPrompt, suffix].filter(p => p).join(' ');
+    return { c, prompt };
+  }
+
+  function showError(err){
+    const banner = document.getElementById('cg-errorBanner');
+    if(err && err.message === 'NO_DATA_LOADED'){
+      banner.textContent = '📂 No dataset loaded yet. Upload a character_data.json file above before generating.';
+    } else {
+      banner.textContent = '⚠️ Something went wrong generating that character. Click "Generate Character" again — this is usually a one-off hiccup. (Details logged to the browser console.)';
+      console.error('CharGenApp: generation failed —', err);
+    }
+    banner.style.display = 'block';
+  }
+
+  function hideError(){
+    const banner = document.getElementById('cg-errorBanner');
+    banner.style.display = 'none';
+    banner.textContent = '';
+  }
+
+  let clickCount = 0;
+
+  function pad2(n){ return String(n).padStart(2,'0'); }
+
+  function updateDiag(note){
+    clickCount++;
+    const diag = document.getElementById('cg-diag');
+    if(!diag) return;
+    const d = new Date();
+    const t = `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+    diag.textContent = `Generate clicked ${clickCount}× this session — last click registered at ${t}${note ? ' — ' + note : ''}`;
+  }
+
+  function generate(){
+    // This line runs before anything else that could possibly fail, so the
+    // on-screen counter above always proves whether the click itself reached
+    // this function — open the browser console (F12) if it ever seems stuck
+    // and compare the counter against how many times you actually clicked.
+    updateDiag();
+    console.log(`CharGenApp.generate() invoked (click #${clickCount})`);
+
+    const statusEl = document.getElementById('cg-statusbar');
+
+    if(!DATA){
+      showError(new Error('NO_DATA_LOADED'));
+      statusEl.textContent = 'Upload a dataset file first.';
+      return;
+    }
+
+    let result;
+    try{
+      result = buildCharacterAndPrompt();
+    } catch(err1){
+      // Character generation is fully random — a rare unlucky combination of
+      // picks can occasionally throw. Silently retry once before bothering
+      // the user with an error, since a fresh roll almost always succeeds.
+      console.warn('CharGenApp: first attempt failed, retrying —', err1);
+      try{
+        result = buildCharacterAndPrompt();
+      } catch(err2){
+        showError(err2);
+        statusEl.textContent = 'Error generating character — click Generate again.';
+        return;
+      }
+    }
+
+    try{
+      hideError();
+      lastPrompt = result.prompt;
+      document.getElementById('cg-promptText').value = lastPrompt;
+      document.getElementById('cg-promptCard').style.display = '';
+      document.getElementById('cg-sheet').innerHTML = renderSheet(result.c);
+      document.getElementById('cg-sheetCard').style.display = '';
+      statusEl.textContent = 'Character generated.';
+    } catch(err){
+      // The character/prompt were generated successfully — this would only be
+      // a rendering-side issue. Surface it rather than leaving stale output.
+      showError(err);
+      statusEl.textContent = 'Error displaying character — click Generate again.';
+    }
+  }
+
+
+  function copyPrompt(btn){
+    if(!lastPrompt) return;
+    const box = document.getElementById('cg-promptBox');
+    const done = ()=>{
+      box.classList.add('copied');
+      const original = btn.textContent;
+      btn.textContent = 'Copied ✓';
+      setTimeout(()=>{ btn.textContent = original; box.classList.remove('copied'); }, 1200);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(lastPrompt).then(done).catch(()=>{
+        const ta = document.getElementById('cg-promptText');
+        ta.select();
+        document.execCommand('copy');
+        done();
+      });
+    } else {
+      const ta = document.getElementById('cg-promptText');
+      ta.select();
+      document.execCommand('copy');
+      done();
+    }
+  }
+
+  function countOptions(d){
+    let total = 0;
+    for(const k in d){
+      const v = d[k];
+      if(Array.isArray(v)) total += v.length;
+      else if(v && typeof v === 'object') total += Object.keys(v).reduce((s,kk)=> s + (Array.isArray(v[kk])?v[kk].length:0), 0) + Object.keys(v).length;
+    }
+    return total;
+  }
+
+  function setStatus(msg, kind){
+    const el = document.getElementById('cg-dataStatus');
+    el.textContent = msg;
+    el.className = 'cg-status' + (kind ? ' cg-status-'+kind : '');
+  }
+
+  function setGenerateEnabled(enabled){
+    const btn = document.getElementById('cg-genBtnEl');
+    if(btn) btn.disabled = !enabled;
+  }
+
+  function populateSelectWithValues(selectId, values){
+    const sel = document.getElementById(selectId);
+    if(!sel || !Array.isArray(values)) return;
+    Array.from(sel.querySelectorAll('option[data-dynamic]')).forEach(o => o.remove());
+    const excludeOpt = sel.querySelector('option[value="exclude"]');
+    values.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v;
+      opt.textContent = v;
+      opt.setAttribute('data-dynamic', '1');
+      if(excludeOpt) sel.insertBefore(opt, excludeOpt);
+      else sel.appendChild(opt);
+    });
+    sel.value = 'random';
+  }
+
+  function populateDynamicSelects(){
+    populateSelectWithValues('cg-age', DATA.ages);
+    populateSelectWithValues('cg-skin', DATA.skin_tones);
+    populateSelectWithValues('cg-build', DATA.body_types);
+    populateSelectWithValues('cg-facialhair', DATA.facial_hair);
+  }
+
+  function handleUpload(evt){
+    const file = evt.target.files && evt.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(){
+      try{
+        const parsed = JSON.parse(reader.result);
+        const required = ['races','genders','classes','subclasses','eye_colors','eye_shapes','eye_designs',
+          'hair_colors','hair_textures','hair_lengths','hair_styles','facial_hair','skin_tones',
+          'body_types','ages','heights','weapons','colors','footwear','accessories'];
+        const missing = required.filter(k => !(k in parsed));
+        if(missing.length){
+          setStatus(`⚠ Uploaded file is missing required fields: ${missing.join(', ')}. Please fix the file and upload again.`, 'warn');
+          document.getElementById('cg-fileInput').value = '';
+          DATA = null;
+          setGenerateEnabled(false);
+          return;
+        }
+        DATA = parsed;
+        populateDynamicSelects();
+        setGenerateEnabled(true);
+        hideError();
+        setStatus(`✅ Loaded "${file.name}" — ${countOptions(DATA)} discrete options across ${Object.keys(DATA).length} categories.`, 'ok');
+      } catch(err){
+        setStatus('⚠ Could not parse that file as JSON. Please check the file and upload again.', 'warn');
+        document.getElementById('cg-fileInput').value = '';
+        DATA = null;
+        setGenerateEnabled(false);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function toggleTrueRandom(){
+    const checkbox = document.getElementById('cg-truerandom');
+    trueRandom = !!checkbox.checked;
+    const card = document.getElementById('cg-customizeCard');
+    card.classList.toggle('cg-locked', trueRandom);
+    card.querySelectorAll('select').forEach(sel => { sel.disabled = trueRandom; });
+  }
+
+  /* ---------- click-swallow-proof activation ----------
+     The native "click" event has been observed to silently fail to reach
+     this button even though the mousedown clearly lands on it (confirmed:
+     it visibly depresses, but the click counter above never increments) —
+     something between mousedown and click swallows the event, on this
+     button specifically, too rarely/randomly to catch live in the act.
+     Rather than depend on the browser's native click synthesis (which is
+     what's failing), this tracks the press itself: on pointerdown over the
+     button, arm a flag; on the matching pointerup anywhere, check by raw
+     screen coordinates (not event.target, since whatever swallows the
+     click may also be misreporting the target) whether the pointer is
+     still over the button. If the native click hasn't fired by the very
+     next tick, fire generate() directly. A normal, successful click is
+     completely unaffected — this only ever engages on the exact presses
+     where the native click was missing. */
+  (function(){
+    const btn = document.getElementById('cg-genBtnEl');
+    if(!btn) return;
+    let armed = false;
+    let nativeClickFired = false;
+
+    btn.addEventListener('click', ()=>{ nativeClickFired = true; });
+
+    btn.addEventListener('pointerdown', ()=>{
+      armed = true;
+      nativeClickFired = false;
+    });
+
+    document.addEventListener('pointerup', (e)=>{
+      if(!armed) return;
+      armed = false;
+      const rect = btn.getBoundingClientRect();
+      const overButton = e.clientX >= rect.left && e.clientX <= rect.right &&
+                          e.clientY >= rect.top && e.clientY <= rect.bottom;
+      setTimeout(()=>{
+        if(overButton && !nativeClickFired && !btn.disabled){
+          console.warn('[Generate] native click was swallowed on this press — firing generate() directly as a fallback.');
+          generate();
+        }
+      }, 0);
+    }, true);
+
+    document.addEventListener('pointercancel', ()=>{ armed = false; });
+  })();
+
+  return { generate, copyPrompt, handleUpload, toggleTrueRandom };
+})();
+
+</script>
 </body></html>
