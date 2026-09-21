@@ -1443,6 +1443,13 @@ NOTES
         <div class="cg-status" id="cg-comboCount"></div>
       </div>
 
+      <div class="sref-tabs" id="cg-tabs">
+        <div class="sref-tab active" onclick="CharGenApp.switchTab(0)">🎲 Random</div>
+        <div class="sref-tab" onclick="CharGenApp.switchTab(1)">✍️ Manual</div>
+      </div>
+
+      <div class="sref-tabContent" id="cg-tabRandom">
+
       <div class="sref-card">
         <label class="sref-toggle-row" style="font-weight:bold;font-size:12px">
           <input type="checkbox" id="cg-truerandom" onchange="CharGenApp.toggleTrueRandom()">
@@ -1569,6 +1576,46 @@ NOTES
           </div>
 
         </div>
+      </div>
+
+      </div>
+
+      <div class="sref-tabContent" id="cg-tabManual" style="display:none">
+
+        <div class="sref-card">
+          <div class="sref-small">Every feature defaults to <b>🚫 Don't include</b>. Pick a specific option from a list, or set it to <b>🎲 Random</b> to still get that feature picked randomly from its full list — no weighting, just an even chance across every option.</div>
+        </div>
+
+        <div class="sref-card">
+          <label class="sref-label">🧬 Identity</label>
+          <div class="cg-grid" style="margin-top:8px" id="cgm-grid-identity"></div>
+        </div>
+
+        <div class="sref-card">
+          <label class="sref-label">👁 Eyes</label>
+          <div class="cg-grid" style="margin-top:8px" id="cgm-grid-eyes"></div>
+        </div>
+
+        <div class="sref-card">
+          <label class="sref-label">💇 Hair &amp; Face</label>
+          <div class="cg-grid" style="margin-top:8px" id="cgm-grid-hair"></div>
+        </div>
+
+        <div class="sref-card">
+          <label class="sref-label">🧥 Outfit</label>
+          <div class="cg-grid" style="margin-top:8px" id="cgm-grid-outfit"></div>
+        </div>
+
+        <div class="sref-card">
+          <label class="sref-label">🎒⚔ Gear</label>
+          <div class="cg-grid" style="margin-top:8px" id="cgm-grid-gear"></div>
+        </div>
+
+        <div class="sref-card">
+          <label class="sref-label">🎭 Personality <span style="font-weight:normal">(character sheet only — not part of the art prompt)</span></label>
+          <div class="cg-grid" style="margin-top:8px" id="cgm-grid-personality"></div>
+        </div>
+
       </div>
 
       <div class="sref-card">
@@ -8152,6 +8199,7 @@ const CharGenApp = (function(){
   // raw hand-tuned probability bands (eyes, class count, weapon count)
   // switch to picking uniformly among their possible outcomes instead.
   let trueRandom = false;
+  let activeTab = 0; // 0 = Random tab, 1 = Manual tab
 
   /* ---------- basic RNG helpers (mirrors python's random module usage) ---------- */
   function pick(seq){
@@ -8609,6 +8657,327 @@ const CharGenApp = (function(){
     return { c, prompt };
   }
 
+  /* =====================================================
+     MANUAL TAB — direct list picks (Random / Don't include / specific
+     value) for every category, instead of the weighted percentages used
+     by the Random tab above. "Random" here always means an even, uniform
+     pick across that category's full list — no hand-tuned odds.
+  ===================================================== */
+
+  const MANUAL_GROUPS = {
+    identity: [
+      { id:'cgm-gender', label:'Gender', data:'genders' },
+      { id:'cgm-race', label:'Race', data:'races' },
+      { id:'cgm-class', label:'Class', data:'classes' },
+      { id:'cgm-subclass', label:'Subclass', data:'__subclasses' },
+      { id:'cgm-age', label:'Age', data:'ages' },
+      { id:'cgm-skin', label:'Skin Tone', data:'skin_tones' },
+      { id:'cgm-build', label:'Body Build', data:'body_types' },
+      { id:'cgm-height', label:'Height', data:'heights' },
+      { id:'cgm-feature', label:'Distinguishing Feature', data:'distinguishing_features' }
+    ],
+    eyes: [
+      { id:'cgm-eyecount', label:'Number of Eyes', data:'__eyecount' },
+      { id:'cgm-eyecolor', label:'Eye Color', data:'eye_colors' },
+      { id:'cgm-eyeshape', label:'Eye Shape', data:'eye_shapes' },
+      { id:'cgm-eyedesign', label:'Eye Design', data:'eye_designs' }
+    ],
+    hair: [
+      { id:'cgm-hairtexture', label:'Hair Texture', data:'hair_textures' },
+      { id:'cgm-hairlength', label:'Hair Length', data:'hair_lengths' },
+      { id:'cgm-hairstyle', label:'Hair Style', data:'hair_styles' },
+      { id:'cgm-haircolor', label:'Hair Color', data:'hair_colors' },
+      { id:'cgm-facialhair', label:'Facial Hair', data:'facial_hair' }
+    ],
+    outfit: [
+      { id:'cgm-fullbody', label:'Full-Body Outfit', data:'fullbody' },
+      { id:'cgm-top', label:'Top', data:'tops' },
+      { id:'cgm-bottom', label:'Bottom', data:'bottoms' },
+      { id:'cgm-outerwear', label:'Outerwear', data:'outerwear' },
+      { id:'cgm-armor', label:'Armor', data:'armor' },
+      { id:'cgm-headwear', label:'Hat / Headwear', data:'headwear' },
+      { id:'cgm-footwear', label:'Shoes / Footwear', data:'footwear' },
+      { id:'cgm-primarycolor', label:'Primary Color', data:'colors' },
+      { id:'cgm-secondarycolor', label:'Secondary Color', data:'colors' }
+    ],
+    gear: [
+      { id:'cgm-accessory', label:'Accessory', data:'accessories' },
+      { id:'cgm-weapon', label:'Weapon', data:'weapons' }
+    ],
+    personality: [
+      { id:'cgm-alignment', label:'Alignment', data:'alignments' },
+      { id:'cgm-background', label:'Background', data:'backgrounds' },
+      { id:'cgm-trait', label:'Personality Trait', data:'personality_traits' },
+      { id:'cgm-ideal', label:'Ideal', data:'ideals' },
+      { id:'cgm-bond', label:'Bond', data:'bonds' },
+      { id:'cgm-flaw', label:'Flaw', data:'flaws' }
+    ]
+  };
+
+  const EYE_COUNT_OPTIONS = [
+    { value:'1', label:'1 (cyclopean)' },
+    { value:'2', label:'2 (standard)' },
+    { value:'3', label:'3' },
+    { value:'4', label:'4' },
+    { value:'6', label:'6' },
+    { value:'8', label:'8' },
+    { value:'many', label:'Many (5–8)' }
+  ];
+
+  function manualFieldSkeleton(id, label){
+    return `<div class="cg-field">
+      <label class="sref-label">${label}</label>
+      <select id="${id}" class="field95">
+        <option value="random">🎲 Random</option>
+        <option value="exclude" selected>🚫 Don't include</option>
+      </select>
+    </div>`;
+  }
+
+  /* Builds the empty skeleton selects (Random / Don't include only) — runs
+     once at startup so the Manual tab isn't blank while the dataset is
+     still loading. The literal option values get filled in separately by
+     populateManualDynamicSelects() once DATA is available. */
+  function buildManualFieldsUI(){
+    Object.keys(MANUAL_GROUPS).forEach(group=>{
+      const container = document.getElementById('cgm-grid-' + group);
+      if(!container) return;
+      container.innerHTML = MANUAL_GROUPS[group].map(f => manualFieldSkeleton(f.id, f.label)).join('');
+    });
+    const eyeCountSel = document.getElementById('cgm-eyecount');
+    if(eyeCountSel){
+      const excludeOpt = eyeCountSel.querySelector('option[value="exclude"]');
+      EYE_COUNT_OPTIONS.forEach(o=>{
+        const opt = document.createElement('option');
+        opt.value = o.value;
+        opt.textContent = o.label;
+        eyeCountSel.insertBefore(opt, excludeOpt);
+      });
+    }
+  }
+
+  function populateManualSelect(id, values){
+    const sel = document.getElementById(id);
+    if(!sel || !Array.isArray(values)) return;
+    Array.from(sel.querySelectorAll('option[data-dynamic]')).forEach(o => o.remove());
+    const excludeOpt = sel.querySelector('option[value="exclude"]');
+    values.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v;
+      opt.textContent = v;
+      opt.setAttribute('data-dynamic', '1');
+      if(excludeOpt) sel.insertBefore(opt, excludeOpt);
+      else sel.appendChild(opt);
+    });
+    sel.value = 'exclude';
+  }
+
+  function populateManualDynamicSelects(){
+    Object.keys(MANUAL_GROUPS).forEach(group=>{
+      MANUAL_GROUPS[group].forEach(f=>{
+        if(f.data === '__subclasses'){
+          const all = Array.from(new Set(Object.values(DATA.subclasses || {}).flat()));
+          populateManualSelect(f.id, all);
+        } else if(f.data === '__eyecount'){
+          // fixed list, already populated in buildManualFieldsUI()
+        } else if(DATA[f.data]){
+          populateManualSelect(f.id, DATA[f.data]);
+        }
+      });
+    });
+  }
+
+  function switchTab(i){
+    activeTab = i;
+    document.querySelectorAll('#cg-tabs .sref-tab').forEach((t, idx) => t.classList.toggle('active', idx === i));
+    document.getElementById('cg-tabRandom').style.display = i === 0 ? '' : 'none';
+    document.getElementById('cg-tabManual').style.display = i === 1 ? '' : 'none';
+  }
+
+  function buildManualCharacterAndPrompt(){
+    if(!DATA){
+      throw new Error('NO_DATA_LOADED');
+    }
+
+    function mv(id){
+      const el = document.getElementById(id);
+      return el ? el.value : 'exclude';
+    }
+    // "exclude" → not picked at all (skipped from both sheet and prompt).
+    // "random" → one uniform pick from the full list, no weighting.
+    // anything else → that exact chosen value.
+    function resolve(id, dataKey){
+      const v = mv(id);
+      if(v === 'exclude') return null;
+      if(v === 'random') return pick(DATA[dataKey]);
+      return v;
+    }
+
+    // ---------- identity ----------
+    const gender = resolve('cgm-gender', 'genders');
+    const race = resolve('cgm-race', 'races');
+    const cls = resolve('cgm-class', 'classes');
+    const allSubclasses = Array.from(new Set(Object.values(DATA.subclasses || {}).flat()));
+    const subclassSel = mv('cgm-subclass');
+    const subclass = subclassSel === 'exclude' ? null : (subclassSel === 'random' ? pick(allSubclasses) : subclassSel);
+    const age = resolve('cgm-age', 'ages');
+    const skin = resolve('cgm-skin', 'skin_tones');
+    const build = resolve('cgm-build', 'body_types');
+    const height = resolve('cgm-height', 'heights');
+    const feature = resolve('cgm-feature', 'distinguishing_features');
+
+    // ---------- eyes ----------
+    const eyeCountSel = mv('cgm-eyecount');
+    let eyeCount = null;
+    if(eyeCountSel === 'random') eyeCount = pick([1,2,3,4,5,6,7,8]);
+    else if(eyeCountSel !== 'exclude') eyeCount = eyeCountSel === 'many' ? pick([5,6,7,8]) : parseInt(eyeCountSel, 10);
+    const eyeColor = resolve('cgm-eyecolor', 'eye_colors');
+    const eyeShape = resolve('cgm-eyeshape', 'eye_shapes');
+    const eyeDesign = resolve('cgm-eyedesign', 'eye_designs');
+    let eyesSummary = null;
+    if(eyeCount != null || eyeColor || eyeShape || eyeDesign){
+      const colorTxt = eyeColor ? eyeColor + ' ' : '';
+      let base;
+      if(eyeCount === 1) base = `1 large cyclopean ${colorTxt}eye`;
+      else if(eyeCount != null) base = `${eyeCount} ${colorTxt}eyes`;
+      else base = `${colorTxt}eyes`.trim();
+      const traits = [eyeShape, eyeDesign].filter(Boolean);
+      eyesSummary = traits.length ? `${base} (${traits.join(', ')})` : base;
+    }
+
+    // ---------- hair ----------
+    const hairTexture = resolve('cgm-hairtexture', 'hair_textures');
+    const hairLength = resolve('cgm-hairlength', 'hair_lengths');
+    const hairStyle = resolve('cgm-hairstyle', 'hair_styles');
+    const hairColor = resolve('cgm-haircolor', 'hair_colors');
+    let hairSummary = null;
+    if(hairTexture || hairLength || hairStyle || hairColor){
+      const descBits = [hairLength, hairTexture].filter(Boolean).join(', ');
+      const colorTxt = hairColor ? `${hairColor} hair` : 'hair';
+      hairSummary = descBits ? `${descBits}, ${colorTxt}` : colorTxt;
+      if(hairStyle){
+        const worn = hairStyle[0] === hairStyle[0].toUpperCase() ? hairStyle.toLowerCase() : hairStyle;
+        hairSummary += `, worn ${worn}`;
+      }
+    }
+
+    const facialHairRaw = resolve('cgm-facialhair', 'facial_hair');
+    const facialHair = facialHairRaw ? (facialHairRaw.toLowerCase().startsWith('none') ? 'clean-shaven' : facialHairRaw) : null;
+
+    // ---------- outfit ----------
+    const fullBody = resolve('cgm-fullbody', 'fullbody');
+    const top = resolve('cgm-top', 'tops');
+    const bottom = resolve('cgm-bottom', 'bottoms');
+    const outerwear = resolve('cgm-outerwear', 'outerwear');
+    const armor = resolve('cgm-armor', 'armor');
+    const headwear = resolve('cgm-headwear', 'headwear');
+    const footwear = resolve('cgm-footwear', 'footwear');
+    const primaryColor = resolve('cgm-primarycolor', 'colors');
+    const secondaryColor = resolve('cgm-secondarycolor', 'colors');
+
+    const outfitBits = [];
+    if(fullBody) outfitBits.push([primaryColor, fullBody].filter(Boolean).join(' '));
+    if(top) outfitBits.push([primaryColor, top].filter(Boolean).join(' '));
+    if(bottom) outfitBits.push([secondaryColor, bottom].filter(Boolean).join(' '));
+    if(outerwear) outfitBits.push(outerwear);
+    if(armor) outfitBits.push(armor);
+    if(footwear) outfitBits.push(footwear);
+    if(headwear) outfitBits.push(headwear);
+
+    const accessory = resolve('cgm-accessory', 'accessories');
+    const accessories = accessory ? [accessory] : [];
+    if(accessories.length) outfitBits.push('accessorized with ' + accessories.join(', '));
+    const outfitLineManual = outfitBits.length ? outfitBits.join('; ') : null;
+
+    const weaponPick = resolve('cgm-weapon', 'weapons');
+    const weapons = weaponPick ? [weaponPick] : [];
+
+    // ---------- personality (character sheet only, matches how the Random
+    // tab's generator never puts these in the art prompt either) ----------
+    const alignment = resolve('cgm-alignment', 'alignments');
+    const background = resolve('cgm-background', 'backgrounds');
+    const trait = resolve('cgm-trait', 'personality_traits');
+    const ideal = resolve('cgm-ideal', 'ideals');
+    const bond = resolve('cgm-bond', 'bonds');
+    const flaw = resolve('cgm-flaw', 'flaws');
+
+    const c = {
+      gender, race, character_class: cls, subclass,
+      age, skin, build, height, feature,
+      eyesSummary, hairSummary, facialHair,
+      outfitLine: outfitLineManual, weapons, accessories,
+      alignment, background, trait, ideal, bond, flaw
+    };
+
+    // ---------- Midjourney / DALL·E prompt ----------
+    const subjectBits = [age, gender].filter(Boolean);
+    const subject = subjectBits.length ? `a ${subjectBits.join(' ')}` : 'a character';
+    const introBits = [];
+    if(race) introBits.push(`race: ${race}`);
+    if(cls) introBits.push(`class: ${cls}${subclass ? ' (' + subclass + ')' : ''}`);
+    const intro = `full body character portrait of ${subject}` + (introBits.length ? ', ' + introBits.join(', ') : '');
+
+    const parts = [
+      intro,
+      eyesSummary,
+      hairSummary,
+      facialHair,
+      skin ? `${skin.toLowerCase()} skin` : '',
+      build ? `${build} build` : '',
+      outfitLineManual ? outfitLineManual.replace('accessorized with', 'wearing') : '',
+      weapons.length ? `wielding ${weapons.join(', ')}` : ''
+    ];
+    const artPrompt = parts.filter(Boolean).join(', ');
+
+    const prefix = document.getElementById('cg-prefix').value.trim();
+    const suffix = document.getElementById('cg-suffix').value.trim();
+    const prompt = [prefix, artPrompt, suffix].filter(Boolean).join(' ');
+
+    return { c, prompt, manual: true };
+  }
+
+  function renderManualSheet(c){
+    const rule = '─'.repeat(60);
+    const lines = [];
+    lines.push(`<span class="cg-h">⚔ RANDOM CHARACTER SHEET ⚔</span>`);
+    lines.push(`<span class="cg-rule">${rule}</span>`);
+
+    let any = false;
+    if(c.race){ lines.push(`<b>Race</b>        : ${esc(c.race)}`); any = true; }
+    if(c.gender){ lines.push(`<b>Gender</b>      : ${esc(c.gender)}`); any = true; }
+    if(c.character_class){
+      lines.push(`<b>Class</b>       : ${esc(c.character_class)}${c.subclass ? ' (' + esc(c.subclass) + ')' : ''}`);
+      any = true;
+    }
+    if(any) lines.push(`<span class="cg-rule">${rule}</span>`);
+
+    any = false;
+    if(c.eyesSummary){ lines.push(`<b>Eyes</b>        : ${esc(c.eyesSummary)}`); any = true; }
+    if(c.hairSummary){ lines.push(`<b>Hair</b>        : ${esc(c.hairSummary)}`); any = true; }
+    if(c.facialHair){ lines.push(`<b>Facial Hair</b> : ${esc(c.facialHair)}`); any = true; }
+    if(c.skin){ lines.push(`<b>Skin</b>        : ${esc(c.skin)}`); any = true; }
+    const bodyBits = [c.build, c.age, c.height, c.feature].filter(Boolean);
+    if(bodyBits.length){ lines.push(`<b>Build</b>       : ${esc(bodyBits.join(', '))}`); any = true; }
+    if(any) lines.push(`<span class="cg-rule">${rule}</span>`);
+
+    any = false;
+    if(c.outfitLine){ lines.push(`<b>Outfit</b>      : ${esc(c.outfitLine)}`); any = true; }
+    if(c.weapons.length){ lines.push(`<b>Weapon(s)</b>   : ${esc(c.weapons.join(', '))}`); any = true; }
+    if(any) lines.push(`<span class="cg-rule">${rule}</span>`);
+
+    const ab = [];
+    if(c.background) ab.push(`<b>Background</b>  : ${esc(c.background)}`);
+    if(c.alignment) ab.push(`<b>Alignment</b>: ${esc(c.alignment)}`);
+    if(ab.length) lines.push(ab.join('   |   '));
+    if(c.trait) lines.push(`<b>Personality</b> : ${esc(c.trait)}`);
+    if(c.ideal) lines.push(`<b>Ideal</b>       : ${esc(c.ideal)}`);
+    if(c.bond) lines.push(`<b>Bond</b>        : ${esc(c.bond)}`);
+    if(c.flaw) lines.push(`<b>Flaw</b>        : ${esc(c.flaw)}`);
+
+    if(lines.length === 2) lines.push('(Nothing selected — pick some features above and hit Generate.)');
+    return lines.join('\n');
+  }
+
   function showError(err){
     const banner = document.getElementById('cg-errorBanner');
     if(err && err.message === 'NO_DATA_LOADED'){
@@ -8650,14 +9019,14 @@ const CharGenApp = (function(){
     }
 
     try{
-      const result = buildCharacterAndPrompt();
+      const result = activeTab === 1 ? buildManualCharacterAndPrompt() : buildCharacterAndPrompt();
       hideError();
       lastPrompt = result.prompt;
       document.getElementById('cg-promptText').value = lastPrompt;
       document.getElementById('cg-promptCard').style.display = '';
-      document.getElementById('cg-sheet').innerHTML = renderSheet(result.c);
+      document.getElementById('cg-sheet').innerHTML = result.manual ? renderManualSheet(result.c) : renderSheet(result.c);
       document.getElementById('cg-sheetCard').style.display = '';
-      statusEl.textContent = 'Character generated.';
+      statusEl.textContent = activeTab === 1 ? 'Character generated from manual selections.' : 'Character generated.';
     } catch(err){
       showError(err);
       statusEl.textContent = 'Error generating character — click Generate again.';
@@ -8897,6 +9266,7 @@ const CharGenApp = (function(){
       }
       DATA = parsed;
       populateDynamicSelects();
+      populateManualDynamicSelects();
       setGenerateEnabled(true);
       hideError();
       setStatus(`✅ Loaded dataset — ${countOptions(DATA)} discrete options across ${Object.keys(DATA).length} categories.`, 'ok');
@@ -8983,10 +9353,12 @@ const CharGenApp = (function(){
     });
   })();
 
+  buildManualFieldsUI();
   loadRemoteData();
 
   return { generate, copyPrompt, loadRemoteData, toggleFileMenu, toggleTrueRandom,
-    openFlowchart, closeFlowchart, flowchartZoom, flowchartReset };
+    openFlowchart, closeFlowchart, flowchartZoom, flowchartReset,
+    switchTab };
 })();
 
 </script>
