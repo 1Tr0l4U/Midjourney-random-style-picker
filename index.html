@@ -1012,12 +1012,12 @@ mark.cp-roster-highlight{
 .cg-promptbox.copied{background:#d4f7d4}
 .cg-promptbox .btn95{align-self:flex-end}
 .cg-genBtn{width:100%;padding:12px;font-weight:bold;font-size:13px}
+.cg-diag{font-size:10px;color:#888;margin:-4px 0 8px;text-align:right}
 .cg-resetlink{font-size:11px;color:#1b4a8a;cursor:pointer;text-decoration:underline;background:none;border:none;padding:0}
 .cg-error{
   margin:4px 0 10px;padding:8px 10px;background:#fff3f3;color:#a01818;
   border:1px solid #a01818;font-size:11px;display:none;
 }
-.cg-diag{font-size:10px;color:#888;margin:-4px 0 8px;text-align:right}
 #cg-customizeCard.cg-locked{opacity:.45;position:relative}
 #cg-customizeCard.cg-locked::after{
   content:"🔒 Locked — TRUE RANDOM is on";
@@ -1595,7 +1595,7 @@ NOTES
       <div class="cg-error" id="cg-errorBanner"></div>
 
       <div class="sref-card" id="cg-promptCard" style="display:none">
-        <label class="sref-label">🎨 Prompt</label>
+        <label class="sref-label">🎨 Midjourney / DALL·E Prompt</label>
         <div class="cg-promptbox" id="cg-promptBox">
           <textarea id="cg-promptText" readonly></textarea>
           <button class="btn95" onclick="CharGenApp.copyPrompt(this)">📋 Copy Prompt</button>
@@ -8572,7 +8572,7 @@ const CharGenApp = (function(){
     const outfitVal = val('cg-outfit');
 
     // "exclude" means: still generate this trait normally for the character
-    // sheet, just leave it out of the prompt text.
+    // sheet, just leave it out of the Midjourney/DALL·E prompt text.
     const asGenParam = v => v === 'exclude' ? 'random' : v;
     const opts = {
       gender: asGenParam(genderVal),
@@ -8630,23 +8630,17 @@ const CharGenApp = (function(){
 
   function pad2(n){ return String(n).padStart(2,'0'); }
 
-  function updateDiag(note){
+  function updateDiag(){
     clickCount++;
     const diag = document.getElementById('cg-diag');
     if(!diag) return;
     const d = new Date();
     const t = `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
-    diag.textContent = `Generate clicked ${clickCount}× this session — last click registered at ${t}${note ? ' — ' + note : ''}`;
+    diag.textContent = `Generate clicked ${clickCount}× this session — last click registered at ${t}`;
   }
 
   function generate(){
-    // This line runs before anything else that could possibly fail, so the
-    // on-screen counter above always proves whether the click itself reached
-    // this function — open the browser console (F12) if it ever seems stuck
-    // and compare the counter against how many times you actually clicked.
     updateDiag();
-    console.log(`CharGenApp.generate() invoked (click #${clickCount})`);
-
     const statusEl = document.getElementById('cg-statusbar');
 
     if(!DATA){
@@ -8655,24 +8649,8 @@ const CharGenApp = (function(){
       return;
     }
 
-    let result;
     try{
-      result = buildCharacterAndPrompt();
-    } catch(err1){
-      // Character generation is fully random — a rare unlucky combination of
-      // picks can occasionally throw. Silently retry once before bothering
-      // the user with an error, since a fresh roll almost always succeeds.
-      console.warn('CharGenApp: first attempt failed, retrying —', err1);
-      try{
-        result = buildCharacterAndPrompt();
-      } catch(err2){
-        showError(err2);
-        statusEl.textContent = 'Error generating character — click Generate again.';
-        return;
-      }
-    }
-
-    try{
+      const result = buildCharacterAndPrompt();
       hideError();
       lastPrompt = result.prompt;
       document.getElementById('cg-promptText').value = lastPrompt;
@@ -8681,10 +8659,8 @@ const CharGenApp = (function(){
       document.getElementById('cg-sheetCard').style.display = '';
       statusEl.textContent = 'Character generated.';
     } catch(err){
-      // The character/prompt were generated successfully — this would only be
-      // a rendering-side issue. Surface it rather than leaving stale output.
       showError(err);
-      statusEl.textContent = 'Error displaying character — click Generate again.';
+      statusEl.textContent = 'Error generating character — click Generate again.';
     }
   }
 
@@ -8938,49 +8914,73 @@ const CharGenApp = (function(){
     card.querySelectorAll('select').forEach(sel => { sel.disabled = trueRandom; });
   }
 
-  /* ---------- click-swallow-proof activation ----------
-     The native "click" event has been observed to silently fail to reach
-     this button even though the mousedown clearly lands on it (confirmed:
-     it visibly depresses, but the click counter above never increments) —
-     something between mousedown and click swallows the event, on this
-     button specifically, too rarely/randomly to catch live in the act.
-     Rather than depend on the browser's native click synthesis (which is
-     what's failing), this tracks the press itself: on pointerdown over the
-     button, arm a flag; on the matching pointerup anywhere, check by raw
-     screen coordinates (not event.target, since whatever swallows the
-     click may also be misreporting the target) whether the pointer is
-     still over the button. If the native click hasn't fired by the very
-     next tick, fire generate() directly. A normal, successful click is
-     completely unaffected — this only ever engages on the exact presses
-     where the native click was missing. */
+  /* Mobile browsers can drop the click event on a button if the tap lands
+     while the page is still settling from a scroll (the tap gets used to
+     stop the scroll instead of registering as a click) — the button still
+     shows its pressed state either way, so this only shows up as "nothing
+     happens". Handling the tap on touchend, right on this button, sidesteps
+     that instead of waiting on a click that may never come. preventDefault
+     stops the browser from also firing a synthetic click afterward, so
+     generate() only runs once. Small moves (scrolling with a finger that
+     started on the button) are ignored so this never fires as a side effect
+     of scrolling. Mouse/keyboard activation still goes through the normal
+     onclick above, unaffected. */
+  (function(){
+    const btn = document.getElementById('cg-genBtnEl');
+    if(!btn) return;
+    let start = null;
+    btn.addEventListener('touchstart', e=>{
+      const t = e.touches[0];
+      start = { x:t.clientX, y:t.clientY, moved:false };
+    }, { passive:true });
+    btn.addEventListener('touchmove', e=>{
+      if(!start) return;
+      const t = e.touches[0];
+      if(Math.abs(t.clientX - start.x) > 10 || Math.abs(t.clientY - start.y) > 10) start.moved = true;
+    }, { passive:true });
+    btn.addEventListener('touchend', e=>{
+      const wasTap = start && !start.moved;
+      start = null;
+      if(wasTap && !btn.disabled){
+        e.preventDefault();
+        generate();
+      }
+    });
+  })();
+
+  /* Desktop counterpart to the touch fix above: a trackpad "flick" keeps
+     sending scroll deltas for a bit after the fingers lift, so if you click
+     right after scrolling, the content can still drift a pixel or two
+     between mousedown and mouseup. The browser's click event requires
+     mousedown and mouseup to land on the same element, so that drift is
+     enough to silently drop the click — the button still shows its pressed
+     state either way. This checks the button's live position at mouseup
+     instead of relying on strict element-match, but only as a fallback: it
+     waits a tick to see if the normal click already fired, and only acts if
+     it didn't. Mouse only — touch is handled separately above, and
+     preventDefault() there stops it from reaching here too. */
   (function(){
     const btn = document.getElementById('cg-genBtnEl');
     if(!btn) return;
     let armed = false;
-    let nativeClickFired = false;
-
-    btn.addEventListener('click', ()=>{ nativeClickFired = true; });
-
-    btn.addEventListener('pointerdown', ()=>{
+    let clicked = false;
+    btn.addEventListener('mousedown', e=>{
+      if(e.button !== 0) return;
       armed = true;
-      nativeClickFired = false;
+      clicked = false;
     });
-
-    document.addEventListener('pointerup', (e)=>{
+    btn.addEventListener('click', ()=>{ clicked = true; });
+    document.addEventListener('mouseup', e=>{
       if(!armed) return;
       armed = false;
-      const rect = btn.getBoundingClientRect();
-      const overButton = e.clientX >= rect.left && e.clientX <= rect.right &&
-                          e.clientY >= rect.top && e.clientY <= rect.bottom;
       setTimeout(()=>{
-        if(overButton && !nativeClickFired && !btn.disabled){
-          console.warn('[Generate] native click was swallowed on this press — firing generate() directly as a fallback.');
-          generate();
-        }
+        if(clicked || btn.disabled) return;
+        const rect = btn.getBoundingClientRect();
+        const stillOverButton = e.clientX >= rect.left && e.clientX <= rect.right &&
+                                 e.clientY >= rect.top && e.clientY <= rect.bottom;
+        if(stillOverButton) generate();
       }, 0);
-    }, true);
-
-    document.addEventListener('pointercancel', ()=>{ armed = false; });
+    });
   })();
 
   loadRemoteData();
