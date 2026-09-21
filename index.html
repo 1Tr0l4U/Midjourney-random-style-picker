@@ -1595,7 +1595,7 @@ NOTES
       <div class="cg-error" id="cg-errorBanner"></div>
 
       <div class="sref-card" id="cg-promptCard" style="display:none">
-        <label class="sref-label">🎨 Midjourney / DALL·E Prompt</label>
+        <label class="sref-label">🎨 Prompt</label>
         <div class="cg-promptbox" id="cg-promptBox">
           <textarea id="cg-promptText" readonly></textarea>
           <button class="btn95" onclick="CharGenApp.copyPrompt(this)">📋 Copy Prompt</button>
@@ -8572,7 +8572,7 @@ const CharGenApp = (function(){
     const outfitVal = val('cg-outfit');
 
     // "exclude" means: still generate this trait normally for the character
-    // sheet, just leave it out of the Midjourney/DALL·E prompt text.
+    // sheet, just leave it out of the prompt text.
     const asGenParam = v => v === 'exclude' ? 'random' : v;
     const opts = {
       gender: asGenParam(genderVal),
