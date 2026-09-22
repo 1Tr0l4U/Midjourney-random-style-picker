@@ -1431,9 +1431,11 @@ NOTES
         File
         <div class="file-dropdown" id="cg-file-dropdown">
           <div class="file-dropdown-item" onclick="CharGenApp.loadRemoteData()">🔄 Click to reload the data</div>
+          <div class="file-dropdown-item" onclick="CharGenApp.triggerFileUpload()">📁 Upload your own dataset</div>
         </div>
       </span>
       <span>Edit</span><span>View</span><span>Help</span>
+      <input type="file" id="cg-file-input" accept=".json,application/json" style="display:none" onchange="CharGenApp.handleFileUpload(event)">
     </div>
     <div class="window-body">
 
@@ -9247,6 +9249,31 @@ const CharGenApp = (function(){
     if(dd) dd.classList.remove('show');
   });
 
+  const REQUIRED_FIELDS = ['races','genders','classes','subclasses','eye_colors','eye_shapes','eye_designs',
+    'hair_colors','hair_textures','hair_lengths','hair_styles','facial_hair','skin_tones',
+    'body_types','ages','heights','weapons','colors','footwear','accessories'];
+
+  /* Applies a parsed dataset object after validating it has every field the
+     generator needs. Shared by the remote fetch and the file upload, so both
+     paths populate selects / enable the button / update status the same way.
+     successMsg is shown in place of the normal "Loaded dataset — N options…"
+     line (used to show "Loaded custom dataset" for uploads). */
+  function applyDataset(parsed, successMsg){
+    const missing = REQUIRED_FIELDS.filter(k => !(k in parsed));
+    if(missing.length){
+      setStatus(`⚠ Dataset is missing required fields: ${missing.join(', ')}.`, 'warn');
+      return false;
+    }
+    DATA = parsed;
+    populateDynamicSelects();
+    populateManualDynamicSelects();
+    setGenerateEnabled(true);
+    hideError();
+    setStatus(successMsg || `✅ Loaded dataset — ${countOptions(DATA)} discrete options across ${Object.keys(DATA).length} categories.`, 'ok');
+    setComboCount(`🔢 ${formatBigNumber(estimateCombinations(DATA))} unique combinations possible`);
+    return true;
+  }
+
   async function loadRemoteData(){
     setStatus('Loading…');
     setComboCount('');
@@ -9256,24 +9283,41 @@ const CharGenApp = (function(){
       const res = await fetch(DATA_URL, { cache: 'no-store' });
       if(!res.ok) throw new Error('HTTP ' + res.status);
       const parsed = await res.json();
-      const required = ['races','genders','classes','subclasses','eye_colors','eye_shapes','eye_designs',
-        'hair_colors','hair_textures','hair_lengths','hair_styles','facial_hair','skin_tones',
-        'body_types','ages','heights','weapons','colors','footwear','accessories'];
-      const missing = required.filter(k => !(k in parsed));
-      if(missing.length){
-        setStatus(`⚠ Remote dataset is missing required fields: ${missing.join(', ')}.`, 'warn');
-        return;
-      }
-      DATA = parsed;
-      populateDynamicSelects();
-      populateManualDynamicSelects();
-      setGenerateEnabled(true);
-      hideError();
-      setStatus(`✅ Loaded dataset — ${countOptions(DATA)} discrete options across ${Object.keys(DATA).length} categories.`, 'ok');
-      setComboCount(`🔢 ${formatBigNumber(estimateCombinations(DATA))} unique combinations possible`);
+      applyDataset(parsed);
     } catch(err){
       setStatus('⚠ Could not load the dataset from GitHub (' + err.message + '). Try Reload Data.', 'warn');
     }
+  }
+
+  function triggerFileUpload(){
+    document.getElementById('cg-file-dropdown').classList.remove('show');
+    const input = document.getElementById('cg-file-input');
+    input.value = '';
+    input.click();
+  }
+
+  function handleFileUpload(event){
+    const file = event.target.files && event.target.files[0];
+    if(!file) return;
+    setStatus('Loading…');
+    setComboCount('');
+    DATA = null;
+    setGenerateEnabled(false);
+    const reader = new FileReader();
+    reader.onload = () => {
+      let parsed;
+      try{
+        parsed = JSON.parse(reader.result);
+      } catch(err){
+        setStatus('⚠ That file is not valid JSON (' + err.message + ').', 'warn');
+        return;
+      }
+      applyDataset(parsed, '✅ Loaded custom dataset');
+    };
+    reader.onerror = () => {
+      setStatus('⚠ Could not read that file. Try again.', 'warn');
+    };
+    reader.readAsText(file);
   }
 
   function toggleTrueRandom(){
@@ -9357,6 +9401,7 @@ const CharGenApp = (function(){
   loadRemoteData();
 
   return { generate, copyPrompt, loadRemoteData, toggleFileMenu, toggleTrueRandom,
+    triggerFileUpload, handleFileUpload,
     openFlowchart, closeFlowchart, flowchartZoom, flowchartReset,
     switchTab };
 })();
