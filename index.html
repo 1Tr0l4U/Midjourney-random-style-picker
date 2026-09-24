@@ -118,6 +118,11 @@ input.field95, textarea.field95, select.field95{
   color:#000;
   width:100%;
 }
+select.field95:disabled{
+  background:#c0c0c0;
+  color:#808080;
+  cursor:not-allowed;
+}
 
 /* ---------- window ---------- */
 .window{
@@ -8565,7 +8570,7 @@ const CharGenApp = (function(){
         introBits.push(`multiclass: ${c.component_classes[0]} and ${c.component_classes[1]}`);
       }
     }
-    const intro = `full body character portrait of ${subject}` + (introBits.length ? ', ' + introBits.join(', ') : '');
+    const intro = subject + (introBits.length ? ', ' + introBits.join(', ') : '');
 
     const parts = [
       intro,
@@ -8574,6 +8579,7 @@ const CharGenApp = (function(){
       (!ex.facialHair && c.facial_hair !== 'clean-shaven' && c.facial_hair !== 'none') ? c.facial_hair : '',
       !ex.skin ? `${c.skin.toLowerCase()} skin` : '',
       !ex.build ? `${c.body.build} build` : '',
+      (!ex.build && c.body.distinguishing_feature) ? c.body.distinguishing_feature : '',
       !ex.outfit ? outfitDesc : '',
       !ex.weapons ? `wielding ${c.weapons.join(', ')}` : ''
     ];
@@ -8756,6 +8762,32 @@ const CharGenApp = (function(){
         eyeCountSel.insertBefore(opt, excludeOpt);
       });
     }
+    ['cgm-fullbody','cgm-top','cgm-bottom'].forEach(id=>{
+      const sel = document.getElementById(id);
+      if(sel) sel.addEventListener('change', updateOutfitColorLocks);
+    });
+    updateOutfitColorLocks();
+  }
+
+  /* Primary/Secondary Color only affect the full-body outfit / top / bottom
+     items, so they're locked (disabled + greyed out) whenever none of the
+     items they'd apply to are actually in use, and re-locked back to
+     "Don't include" so a stale color choice can't silently linger unused. */
+  function updateOutfitColorLocks(){
+    const fullBodySel = document.getElementById('cgm-fullbody');
+    const topSel = document.getElementById('cgm-top');
+    const bottomSel = document.getElementById('cgm-bottom');
+    const primarySel = document.getElementById('cgm-primarycolor');
+    const secondarySel = document.getElementById('cgm-secondarycolor');
+    if(!primarySel || !secondarySel) return;
+
+    const primaryUsable = (fullBodySel && fullBodySel.value !== 'exclude') || (topSel && topSel.value !== 'exclude');
+    primarySel.disabled = !primaryUsable;
+    if(!primaryUsable) primarySel.value = 'exclude';
+
+    const secondaryUsable = bottomSel && bottomSel.value !== 'exclude';
+    secondarySel.disabled = !secondaryUsable;
+    if(!secondaryUsable) secondarySel.value = 'exclude';
   }
 
   function populateManualSelect(id, values){
@@ -8787,6 +8819,7 @@ const CharGenApp = (function(){
         }
       });
     });
+    updateOutfitColorLocks();
   }
 
   function switchTab(i){
@@ -8913,11 +8946,11 @@ const CharGenApp = (function(){
 
     // ---------- Midjourney / DALL·E prompt ----------
     const subjectBits = [age, gender].filter(Boolean);
-    const subject = subjectBits.length ? `a ${subjectBits.join(' ')}` : 'a character';
+    const subject = subjectBits.length ? `a ${subjectBits.join(' ')}` : '';
     const introBits = [];
     if(race) introBits.push(`race: ${race}`);
     if(cls) introBits.push(`class: ${cls}${subclass ? ' (' + subclass + ')' : ''}`);
-    const intro = `full body character portrait of ${subject}` + (introBits.length ? ', ' + introBits.join(', ') : '');
+    const intro = [subject, ...introBits].filter(Boolean).join(', ');
 
     const parts = [
       intro,
@@ -8926,6 +8959,7 @@ const CharGenApp = (function(){
       facialHair,
       skin ? `${skin.toLowerCase()} skin` : '',
       build ? `${build} build` : '',
+      feature || '',
       outfitLineManual ? outfitLineManual.replace('accessorized with', 'wearing') : '',
       weapons.length ? `wielding ${weapons.join(', ')}` : ''
     ];
