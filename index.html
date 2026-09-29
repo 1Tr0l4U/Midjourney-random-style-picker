@@ -118,7 +118,7 @@ input.field95, textarea.field95, select.field95{
   color:#000;
   width:100%;
 }
-select.field95:disabled{
+input.field95:disabled, select.field95:disabled{
   background:#c0c0c0;
   color:#808080;
   cursor:not-allowed;
@@ -1351,12 +1351,24 @@ NOTES
           <option value="majority">Majority Cluster</option>
         </select>
         <div style="margin-top:8px">
-          <button class="btn95" id="pp-processBtn" onclick="PerfectPixelApp.process()" disabled="">Generate Scaled Image</button>
+          <label><input type="checkbox" id="pp-manualGridToggle" onchange="PerfectPixelApp.toggleManualGrid()"> Set grid manually (skip auto-detect)</label>
+          <div style="margin-top:4px;display:flex;align-items:center;gap:6px">
+            <input type="number" id="pp-gridCols" class="field95" min="1" step="1" placeholder="Width" style="width:80px" disabled="" oninput="PerfectPixelApp.gridInput('cols')">
+            <span>×</span>
+            <input type="number" id="pp-gridRows" class="field95" min="1" step="1" placeholder="Height" style="width:80px" disabled="" oninput="PerfectPixelApp.gridInput('rows')">
+          </div>
+          <div style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <label id="pp-lockRatioLabel"><input type="checkbox" id="pp-lockRatio" checked="" disabled="" onchange="PerfectPixelApp.lockChanged()"> Lock aspect ratio</label>
+          </div>
+          <div class="sref-small" id="pp-ratioInfo" style="margin-top:2px">Grid size in pixels of the final image (width × height).</div>
         </div>
-        <div class="sref-small" id="pp-status" style="margin-top:6px"></div>
       </div>
 
       <div class="sref-card">
+        <div style="margin-bottom:10px">
+          <button class="btn95" id="pp-processBtn" onclick="PerfectPixelApp.process()" disabled="" style="width:100%;font-weight:bold;padding:6px 8px">Make pixel perfect</button>
+          <div class="sref-small" id="pp-status" style="margin-top:6px"></div>
+        </div>
         <label><b>Perfect Pixel Result</b></label>
         <div class="pp-preview-box sunken" id="pp-outputPreview" style="margin-top:8px">
           <span class="pp-preview-placeholder">No output yet</span>
@@ -5073,6 +5085,8 @@ const PerfectPixelApp = (function(){
         document.getElementById('pp-downloadBtn').disabled = true;
         document.getElementById('pp-processBtn').disabled = false;
         refinedSize = null; outputCanvas = null;
+        updateRatioFromImage();
+        updateManualState();
         setStatus('Image loaded — ready to process.');
       };
       img.onerror = ()=> setStatus('Could not load that image.');
@@ -5117,7 +5131,14 @@ const PerfectPixelApp = (function(){
 
       const inputNd = createNdArray(data, [h,w,4]);
       const samplingMethod = document.getElementById('pp-samplingMethod').value;
-      const result = getPerfectPixel(inputNd, { sampleMethod: samplingMethod });
+      const opts = { sampleMethod: samplingMethod };
+      if(document.getElementById('pp-manualGridToggle').checked){
+        const cols = Math.round(+document.getElementById('pp-gridCols').value);
+        const rows = Math.round(+document.getElementById('pp-gridRows').value);
+        if(!(cols>0) || !(rows>0)) throw new Error('Enter a valid column and row count for the manual grid.');
+        opts.gridSize = [cols, rows];
+      }
+      const result = getPerfectPixel(inputNd, opts);
 
       if(result.refinedW===null || result.refinedH===null){
         throw new Error('Failed to refine grid. Try a different sampling method or image.');
@@ -5148,11 +5169,13 @@ const PerfectPixelApp = (function(){
 
       renderOutputPreview();
       document.getElementById('pp-downloadBtn').disabled = false;
-      setStatus(`Detected grid: ${refinedSize.w} × ${refinedSize.h}`);
+      setStatus(`${opts.gridSize ? 'Manual' : 'Detected'} grid: ${refinedSize.w} × ${refinedSize.h}`);
     } catch(err){
       document.getElementById('pp-outputPreview').innerHTML =
         `<span class="pp-preview-placeholder">${err.message || 'Something went wrong processing that image.'}</span>`;
-      setStatus('Detection failed — try the other sampling method.');
+      setStatus(document.getElementById('pp-manualGridToggle').checked
+        ? 'Failed — check your grid values.'
+        : 'Detection failed — try the other sampling method.');
     } finally {
       document.getElementById('pp-processBtn').disabled = false;
     }
@@ -5196,7 +5219,62 @@ const PerfectPixelApp = (function(){
     a.remove();
   }
 
-  return { process, download };
+  /* ---------- manual grid controls ---------- */
+  let gridRatio = null; // width / height of the input image
+
+  function updateManualState(){
+    const on = document.getElementById('pp-manualGridToggle').checked;
+    document.getElementById('pp-gridCols').disabled = !on;
+    document.getElementById('pp-gridRows').disabled = !on;
+    document.getElementById('pp-lockRatio').disabled = !on;
+    document.getElementById('pp-lockRatioLabel').style.opacity = on ? '1' : '0.5';
+    document.getElementById('pp-ratioInfo').style.opacity = on ? '1' : '0.5';
+  }
+
+  function toggleManualGrid(){ updateManualState(); }
+
+  function updateRatioFromImage(){
+    if(!inputImageEl) return;
+    gridRatio = inputImageEl.width / inputImageEl.height;
+    document.getElementById('pp-ratioInfo').textContent =
+      `Image aspect ratio: ${gridRatio.toFixed(3)} (${inputImageEl.width}×${inputImageEl.height})`;
+    if(document.getElementById('pp-lockRatio').checked) syncFrom('cols', true);
+  }
+
+  // Recompute the other field from the given one, using the locked ratio.
+  function syncFrom(source, fallbackToOther){
+    if(!gridRatio) return;
+    const colsEl = document.getElementById('pp-gridCols');
+    const rowsEl = document.getElementById('pp-gridRows');
+    const c = Math.round(+colsEl.value), r = Math.round(+rowsEl.value);
+    if(source==='cols'){
+      if(c>0) rowsEl.value = Math.max(1, Math.round(c/gridRatio));
+      else if(fallbackToOther && r>0) colsEl.value = Math.max(1, Math.round(r*gridRatio));
+    } else {
+      if(r>0) colsEl.value = Math.max(1, Math.round(r*gridRatio));
+      else if(fallbackToOther && c>0) rowsEl.value = Math.max(1, Math.round(c/gridRatio));
+    }
+  }
+
+  function gridInput(source){
+    if(!document.getElementById('pp-lockRatio').checked) return;
+    const el = document.getElementById(source==='cols' ? 'pp-gridCols' : 'pp-gridRows');
+    if(!(+el.value>0)){
+      // cleared/invalid: clear the partner too so they stay in step
+      document.getElementById(source==='cols' ? 'pp-gridRows' : 'pp-gridCols').value = '';
+      return;
+    }
+    syncFrom(source, false);
+  }
+
+  function lockChanged(){
+    if(document.getElementById('pp-lockRatio').checked){
+      if(!gridRatio) updateRatioFromImage();
+      else syncFrom('cols', true);
+    }
+  }
+
+  return { process, download, toggleManualGrid, gridInput, lockChanged };
 })();
 
 /* =====================================================
